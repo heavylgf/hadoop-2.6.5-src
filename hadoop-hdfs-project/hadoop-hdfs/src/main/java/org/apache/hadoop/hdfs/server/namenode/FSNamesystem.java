@@ -719,6 +719,9 @@ public class FSNamesystem implements Namesystem, FSClusterStats,
    * Instantiates an FSNamesystem loaded from the image and edits
    * directories specified in the passed Configuration.
    *
+   * 实例化一个FSNamesystem，这个数据是从磁盘上加载的image和edits文件
+   * 从哪个目录下去加载呢？通过我们在hdfs配置文件里配置的那个路径下的文件去加载，如果不配置的话，那就是用默认的路径
+   *
    * @param conf the Configuration which specifies the storage directories
    *             from which to load
    * @return an FSNamesystem which contains the loaded namespace
@@ -727,15 +730,28 @@ public class FSNamesystem implements Namesystem, FSClusterStats,
   static FSNamesystem loadFromDisk(Configuration conf) throws IOException {
 
     checkConfiguration(conf);
+
+    // 构造了一个FSImage，这个是一个关键的对象
+    // 他里面其实就是存放了磁盘上的fsimage文件里的数据，也就是代表了hdfs的元数据
     FSImage fsImage = new FSImage(conf,
+        // 人家都显示清楚了，是从哪个路径去加载fsimage文件，就是从namespace dirs
+        // 可以推测，如果你不做任何的配置的话，fsiamge文件默认是从目录：/tmp/hadoop-root/dfs/name，来加载
         FSNamesystem.getNamespaceDirs(conf),
+        // 从哪里来加载edits文件
+        // 默认的配置下，edits日志文件是跟fsimage文件是放在一起的，是否还记得我们而之前给大家演示过
+        // 在linux上查看了一下hadoop的fsimage文件和edits文件，他们是不是就是在一个目录中的
         FSNamesystem.getNamespaceEditsDirs(conf));
+    // 这行代码也很关键，实例化了一个FSNamesystem的对象
+    // 关键的点在于是将FSImage对象放在FSNamesystem里面的
     FSNamesystem namesystem = new FSNamesystem(conf, fsImage, false);
     StartupOption startOpt = NameNode.getStartupOption(conf);
     if (startOpt == StartupOption.RECOVER) {
       namesystem.setSafeMode(SafeModeAction.SAFEMODE_ENTER);
     }
 
+    // 这块其实就是说通过FSNamesystem.loadFSImage()方法，从磁盘上去加载fsimage和edits两个文件的数据
+    // 然后在内存中合并两个文件的数据
+    // 通过FSImage会持有一份在内存中的完整的元数据信息
     long loadStart = now();
     try {
       namesystem.loadFSImage(startOpt);
@@ -1004,8 +1020,23 @@ public class FSNamesystem implements Namesystem, FSClusterStats,
     return Collections.unmodifiableList(auditLoggers);
   }
 
+  /**
+   * 我们后面要重点剖析这块，但是不是现在，我们要什么时候来剖析这块内容呢？
+   * 先是讲解集群启动，namenode启动，datanode启动，互相之间注册以及集群信息的管理
+   * 假设是一个空的集群刚启动，刚开始这个fsimage、edits都是空的
+   * 这块代码，我们在这里来留一个伏笔，现在不用来仔细的看，后面我们专门讲解namenode元数据管理的
+   * 以创建目录来举例，创建一个目录，在内存中如何维护元数据，在磁盘的edits log文件中如何写如数据，接下来
+   * 才是说namenode如果重启的话，是如何从磁盘上加载fsimage和edits log进行和合并以及写新的fsimage，清空editslog
+   * @param startOpt
+   * @throws IOException
+   */
   private void loadFSImage(StartupOption startOpt) throws IOException {
     final FSImage fsImage = getFSImage();
+
+    // 之前给大家提过，在namenode刚启动的时候，其实是从磁盘上读取fsimage和edits两个文件
+    // 在内存中合并为一份完整的元数据
+    // 接着将内存中的元数据会写一份到磁盘上去替换原来旧的fsimage文件
+    // 写完了一份新的fsimage之后，就会重新打开一个新的、空的edits文件来写入就可以了
 
     // format before starting up if requested
     if (startOpt == StartupOption.FORMAT) {
@@ -1102,14 +1133,32 @@ public class FSNamesystem implements Namesystem, FSClusterStats,
     writeLock();
     this.haContext = haContext;
     try {
+      // 这个其实就是我们这一讲的主题
+      // 创建了一个NameNodeResourceChecker对象，顾名思义
+      // 一看就是用来检查namenode所在linux上的磁盘空间是否还足够的
       nnResourceChecker = new NameNodeResourceChecker(conf);
+      // 检查可用的资源是否充足
+      // 这个到并不是说是，如果检查失败就不让启动namenode了，但是起码会打印出来一个warning警告
+      // 但是可以看到的是，如果检查失败了，会设置是否有足够的资源为false
       checkAvailableResources();
+
+      // safemode，安全模式
+      // 下一讲要讲解的东西，就会尝试判断是否要进入安全模式
       assert safeMode != null && !isPopulatingReplQueues();
       StartupProgress prog = NameNode.getStartupProgress();
+
+      // 目前的namenode启动，已经进入了safemode phase
+      // 处于一个等待汇报blocks的step
       prog.beginPhase(Phase.SAFEMODE);
       prog.setTotal(Phase.SAFEMODE, STEP_AWAITING_REPORTED_BLOCKS,
         getCompleteBlocksTotal());
+
+      // 判断是否要进入safemode模式
+      // 以及如果进入了safemode模式之后会干什么事情
+      // 入口方法都在setBlockTotal()方法
       setBlockTotal();
+
+      // 最后一块其实就是在启动BlockManager里面的一堆后台线程
       blockManager.activate(conf);
     } finally {
       writeUnlock();
@@ -5084,6 +5133,8 @@ public class FSNamesystem implements Namesystem, FSClusterStats,
       //get datanode commands
       final int maxTransfer = blockManager.getMaxReplicationStreams()
           - xmitsInProgress;
+      // DatanodeManager顾名思义，本来就是负责管理datanode的
+      // 人家现在datanode发送了心跳过来，肯定是DatanodeManager来进行处理的
       DatanodeCommand[] cmds = blockManager.getDatanodeManager().handleHeartbeat(
           nodeReg, reports, blockPoolId, cacheCapacity, cacheUsed,
           xceiverCount, maxTransfer, failedVolumes);
@@ -5112,9 +5163,10 @@ public class FSNamesystem implements Namesystem, FSClusterStats,
   /**
    * Perform resource checks and cache the results.
    */
-  void checkAvailableResources() {
+  void checkAvailableResources() {   // 检查可用资源
     Preconditions.checkState(nnResourceChecker != null,
         "nnResourceChecker not initialized");
+    // 使用NameNodeResourceChecker检查是否有充足的可用的磁盘空间
     hasResourcesAvailable = nnResourceChecker.hasAvailableDiskSpace();
   }
 
@@ -5852,8 +5904,19 @@ public class FSNamesystem implements Namesystem, FSClusterStats,
      * if DFS is empty or {@link #threshold} == 0
      */
     private boolean needEnter() {
+      // 这段逻辑就是在检查到底是否要进入safe mode，安全模式
+      // threshold = 0.999
+      // blockSafe = 0
+      // blockThreshold = 999
+
+      // 如果要进入安全模式，还有一个条件，当前存活的datanode数量
+      // 当前副本数量达到最小要求（1个）的block的数量，如果小于了blockThreshold指定的数量
+      // 当前副本数量>1的block有500个，boockThreshold = 999，此时会进入安全模式
+
+      // 他是怎么感知到blockSafe的数量的呢？什么情况下blockSafe的数量会增加呢？不会是0呢？
       return (threshold != 0 && blockSafe < blockThreshold) ||
         (datanodeThreshold != 0 && getNumLiveDataNodes() < datanodeThreshold) ||
+              // 或者是之前检查磁盘资源是否充足的时候，发现edits目录的磁盘空间不足100m，此时也会进入安全模式
         (!nameNodeHasResourcesAvailable());
     }
       
@@ -5869,6 +5932,7 @@ public class FSNamesystem implements Namesystem, FSClusterStats,
       }
       // if smmthread is already running, the block threshold must have been 
       // reached before, there is no need to enter the safe mode again
+      // 其实在这个needEnter()方法中就是在检查是否要进入安全模式
       if (smmthread == null && needEnter()) {
         enter();
         // check if we are ready to initialize replication queues
@@ -5908,7 +5972,11 @@ public class FSNamesystem implements Namesystem, FSClusterStats,
      */
     private synchronized void setBlockTotal(int total) {
       this.blockTotal = total;
+      // 在这里其实就可以看到他的threshold的意思就是99.9%的block必须满足副本数量>1的要求
+      // 比如说此时hdfs集群中一共是1000个block，此时就要求其中999个block都必须有超过1个副本
+      // blockThreshold = 999
       this.blockThreshold = (int) (blockTotal * threshold);
+      // replQueueThreshold，也是99.9%，blockReplQueueThreshold也是999
       this.blockReplQueueThreshold = 
         (int) (blockTotal * replQueueThreshold);
       if (haEnabled) {
@@ -5919,13 +5987,22 @@ public class FSNamesystem implements Namesystem, FSClusterStats,
       }
       if(blockSafe < 0)
         this.blockSafe = 0;
+      // 进入checkMode的状态，检查是否要进入safemode状态
       checkMode();
     }
       
     /**
      * Increment number of safe blocks if current block has 
      * reached minimal replication.
-     * @param replication current replication 
+     * @param replication current replication
+     *
+     * datanode一旦启动之后，一定会给namenode汇报自己的block的情况
+     * namenode接收到block的情况之后，一定会调用FSNamesystem的incrementSafeBlockCount()方法
+     * 传递进来当前这个block的副本数量
+     * 如果block的副本数量正好是等于safeReplication的数量（默认是1）
+     *
+     * 每次这个方法更新之后，都会去执行一下checkMode这个方法，检查一下当前是否可以退出安全模式
+     *
      */
     private synchronized void incrementSafeBlockCount(short replication) {
       if (replication == safeReplication) {
@@ -6264,6 +6341,8 @@ public class FSNamesystem implements Namesystem, FSClusterStats,
     SafeModeInfo safeMode = this.safeMode;
     if (safeMode == null)
       return;
+    // 一块是getCompleteBlocksTotal()
+    // 另外一块SafeMode.setBlockTotal()
     safeMode.setBlockTotal((int)getCompleteBlocksTotal());
   }
 
@@ -6279,13 +6358,27 @@ public class FSNamesystem implements Namesystem, FSClusterStats,
   /**
    * Get the total number of COMPLETE blocks in the system.
    * For safe mode only complete blocks are counted.
+   *
+   * COMPLETE blocks，就是说当前处于complete状态的block
+   * 有可能一个block的信息比如说datanode还没上报上来，或者是别的什么原因，正在构造block的对象
+   *
    */
   private long getCompleteBlocksTotal() {
     // Calculate number of blocks under construction
+    // 如果获取到complete block的数量
     long numUCBlocks = 0;
     readLock();
+    // 调用LeaseManager的getNumUnderConstructionBlocks()
+    // 这个方法的意思，其实是返回的是处于under construction状态的block的数量
+    // 可能是block还没收到汇报的信息，或者是block的对象可能正在构造中
+
+    // LeaseManager，后面我会给大家去讲解，但是这里的话我们先简单看一下就好了
     numUCBlocks = leaseManager.getNumUnderConstructionBlocks();
     try {
+      // 又会去获取一个getBlocksTotal()总的block的数量，减去uncomplete block的数量
+      // 最后就会得到一个complete block的数量
+      // 使用block的总数量 - 处于under construction状态的block的数量，就是所有的当前处于complete状态的block
+      // 处于complete状态的block，就是当前可以统计的block
       return getBlocksTotal() - numUCBlocks;
     } finally {
       readUnlock();
