@@ -215,11 +215,23 @@ import com.google.protobuf.BlockingService;
  * regularly with a single NameNode.  It also communicates
  * with client code and other DataNodes from time to time.
  *
+ * DataNode是专门负责存储block的，一个hdfs集群中可以有一个或者多个datanode都可以
+ * 每个datanode都会定时的去跟namenode进行通信（定时发送心跳，汇报自己的block的情况，通知namenode自己是存活的）
+ * datanode有时候也会直接跟client以及其他的datanode进行通信
+ * client如果要上传文件或者是下载文件，都是直接跟datanode通信上传block或者是下载block的
+ * 上传文件的时候，要有多个副本，此时是client上传一个副本给datanode，datanode负责复制给其他的datanode
+ *
  * DataNodes store a series of named blocks.  The DataNode
  * allows client code to read these blocks, or to write new
  * block data.  The DataNode may also, in response to instructions
  * from its NameNode, delete blocks or copy blocks to/from other
  * DataNodes.
+ *
+ * datanode存储的是一系列的有自己的名字的block，datanode允许client来读取这些block的数据
+ * 或者是写入新的block的数据，datanode也可能会响应namenode发送过来的一些指令
+ * 比如说集群中某个datanode突然宕机了，会导致namenode感知到一些block的副本数量不足3了
+ * 此时namenode可能就会对某些datanode下达一个指令，你可以复制一个block的副本给其他的datanode
+ * 也可能是namenode发现集群中某个block的副本有4个，多了一个副本，此时会下达指令让某个datanode删除一个block副本
  *
  * The DataNode maintains just one critical table:
  *   block-> stream of bytes (of BLOCK_SIZE or less)
@@ -228,15 +240,43 @@ import com.google.protobuf.BlockingService;
  * reports the table's contents to the NameNode upon startup
  * and every so often afterwards.
  *
+ * datanode仅仅会在维护一份关键的数据，block -> stream of bytes的映射
+ * 这份数据会存储在本地的磁盘文件里，datanode会在自己启动的时候给namenode汇报一次这份数据
+ * 同时后面在运行的过程中会不断的给namenode汇报
+ *
  * DataNodes spend their lives in an endless loop of asking
  * the NameNode for something to do.  A NameNode cannot connect
  * to a DataNode directly; a NameNode simply returns values from
  * functions invoked by a DataNode.
  *
- * DataNodes maintain an open server socket so that client code 
+ * datanode会无限循环去询问namenode自己是不是有什么事情可以干
+ * namenode是没法直接跟datanode进行连接的，意思是说，namenode是不会直接主动给datanode发送指令
+ * 必须是随着datanode不断的给namenode发送心跳吗？每次datanode询问namenode自己是否有什么事儿可以干的时候
+ * namenode才会给datanode在这次心跳里返回一个指令，让datanode去执行
+ *
+ * DataNodes maintain an open server socket so that client code
  * or other DataNodes can read/write data.  The host/port for
  * this server is reported to the NameNode, which then sends that
  * information to clients or other DataNodes that might be interested.
+ *
+ * datanode维护一个开放的server socket，监听一个端口，client或者其他的datanode可以直接
+ * 跟这个端口进行通信，来读写datanode上存储的block数据。这个监听的端口以及hostname会汇报给namenode
+ * namenode可以感知到集群中所有的datanode的host和port，通信地址
+ * 然后的话呢，比如说，client和其他的datanode如果说要跟某个datanode进行通信，会找namenode
+ * namenode会把那个datanode的host和port发送给client和其他datanode，让他们可以直接跟那个datanode进行通信
+ *
+ * 从上面这段注释里可以提取出来的关键信息点：
+ *
+ * 1、datanode在磁盘上维护了一份block列表，会定期汇报给namenode
+ * 2、namenode不会主动调用datanode的接口的
+ * 	datanode每隔一段时间发送心跳，询问namenode是否有任务
+ *  namenode返回一个指令，告诉datanode要去做什么事情，比如删除或者复制block副本
+ * 3、如果client或者其他datanode要跟某个datanode进行通信，不是直接就可以进行通信的
+ * 	datanode需要将自己监听的端口号和机器地址发给namenode
+ * 	如果某个client或者某个datanode要去跟那个datanode进行通信的话，会找namenode询问他的地址
+ *  namenode会将这个datanode的host和port发送给client或者datanode
+ *
+ * 先了解一下datanode源码层面透露出来的一些信息
  *
  **********************************************************/
 @InterfaceAudience.Private
@@ -415,6 +455,9 @@ public class DataNode extends ReconfigurableBase
     try {
       hostName = getHostName(conf);
       LOG.info("Configured hostname is " + hostName);
+
+      // 实例化datanode的一个入口
+      // 初始化了datanode所有的关键性的组件
       startDataNode(conf, dataDirs, resources);
     } catch (IOException ie) {
       shutdown();
@@ -2263,8 +2306,11 @@ public class DataNode extends ReconfigurableBase
   @InterfaceAudience.Private
   public static DataNode createDataNode(String args[], Configuration conf,
       SecureResources resources) throws IOException {
+    // 第一块是实例化一个DataNode实例，同时会进行一些组件的初始化
     DataNode dn = instantiateDataNode(args, conf, resources);
     if (dn != null) {
+      // 第二块其实就是启动datanode他的一些server，http server，rpc server，stream server
+      // 同时启动一些后台线程
       dn.runDatanodeDaemon();
     }
     return dn;
@@ -2329,6 +2375,8 @@ public class DataNode extends ReconfigurableBase
     DefaultMetricsSystem.initialize("DataNode");
 
     assert locations.size() > 0 : "number of data directories should be > 0";
+
+    // 直接就是创建和实例化了一个DataNode
     return new DataNode(conf, locations, resources);
   }
 
@@ -2439,8 +2487,10 @@ public class DataNode extends ReconfigurableBase
     int errorCode = 0;
     try {
       StringUtils.startupShutdownMessage(DataNode.class, args, LOG);
+      // 这个整体的代码结构，跟namenode启动是很相似的，都是创建datanode实例
       DataNode datanode = createDataNode(args, null, resources);
       if (datanode != null) {
+        // 调用datanode.join()方法，让datanode无限循环，等待别人来调用他的接口
         datanode.join();
       } else {
         errorCode = 1;
