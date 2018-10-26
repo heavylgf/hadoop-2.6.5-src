@@ -680,6 +680,8 @@ public class DataNode extends ReconfigurableBase
    * Http Policy is decided.
    */
   private void startInfoServer(Configuration conf) throws IOException {
+    // 直接用的就是hadoop-common中提供的HttpServer2的组件
+    // 你可以给他一个监听的端口号，人家HttpServer2会监听那个端口号上发过来的http请求
     HttpServer2.Builder builder = new HttpServer2.Builder().setName("datanode")
         .setConf(conf).setACL(new AccessControlList(conf.get(DFS_ADMIN, " ")));
 
@@ -718,6 +720,8 @@ public class DataNode extends ReconfigurableBase
 
     this.infoServer = builder.build();
 
+    // 在这里一定会给这个HttpServer2加一些url和servlet的映射
+    // 过来哪些请求url，是转发给哪个servlet来进行处理的，在这里要做好配置和映射
     this.infoServer.addInternalServlet(null, "/streamFile/*", StreamFile.class);
     this.infoServer.addInternalServlet(null, "/getFileChecksum/*",
         FileChecksumServlets.GetServlet.class);
@@ -764,6 +768,10 @@ public class DataNode extends ReconfigurableBase
     // Add all the RPC protocols that the Datanode implements    
     RPC.setProtocolEngine(conf, ClientDatanodeProtocolPB.class,
         ProtobufRpcEngine.class);
+
+    // 这个是什么呀？
+    // 定义好了这个rpc server可以提供和处理的rpc接口
+    // 他这个rpc接口，主要是用来提供的是client和datanode之间进行管理（关闭datanode，汇报block）的接口
     ClientDatanodeProtocolServerSideTranslatorPB clientDatanodeProtocolXlator = 
           new ClientDatanodeProtocolServerSideTranslatorPB(this);
     BlockingService service = ClientDatanodeProtocolService
@@ -777,7 +785,8 @@ public class DataNode extends ReconfigurableBase
             conf.getInt(DFS_DATANODE_HANDLER_COUNT_KEY,
                 DFS_DATANODE_HANDLER_COUNT_DEFAULT)).setVerbose(false)
         .setSecretManager(blockPoolTokenSecretManager).build();
-    
+
+    // 看起来是提供的datanode和datanode之间的rpc接口
     InterDatanodeProtocolServerSideTranslatorPB interDatanodeProtocolXlator = 
         new InterDatanodeProtocolServerSideTranslatorPB(this);
     service = InterDatanodeProtocolService
@@ -785,6 +794,7 @@ public class DataNode extends ReconfigurableBase
     DFSUtil.addPBProtocol(conf, InterDatanodeProtocolPB.class, service,
         ipcServer);
 
+    // 也是一些管理型的rpc接口
     TraceAdminProtocolServerSideTranslatorPB traceAdminXlator =
         new TraceAdminProtocolServerSideTranslatorPB(this);
     BlockingService traceAdminService = TraceAdminService
@@ -908,6 +918,8 @@ public class DataNode extends ReconfigurableBase
   
   private void initDataXceiver(Configuration conf) throws IOException {
     // find free port or use privileged port provided
+
+    // 初始化了一个TcpPeerServer，这个东西一看就是接收tcp连接和请求的一个server
     TcpPeerServer tcpPeerServer;
     if (secureResources != null) {
       tcpPeerServer = new TcpPeerServer(secureResources);
@@ -922,6 +934,11 @@ public class DataNode extends ReconfigurableBase
     streamingAddr = tcpPeerServer.getStreamingAddr();
     LOG.info("Opened streaming server at " + streamingAddr);
     this.threadGroup = new ThreadGroup("dataXceiverServer");
+
+    // 这里实例化了一个DataXceiverServer组件
+    // 直接告诉大家这个是个什么东西？这个东西是datanode上面专门在后面负责为client和datanode接收读写block的请求的
+    // Xceiver，数据流的意思
+    // 他的这个server是以数据流的方式，为client读写block提供数据流的上传，数据流的下载
     xserver = new DataXceiverServer(tcpPeerServer, conf, this);
     this.dataXceiverServer = new Daemon(threadGroup, xserver);
     this.threadGroup.setDaemon(true); // auto destroy when empty
@@ -1124,11 +1141,14 @@ public class DataNode extends ReconfigurableBase
     LOG.info("Starting DataNode with maxLockedMemory = " +
         dnConf.maxLockedMemory);
 
+    // 先来猜测一下，DataStorage应该是负责管理datanode上的block数据的
     storage = new DataStorage();
     
     // global DN settings
     registerMXBean();
+    // 初始化了一个DataXceiverServer组件，后续会为client提供数据流方式的block读写
     initDataXceiver(conf);
+    // 启动info server，是一个http server，本质跟namenode上面的那个http server是一样的
     startInfoServer(conf);
     pauseMonitor = new JvmPauseMonitor(conf);
     pauseMonitor.start();
@@ -1140,12 +1160,16 @@ public class DataNode extends ReconfigurableBase
     dnUserName = UserGroupInformation.getCurrentUser().getShortUserName();
     LOG.info("dnUserName = " + dnUserName);
     LOG.info("supergroup = " + supergroup);
+
+    // 这里有一个比较关键的东西，就是rpc server
     initIpcServer(conf);
 
     metrics = DataNodeMetrics.create(conf, getDisplayName());
     metrics.getJvmMetrics().setPauseMonitor(pauseMonitor);
-    
+
+    // 比较关键的组件，BlockPoolManager，是负责管理block，blockPool的概念
     blockPoolManager = new BlockPoolManager(this);
+    // BlockPoolManager在初始化的时候，通过refreshNamenodes()方法做了一些初始化的事情的
     blockPoolManager.refreshNamenodes(conf);
 
     // Create the ReadaheadPool from the DataNode context so we can
