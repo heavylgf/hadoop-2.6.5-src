@@ -2232,10 +2232,12 @@ public class DataNode extends ReconfigurableBase
     blockPoolManager.startAll();
 
     // start dataXceiveServer
+    // 启动了DataXceiverServer，监听一个端口号，后面可以提供block数据流的读写
     dataXceiverServer.start();
     if (localDataXceiverServer != null) {
       localDataXceiverServer.start();
     }
+    // 启动了一个rpc server，监听一个端口号，后续可以接收别人的rpc请求的调用
     ipcServer.start();
     startPlugins(conf);
   }

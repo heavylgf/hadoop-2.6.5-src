@@ -122,6 +122,10 @@ class BPOfferService {
     this.dn = dn;
 
     for (InetSocketAddress addr : nnAddrs) {
+      // BPServiceActor是用来干嘛的呢？
+      // 如果你的datanode要反过来向namenode发送一些请求的话
+      // 比如说：注册、心跳、汇报block，以及其他的一些东西，都是在BPServiceAactor里面去发送的
+      // 一个BPServiceActor就是一个线程
       this.bpServices.add(new BPServiceActor(addr, this));
     }
   }
@@ -303,6 +307,8 @@ class BPOfferService {
   void verifyAndSetNamespaceInfo(NamespaceInfo nsInfo) throws IOException {
     writeLock();
     try {
+      // 判断一下，如果bpNSInfo是null的话，代表的就是第一个namenode返回了一个NamespaceInfo
+      // 在这里就会去初始化DataStorage，开辟对应的存储空间
       if (this.bpNSInfo == null) {
         this.bpNSInfo = nsInfo;
         boolean success = false;
@@ -310,6 +316,9 @@ class BPOfferService {
         // Now that we know the namespace ID, etc, we can pass this to the DN.
         // The DN can now initialize its local storage if we are the
         // first BP to handshake, etc.
+
+        // 现在我们已经知道了namespace ID，此时就可以调用datanode的initBlockPool()方法
+        // 来完成local storage，也就是datanode本地的存储的初始化
         try {
           dn.initBlockPool(this);
           success = true;
@@ -322,6 +331,9 @@ class BPOfferService {
           }
         }
       } else {
+        // 反之，如果是else的话，说明本次是第二个namenode返回了一个NamespaceInfo
+        // 将两个NamespaceInfo进行校验，看看一些信息是否匹配的工作就是在这个代码分支里完成的
+        // 比较了一下两个namenode返回的blockPoolId、namespaceId、clusterId，是否全部一致
         checkNSEquality(bpNSInfo.getBlockPoolID(), nsInfo.getBlockPoolID(),
             "Blockpool ID");
         checkNSEquality(bpNSInfo.getNamespaceID(), nsInfo.getNamespaceID(),
