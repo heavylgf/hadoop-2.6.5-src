@@ -97,5 +97,5 @@
   <classpathentry kind="src" path="/hadoop-yarn-server-tests"/>
   <classpathentry kind="src" path="/hadoop-yarn-server-resourcemanager"/>
   <classpathentry kind="src" path="/hadoop-yarn-server-applicationhistoryservice"/>
-  <classpathentry kind="var" path="M2_REPO/cglib/cglib/2.2/cglib-2.2.jar"/>
+  <classpathentry kind="var" path="M2_REPO/cglib/cglib/2.2/cglib-2.2.jar" sourcepath="M2_REPO/cglib/cglib/2.2/cglib-2.2-sources.jar"/>
 </classpath>

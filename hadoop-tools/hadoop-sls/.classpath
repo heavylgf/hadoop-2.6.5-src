@@ -100,5 +100,5 @@
   <classpathentry kind="src" path="/hadoop-yarn-server-web-proxy"/>
   <classpathentry kind="src" path="/hadoop-mapreduce-client-hs"/>
   <classpathentry kind="src" path="/hadoop-rumen"/>
-  <classpathentry kind="var" path="M2_REPO/com/codahale/metrics/metrics-core/3.0.1/metrics-core-3.0.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/codahale/metrics/metrics-core/3.0.1/metrics-core-3.0.1.jar" sourcepath="M2_REPO/com/codahale/metrics/metrics-core/3.0.1/metrics-core-3.0.1-sources.jar"/>
 </classpath>
