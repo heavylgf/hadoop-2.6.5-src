@@ -2,112 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d2cec9df-38d7-4658-8af9-416594532bd5" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-maven-plugins/target/hadoop-maven-plugins-2.6.5.jar" afterPath="$PROJECT_DIR$/hadoop-maven-plugins/target/hadoop-maven-plugins-2.6.5.jar" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-assemblies/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-assemblies/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-client/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-client/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-common-project/hadoop-annotations/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-common-project/hadoop-annotations/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-common-project/hadoop-auth-examples/.classpath" afterPath="$PROJECT_DIR$/hadoop-common-project/hadoop-auth-examples/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-common-project/hadoop-auth-examples/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-common-project/hadoop-auth-examples/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-common-project/hadoop-auth/.classpath" afterPath="$PROJECT_DIR$/hadoop-common-project/hadoop-auth/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-common-project/hadoop-auth/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-common-project/hadoop-auth/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-common-project/hadoop-common/.classpath" afterPath="$PROJECT_DIR$/hadoop-common-project/hadoop-common/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-common-project/hadoop-common/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-common-project/hadoop-common/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-common-project/hadoop-kms/.classpath" afterPath="$PROJECT_DIR$/hadoop-common-project/hadoop-kms/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-common-project/hadoop-kms/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-common-project/hadoop-kms/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-common-project/hadoop-minikdc/.classpath" afterPath="$PROJECT_DIR$/hadoop-common-project/hadoop-minikdc/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-common-project/hadoop-minikdc/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-common-project/hadoop-minikdc/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-common-project/hadoop-nfs/.classpath" afterPath="$PROJECT_DIR$/hadoop-common-project/hadoop-nfs/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-common-project/hadoop-nfs/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-common-project/hadoop-nfs/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-common-project/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-common-project/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-dist/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-dist/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs-httpfs/.classpath" afterPath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs-httpfs/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs-httpfs/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs-httpfs/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs-nfs/.classpath" afterPath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs-nfs/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs-nfs/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs-nfs/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/.classpath" afterPath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/contrib/bkjournal/.classpath" afterPath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/contrib/bkjournal/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/contrib/bkjournal/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/contrib/bkjournal/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/target/generated-sources/java/org/apache/hadoop/hdfs/protocol/proto/ClientNamenodeProtocolProtos.java" afterPath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/target/generated-sources/java/org/apache/hadoop/hdfs/protocol/proto/ClientNamenodeProtocolProtos.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-hdfs-project/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-hdfs-project/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-app/.classpath" afterPath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-app/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-app/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-app/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-common/.classpath" afterPath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-common/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-common/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-common/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-core/.classpath" afterPath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-core/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-core/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-core/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-hs-plugins/.classpath" afterPath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-hs-plugins/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-hs-plugins/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-hs-plugins/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-hs/.classpath" afterPath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-hs/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-hs/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-hs/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-jobclient/.classpath" afterPath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-jobclient/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-jobclient/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-jobclient/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-shuffle/.classpath" afterPath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-shuffle/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-shuffle/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-shuffle/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-examples/.classpath" afterPath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-examples/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-examples/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-examples/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-mapreduce-project/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-mapreduce-project/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-maven-plugins/.classpath" afterPath="$PROJECT_DIR$/hadoop-maven-plugins/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-maven-plugins/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-maven-plugins/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-maven-plugins/target/classes/META-INF/maven/org.apache.hadoop/hadoop-maven-plugins/plugin-help.xml" afterPath="$PROJECT_DIR$/hadoop-maven-plugins/target/classes/META-INF/maven/org.apache.hadoop/hadoop-maven-plugins/plugin-help.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-maven-plugins/target/classes/META-INF/maven/plugin.xml" afterPath="$PROJECT_DIR$/hadoop-maven-plugins/target/classes/META-INF/maven/plugin.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-minicluster/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-minicluster/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-project-dist/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-project-dist/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-project/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-project/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-tools/hadoop-ant/.classpath" afterPath="$PROJECT_DIR$/hadoop-tools/hadoop-ant/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-tools/hadoop-ant/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-tools/hadoop-ant/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-tools/hadoop-archives/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-tools/hadoop-archives/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-tools/hadoop-aws/.classpath" afterPath="$PROJECT_DIR$/hadoop-tools/hadoop-aws/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-tools/hadoop-aws/hadoop-aws.iml" afterPath="$PROJECT_DIR$/hadoop-tools/hadoop-aws/hadoop-aws.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-tools/hadoop-aws/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-tools/hadoop-aws/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-tools/hadoop-datajoin/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-tools/hadoop-datajoin/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-tools/hadoop-distcp/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-tools/hadoop-distcp/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-tools/hadoop-extras/.classpath" afterPath="$PROJECT_DIR$/hadoop-tools/hadoop-extras/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-tools/hadoop-extras/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-tools/hadoop-extras/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-tools/hadoop-gridmix/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-tools/hadoop-gridmix/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-tools/hadoop-openstack/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-tools/hadoop-openstack/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-tools/hadoop-pipes/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-tools/hadoop-pipes/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-tools/hadoop-rumen/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-tools/hadoop-rumen/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-tools/hadoop-sls/.classpath" afterPath="$PROJECT_DIR$/hadoop-tools/hadoop-sls/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-tools/hadoop-sls/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-tools/hadoop-sls/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-tools/hadoop-streaming/.classpath" afterPath="$PROJECT_DIR$/hadoop-tools/hadoop-streaming/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-tools/hadoop-streaming/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-tools/hadoop-streaming/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-tools/hadoop-tools-dist/.classpath" afterPath="$PROJECT_DIR$/hadoop-tools/hadoop-tools-dist/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-tools/hadoop-tools-dist/hadoop-tools-dist.iml" afterPath="$PROJECT_DIR$/hadoop-tools/hadoop-tools-dist/hadoop-tools-dist.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-tools/hadoop-tools-dist/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-tools/hadoop-tools-dist/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-tools/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-tools/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-api/.classpath" afterPath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-api/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-api/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-api/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-applications-distributedshell/.classpath" afterPath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-applications-distributedshell/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-applications-distributedshell/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-applications-distributedshell/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-applications-unmanaged-am-launcher/.classpath" afterPath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-applications-unmanaged-am-launcher/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-applications-unmanaged-am-launcher/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-applications-unmanaged-am-launcher/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/.classpath" afterPath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-common/.classpath" afterPath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-common/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-common/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-common/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-registry/.classpath" afterPath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-registry/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-registry/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-registry/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-applicationhistoryservice/.classpath" afterPath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-applicationhistoryservice/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-applicationhistoryservice/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-applicationhistoryservice/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-common/.classpath" afterPath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-common/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-common/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-common/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-nodemanager/.classpath" afterPath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-nodemanager/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-nodemanager/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-nodemanager/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-resourcemanager/.classpath" afterPath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-resourcemanager/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-resourcemanager/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-resourcemanager/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-tests/.classpath" afterPath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-tests/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-tests/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-tests/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-web-proxy/.classpath" afterPath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-web-proxy/.classpath" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-web-proxy/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-web-proxy/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-site/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-site/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/target/antrun/build-main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-yarn-project/target/antrun/build-main.xml" afterPath="$PROJECT_DIR$/hadoop-yarn-project/target/antrun/build-main.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__joda_time_joda_time_2_10.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__joda_time_joda_time_2_10_1.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNode.java" afterPath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNode.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNodeHttpServer.java" afterPath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNodeHttpServer.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNodeRpcServer.java" afterPath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNodeRpcServer.java" />
     </list>
     <ignored path="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/target/" />
     <ignored path="$PROJECT_DIR$/hadoop-project-dist/target/" />
@@ -182,12 +80,103 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="pom.xml" pinned="false" current-in-tab="true">
+      <file leaf-file-name="pom.xml" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pom.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="192">
-              <caret line="436" column="18" lean-forward="true" selection-start-line="436" selection-start-column="18" selection-end-line="436" selection-end-column="18" />
+            <state relative-caret-position="1167">
+              <caret line="427" column="25" lean-forward="true" selection-start-line="427" selection-start-column="25" selection-end-line="427" selection-end-column="25" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DFSClient.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/DFSClient.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="400">
+              <caret line="237" column="26" lean-forward="true" selection-start-line="237" selection-start-column="26" selection-end-line="237" selection-end-column="26" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="NameNode.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNode.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="393">
+              <caret line="1816" column="27" lean-forward="true" selection-start-line="1816" selection-start-column="27" selection-end-line="1816" selection-end-column="27" />
+              <folding>
+                <element signature="e#21642#21643#0" expanded="true" />
+                <element signature="e#21675#21676#0" expanded="true" />
+                <element signature="e#26628#26831#0" expanded="true" />
+                <element signature="e#26830#26831#0" expanded="true" />
+                <element signature="e#30365#30366#0" expanded="true" />
+                <element signature="e#30405#30406#0" expanded="true" />
+                <element signature="e#31502#31503#0" expanded="true" />
+                <element signature="e#31532#31533#0" expanded="true" />
+                <element signature="e#31623#31624#0" expanded="true" />
+                <element signature="e#31665#31666#0" expanded="true" />
+                <element signature="e#31740#31741#0" expanded="true" />
+                <element signature="e#31780#31781#0" expanded="true" />
+                <element signature="e#31877#31878#0" expanded="true" />
+                <element signature="e#31919#31920#0" expanded="true" />
+                <element signature="e#32046#32047#0" expanded="true" />
+                <element signature="e#32116#32117#0" expanded="true" />
+                <element signature="e#32631#32632#0" expanded="true" />
+                <element signature="e#32675#32676#0" expanded="true" />
+                <element signature="e#32873#32874#0" expanded="true" />
+                <element signature="e#32918#32919#0" expanded="true" />
+                <element signature="e#43639#43640#0" expanded="true" />
+                <element signature="e#43674#43675#0" expanded="true" />
+                <element signature="e#57403#57404#0" expanded="true" />
+                <element signature="e#57458#57459#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="NameCache.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameCache.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="682">
+              <caret line="165" column="0" lean-forward="true" selection-start-line="165" selection-start-column="0" selection-end-line="165" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="NameNodeHttpServer.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNodeHttpServer.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="782">
+              <caret line="319" column="0" lean-forward="false" selection-start-line="319" selection-start-column="0" selection-end-line="319" selection-end-column="0" />
+              <folding>
+                <element signature="e#7110#7126#0" expanded="true" />
+                <element signature="e#8922#8923#0" expanded="true" />
+                <element signature="e#8950#8951#0" expanded="true" />
+                <element signature="e#8991#8992#0" expanded="true" />
+                <element signature="e#9020#9021#0" expanded="true" />
+                <element signature="e#9149#9150#0" expanded="true" />
+                <element signature="e#9214#9215#0" expanded="true" />
+                <element signature="e#9689#9690#0" expanded="true" />
+                <element signature="e#9760#9761#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="NameNodeRpcServer.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNodeRpcServer.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="782">
+              <caret line="1813" column="0" lean-forward="true" selection-start-line="1813" selection-start-column="0" selection-end-line="1813" selection-end-column="0" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#23038#23039#0" expanded="true" />
+                <element signature="e#23076#23077#0" expanded="true" />
+                <element signature="e#23201#23202#0" expanded="true" />
+                <element signature="e#23240#23241#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -252,9 +241,11 @@
         <option value="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/DataNode.java" />
         <option value="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/BPOfferService.java" />
         <option value="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/BPServiceActor.java" />
-        <option value="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNodeRpcServer.java" />
         <option value="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/target/generated-sources/java/org/apache/hadoop/hdfs/protocol/proto/ClientNamenodeProtocolProtosa.java" />
         <option value="$USER_HOME$/.IdeaIC2017.1/idea.properties" />
+        <option value="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNode.java" />
+        <option value="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNodeHttpServer.java" />
+        <option value="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNodeRpcServer.java" />
       </list>
     </option>
   </component>
@@ -338,9 +329,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
       <pane id="Scope" />
-      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -367,8 +356,266 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-2.6.5-src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-hdfs-project" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-hdfs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-2.6.5-src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-hdfs-project" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-hdfs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-2.6.5-src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-hdfs-project" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-hdfs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-2.6.5-src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-hdfs-project" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-hdfs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-2.6.5-src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-hdfs-project" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-hdfs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hdfs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-2.6.5-src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-hdfs-project" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-hdfs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hdfs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="server" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-2.6.5-src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-hdfs-project" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-hdfs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hdfs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="server" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="namenode" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-2.6.5-src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-hdfs-project" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop-hdfs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoop" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
+      <pane id="Scratches" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -643,7 +890,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1932" height="1056" extended-state="0" />
-    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32849163" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -652,15 +898,14 @@
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.328125" sideWeight="0.5" order="8" side_tool="true" content_ui="tabs" />
-      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2820513" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17735043" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32849163" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33115467" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Properties" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32849163" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20512821" sideWeight="0.4956427" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32700893" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23717949" sideWeight="0.4956427" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -673,6 +918,7 @@
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32700893" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32700893" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="VcsContentAnnotationSettings">
@@ -689,34 +935,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/ReplicaBeingWritten.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="29" column="13" lean-forward="false" selection-start-line="29" selection-start-column="13" selection-end-line="29" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/ReplicaInfo.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="250">
-          <caret line="42" column="22" lean-forward="false" selection-start-line="42" selection-start-column="22" selection-end-line="42" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/ReplicaInPipeline.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="288">
-          <caret line="40" column="13" lean-forward="false" selection-start-line="40" selection-start-column="13" selection-end-line="40" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/ReplicaInPipelineInterface.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="200">
-          <caret line="27" column="17" lean-forward="false" selection-start-line="27" selection-start-column="17" selection-end-line="27" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/ReplicaNotFoundException.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="275">
@@ -892,13 +1110,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/FSDirectory.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="250">
-          <caret line="104" column="50" lean-forward="true" selection-start-line="104" selection-start-column="50" selection-end-line="104" selection-end-column="50" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/resources/hdfs-default.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1242">
@@ -910,14 +1121,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="341">
           <caret line="1138" column="23" lean-forward="false" selection-start-line="1138" selection-start-column="23" selection-end-line="1138" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/FSNamesystem.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="283">
-          <caret line="801" column="5" lean-forward="true" selection-start-line="801" selection-start-column="5" selection-end-line="801" selection-end-column="5" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -939,7 +1142,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="277">
           <caret line="436" column="92" lean-forward="true" selection-start-line="436" selection-start-column="92" selection-end-line="436" selection-end-column="92" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1031,29 +1233,116 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNodeRpcServer.java">
+    <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="269">
-          <caret line="105" column="47" lean-forward="true" selection-start-line="105" selection-start-column="47" selection-end-line="105" selection-end-column="47" />
-          <folding>
-            <element signature="n#!!doc" expanded="true" />
-          </folding>
+        <state relative-caret-position="1167">
+          <caret line="427" column="25" lean-forward="true" selection-start-line="427" selection-start-column="25" selection-end-line="427" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/FSNamesystem.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="643">
+          <caret line="9495" column="0" lean-forward="true" selection-start-line="9495" selection-start-column="0" selection-end-line="9495" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/FSDirectory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="618">
+          <caret line="3332" column="3" lean-forward="true" selection-start-line="3332" selection-start-column="3" selection-end-line="3332" selection-end-column="3" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/FSEditLog.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="275">
+          <caret line="110" column="13" lean-forward="false" selection-start-line="110" selection-start-column="13" selection-end-line="110" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/DFSClient.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="400">
+          <caret line="237" column="26" lean-forward="true" selection-start-line="237" selection-start-column="26" selection-end-line="237" selection-end-column="26" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNode.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="188">
-          <caret line="570" column="2" lean-forward="true" selection-start-line="570" selection-start-column="2" selection-end-line="570" selection-end-column="2" />
+        <state relative-caret-position="393">
+          <caret line="1816" column="27" lean-forward="true" selection-start-line="1816" selection-start-column="27" selection-end-line="1816" selection-end-column="27" />
+          <folding>
+            <element signature="e#21642#21643#0" expanded="true" />
+            <element signature="e#21675#21676#0" expanded="true" />
+            <element signature="e#26628#26831#0" expanded="true" />
+            <element signature="e#26830#26831#0" expanded="true" />
+            <element signature="e#30365#30366#0" expanded="true" />
+            <element signature="e#30405#30406#0" expanded="true" />
+            <element signature="e#31502#31503#0" expanded="true" />
+            <element signature="e#31532#31533#0" expanded="true" />
+            <element signature="e#31623#31624#0" expanded="true" />
+            <element signature="e#31665#31666#0" expanded="true" />
+            <element signature="e#31740#31741#0" expanded="true" />
+            <element signature="e#31780#31781#0" expanded="true" />
+            <element signature="e#31877#31878#0" expanded="true" />
+            <element signature="e#31919#31920#0" expanded="true" />
+            <element signature="e#32046#32047#0" expanded="true" />
+            <element signature="e#32116#32117#0" expanded="true" />
+            <element signature="e#32631#32632#0" expanded="true" />
+            <element signature="e#32675#32676#0" expanded="true" />
+            <element signature="e#32873#32874#0" expanded="true" />
+            <element signature="e#32918#32919#0" expanded="true" />
+            <element signature="e#43639#43640#0" expanded="true" />
+            <element signature="e#43674#43675#0" expanded="true" />
+            <element signature="e#57403#57404#0" expanded="true" />
+            <element signature="e#57458#57459#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameCache.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="682">
+          <caret line="165" column="0" lean-forward="true" selection-start-line="165" selection-start-column="0" selection-end-line="165" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pom.xml">
+    <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNodeHttpServer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="192">
-          <caret line="436" column="18" lean-forward="true" selection-start-line="436" selection-start-column="18" selection-end-line="436" selection-end-column="18" />
-          <folding />
+        <state relative-caret-position="782">
+          <caret line="319" column="0" lean-forward="false" selection-start-line="319" selection-start-column="0" selection-end-line="319" selection-end-column="0" />
+          <folding>
+            <element signature="e#7110#7126#0" expanded="true" />
+            <element signature="e#8922#8923#0" expanded="true" />
+            <element signature="e#8950#8951#0" expanded="true" />
+            <element signature="e#8991#8992#0" expanded="true" />
+            <element signature="e#9020#9021#0" expanded="true" />
+            <element signature="e#9149#9150#0" expanded="true" />
+            <element signature="e#9214#9215#0" expanded="true" />
+            <element signature="e#9689#9690#0" expanded="true" />
+            <element signature="e#9760#9761#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNodeRpcServer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="782">
+          <caret line="1813" column="0" lean-forward="true" selection-start-line="1813" selection-start-column="0" selection-end-line="1813" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#23038#23039#0" expanded="true" />
+            <element signature="e#23076#23077#0" expanded="true" />
+            <element signature="e#23201#23202#0" expanded="true" />
+            <element signature="e#23240#23241#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
