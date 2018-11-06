@@ -781,6 +781,8 @@ public class NameNode implements NameNodeStatusMXBean {
       // 初始化这个NameNode实例对象，推测，NameNode启动一些server的核心源码，应该就在这里
       initialize(conf);
       try {
+        // 这边会切换HA的一些状态
+        // 比如说
         haContext.writeLock();
         state.prepareToEnterState(haContext);
         state.enterState(haContext);

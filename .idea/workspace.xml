@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d2cec9df-38d7-4658-8af9-416594532bd5" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/ha/ZKFailoverController.java" afterPath="$PROJECT_DIR$/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/ha/ZKFailoverController.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNode.java" afterPath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNode.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNodeHttpServer.java" afterPath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNodeHttpServer.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNodeRpcServer.java" afterPath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNodeRpcServer.java" />
     </list>
     <ignored path="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/target/" />
     <ignored path="$PROJECT_DIR$/hadoop-project-dist/target/" />
@@ -83,8 +81,8 @@
       <file leaf-file-name="pom.xml" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pom.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1167">
-              <caret line="427" column="25" lean-forward="true" selection-start-line="427" selection-start-column="25" selection-end-line="427" selection-end-column="25" />
+            <state relative-caret-position="10675">
+              <caret line="427" column="25" lean-forward="false" selection-start-line="427" selection-start-column="25" selection-end-line="427" selection-end-column="25" />
               <folding />
             </state>
           </provider>
@@ -94,8 +92,67 @@
         <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/DFSClient.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="400">
-              <caret line="237" column="26" lean-forward="true" selection-start-line="237" selection-start-column="26" selection-end-line="237" selection-end-column="26" />
-              <folding />
+              <caret line="237" column="26" lean-forward="false" selection-start-line="237" selection-start-column="26" selection-end-line="237" selection-end-column="26" />
+              <folding>
+                <element signature="n#!!doc" expanded="false" />
+                <element signature="imports" expanded="false" />
+                <element signature="e#26146#26147#0" expanded="false" />
+                <element signature="e#26192#26193#0" expanded="false" />
+                <element signature="e#26235#26236#0" expanded="false" />
+                <element signature="e#26272#26273#0" expanded="false" />
+                <element signature="e#26321#26322#0" expanded="false" />
+                <element signature="e#26364#26365#0" expanded="false" />
+                <element signature="e#26414#26415#0" expanded="false" />
+                <element signature="e#26458#26459#0" expanded="false" />
+                <element signature="e#28151#28152#0" expanded="false" />
+                <element signature="e#28181#28182#0" expanded="false" />
+                <element signature="e#28219#28220#0" expanded="false" />
+                <element signature="e#28240#28241#0" expanded="false" />
+                <element signature="e#36681#36682#0" expanded="false" />
+                <element signature="e#36735#36736#0" expanded="false" />
+                <element signature="e#37300#37301#0" expanded="false" />
+                <element signature="e#37342#37343#0" expanded="false" />
+                <element signature="e#37400#37401#0" expanded="false" />
+                <element signature="e#37427#37428#0" expanded="false" />
+                <element signature="e#39460#39461#0" expanded="false" />
+                <element signature="e#39490#39491#0" expanded="false" />
+                <element signature="e#39522#39523#0" expanded="false" />
+                <element signature="e#39555#39556#0" expanded="false" />
+                <element signature="e#40844#40845#0" expanded="false" />
+                <element signature="e#40877#40878#0" expanded="false" />
+                <element signature="e#42577#42578#0" expanded="false" />
+                <element signature="e#42624#42625#0" expanded="false" />
+                <element signature="e#43630#43631#0" expanded="false" />
+                <element signature="e#43696#43697#0" expanded="false" />
+                <element signature="e#46818#46819#0" expanded="false" />
+                <element signature="e#46898#46899#0" expanded="false" />
+                <element signature="e#49690#49691#0" expanded="false" />
+                <element signature="e#49739#49740#0" expanded="false" />
+                <element signature="e#62119#62120#0" expanded="false" />
+                <element signature="e#62144#62145#0" expanded="false" />
+                <element signature="e#102362#102363#0" expanded="false" />
+                <element signature="e#102419#102420#0" expanded="false" />
+                <element signature="e#109899#109900#0" expanded="false" />
+                <element signature="e#109942#109943#0" expanded="false" />
+                <element signature="e#110003#110004#0" expanded="false" />
+                <element signature="e#110047#110048#0" expanded="false" />
+                <element signature="e#110092#110093#0" expanded="false" />
+                <element signature="e#110122#110123#0" expanded="false" />
+                <element signature="e#120795#120796#0" expanded="false" />
+                <element signature="e#120842#120843#0" expanded="false" />
+                <element signature="e#120914#120915#0" expanded="false" />
+                <element signature="e#120970#120971#0" expanded="false" />
+                <element signature="e#121021#121022#0" expanded="false" />
+                <element signature="e#121061#121062#0" expanded="false" />
+                <element signature="e#121254#121255#0" expanded="false" />
+                <element signature="e#121289#121290#0" expanded="false" />
+                <element signature="e#121330#121331#0" expanded="false" />
+                <element signature="e#121355#121356#0" expanded="false" />
+                <element signature="e#121445#121446#0" expanded="false" />
+                <element signature="e#121479#121480#0" expanded="false" />
+                <element signature="e#121696#121697#0" expanded="false" />
+                <element signature="e#121723#121724#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -103,80 +160,39 @@
       <file leaf-file-name="NameNode.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNode.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="393">
-              <caret line="1816" column="27" lean-forward="true" selection-start-line="1816" selection-start-column="27" selection-end-line="1816" selection-end-column="27" />
-              <folding>
-                <element signature="e#21642#21643#0" expanded="true" />
-                <element signature="e#21675#21676#0" expanded="true" />
-                <element signature="e#26628#26831#0" expanded="true" />
-                <element signature="e#26830#26831#0" expanded="true" />
-                <element signature="e#30365#30366#0" expanded="true" />
-                <element signature="e#30405#30406#0" expanded="true" />
-                <element signature="e#31502#31503#0" expanded="true" />
-                <element signature="e#31532#31533#0" expanded="true" />
-                <element signature="e#31623#31624#0" expanded="true" />
-                <element signature="e#31665#31666#0" expanded="true" />
-                <element signature="e#31740#31741#0" expanded="true" />
-                <element signature="e#31780#31781#0" expanded="true" />
-                <element signature="e#31877#31878#0" expanded="true" />
-                <element signature="e#31919#31920#0" expanded="true" />
-                <element signature="e#32046#32047#0" expanded="true" />
-                <element signature="e#32116#32117#0" expanded="true" />
-                <element signature="e#32631#32632#0" expanded="true" />
-                <element signature="e#32675#32676#0" expanded="true" />
-                <element signature="e#32873#32874#0" expanded="true" />
-                <element signature="e#32918#32919#0" expanded="true" />
-                <element signature="e#43639#43640#0" expanded="true" />
-                <element signature="e#43674#43675#0" expanded="true" />
-                <element signature="e#57403#57404#0" expanded="true" />
-                <element signature="e#57458#57459#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="NameCache.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameCache.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="682">
-              <caret line="165" column="0" lean-forward="true" selection-start-line="165" selection-start-column="0" selection-end-line="165" selection-end-column="0" />
+            <state relative-caret-position="183">
+              <caret line="1499" column="42" lean-forward="false" selection-start-line="1499" selection-start-column="21" selection-end-line="1499" selection-end-column="42" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="NameNodeHttpServer.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNodeHttpServer.java">
+      <file leaf-file-name="DFSZKFailoverController.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/tools/DFSZKFailoverController.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="782">
-              <caret line="319" column="0" lean-forward="false" selection-start-line="319" selection-start-column="0" selection-end-line="319" selection-end-column="0" />
-              <folding>
-                <element signature="e#7110#7126#0" expanded="true" />
-                <element signature="e#8922#8923#0" expanded="true" />
-                <element signature="e#8950#8951#0" expanded="true" />
-                <element signature="e#8991#8992#0" expanded="true" />
-                <element signature="e#9020#9021#0" expanded="true" />
-                <element signature="e#9149#9150#0" expanded="true" />
-                <element signature="e#9214#9215#0" expanded="true" />
-                <element signature="e#9689#9690#0" expanded="true" />
-                <element signature="e#9760#9761#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="150">
+              <caret line="51" column="54" lean-forward="false" selection-start-line="51" selection-start-column="54" selection-end-line="51" selection-end-column="54" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="NameNodeRpcServer.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNodeRpcServer.java">
+      <file leaf-file-name="ZKFailoverController.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/ha/ZKFailoverController.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="782">
-              <caret line="1813" column="0" lean-forward="true" selection-start-line="1813" selection-start-column="0" selection-end-line="1813" selection-end-column="0" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#23038#23039#0" expanded="true" />
-                <element signature="e#23076#23077#0" expanded="true" />
-                <element signature="e#23201#23202#0" expanded="true" />
-                <element signature="e#23240#23241#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="521">
+              <caret line="243" column="23" lean-forward="true" selection-start-line="243" selection-start-column="23" selection-end-line="243" selection-end-column="23" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="HealthMonitor.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/ha/HealthMonitor.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="638">
+              <caret line="230" column="59" lean-forward="true" selection-start-line="230" selection-start-column="59" selection-end-line="230" selection-end-column="59" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -213,7 +229,6 @@
       <find>threshold</find>
       <find>blockManager</find>
       <find>main</find>
-      <find>main(</find>
       <find>dATAsTOR</find>
       <find>startDataNode</find>
       <find>MAIN(</find>
@@ -222,6 +237,7 @@
       <find>rundata</find>
       <find>dore</find>
       <find>ClientNamenodeProtocolProtos</find>
+      <find>main(</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -243,9 +259,10 @@
         <option value="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/BPServiceActor.java" />
         <option value="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/target/generated-sources/java/org/apache/hadoop/hdfs/protocol/proto/ClientNamenodeProtocolProtosa.java" />
         <option value="$USER_HOME$/.IdeaIC2017.1/idea.properties" />
-        <option value="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNode.java" />
         <option value="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNodeHttpServer.java" />
         <option value="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNodeRpcServer.java" />
+        <option value="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNode.java" />
+        <option value="$PROJECT_DIR$/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/ha/ZKFailoverController.java" />
       </list>
     </option>
   </component>
@@ -329,7 +346,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -528,53 +544,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="server" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="hadoop-main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="hadoop-2.6.5-src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="hadoop-hdfs-project" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="hadoop-hdfs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="hadoop" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="hdfs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="server" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="namenode" />
+              <option name="myItemId" value="tools" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -614,8 +584,9 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scratches" />
       <pane id="PackagesPane" />
+      <pane id="Scope" />
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -890,6 +861,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1932" height="1056" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32849163" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -905,7 +877,7 @@
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32849163" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23717949" sideWeight="0.4956427" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23985043" sideWeight="0.4956427" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -935,34 +907,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/ReplicaNotFoundException.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="275">
-          <caret line="29" column="13" lean-forward="false" selection-start-line="29" selection-start-column="13" selection-end-line="29" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/ReplicaUnderRecovery.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="288">
-          <caret line="33" column="13" lean-forward="false" selection-start-line="33" selection-start-column="13" selection-end-line="33" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/ReplicaWaitingToBeRecovered.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="288">
-          <caret line="34" column="13" lean-forward="false" selection-start-line="34" selection-start-column="13" selection-end-line="34" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/SecureDataNodeStarter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="41" column="13" lean-forward="false" selection-start-line="41" selection-start-column="13" selection-end-line="41" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/ShortCircuitRegistry.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="288">
@@ -1160,13 +1104,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar://C:/Program Files/Java/jdk1.8.0_11/src.zip!/java/lang/Thread.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="52">
-          <caret line="695" column="29" lean-forward="false" selection-start-line="695" selection-start-column="29" selection-end-line="695" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/BlockPoolManager.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="483">
@@ -1199,7 +1136,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="300">
           <caret line="12" column="5" lean-forward="true" selection-start-line="12" selection-start-column="5" selection-end-line="12" selection-end-column="5" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1221,7 +1157,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="150">
           <caret line="6" column="46" lean-forward="false" selection-start-line="6" selection-start-column="46" selection-end-line="6" selection-end-column="46" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1229,14 +1164,13 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="100">
           <caret line="5" column="47" lean-forward="false" selection-start-line="5" selection-start-column="19" selection-end-line="5" selection-end-column="47" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1167">
-          <caret line="427" column="25" lean-forward="true" selection-start-line="427" selection-start-column="25" selection-end-line="427" selection-end-column="25" />
+        <state relative-caret-position="10675">
+          <caret line="427" column="25" lean-forward="false" selection-start-line="427" selection-start-column="25" selection-end-line="427" selection-end-column="25" />
           <folding />
         </state>
       </provider>
@@ -1268,48 +1202,82 @@
     <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/DFSClient.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="400">
-          <caret line="237" column="26" lean-forward="true" selection-start-line="237" selection-start-column="26" selection-end-line="237" selection-end-column="26" />
-          <folding />
+          <caret line="237" column="26" lean-forward="false" selection-start-line="237" selection-start-column="26" selection-end-line="237" selection-end-column="26" />
+          <folding>
+            <element signature="n#!!doc" expanded="false" />
+            <element signature="imports" expanded="false" />
+            <element signature="e#26146#26147#0" expanded="false" />
+            <element signature="e#26192#26193#0" expanded="false" />
+            <element signature="e#26235#26236#0" expanded="false" />
+            <element signature="e#26272#26273#0" expanded="false" />
+            <element signature="e#26321#26322#0" expanded="false" />
+            <element signature="e#26364#26365#0" expanded="false" />
+            <element signature="e#26414#26415#0" expanded="false" />
+            <element signature="e#26458#26459#0" expanded="false" />
+            <element signature="e#28151#28152#0" expanded="false" />
+            <element signature="e#28181#28182#0" expanded="false" />
+            <element signature="e#28219#28220#0" expanded="false" />
+            <element signature="e#28240#28241#0" expanded="false" />
+            <element signature="e#36681#36682#0" expanded="false" />
+            <element signature="e#36735#36736#0" expanded="false" />
+            <element signature="e#37300#37301#0" expanded="false" />
+            <element signature="e#37342#37343#0" expanded="false" />
+            <element signature="e#37400#37401#0" expanded="false" />
+            <element signature="e#37427#37428#0" expanded="false" />
+            <element signature="e#39460#39461#0" expanded="false" />
+            <element signature="e#39490#39491#0" expanded="false" />
+            <element signature="e#39522#39523#0" expanded="false" />
+            <element signature="e#39555#39556#0" expanded="false" />
+            <element signature="e#40844#40845#0" expanded="false" />
+            <element signature="e#40877#40878#0" expanded="false" />
+            <element signature="e#42577#42578#0" expanded="false" />
+            <element signature="e#42624#42625#0" expanded="false" />
+            <element signature="e#43630#43631#0" expanded="false" />
+            <element signature="e#43696#43697#0" expanded="false" />
+            <element signature="e#46818#46819#0" expanded="false" />
+            <element signature="e#46898#46899#0" expanded="false" />
+            <element signature="e#49690#49691#0" expanded="false" />
+            <element signature="e#49739#49740#0" expanded="false" />
+            <element signature="e#62119#62120#0" expanded="false" />
+            <element signature="e#62144#62145#0" expanded="false" />
+            <element signature="e#102362#102363#0" expanded="false" />
+            <element signature="e#102419#102420#0" expanded="false" />
+            <element signature="e#109899#109900#0" expanded="false" />
+            <element signature="e#109942#109943#0" expanded="false" />
+            <element signature="e#110003#110004#0" expanded="false" />
+            <element signature="e#110047#110048#0" expanded="false" />
+            <element signature="e#110092#110093#0" expanded="false" />
+            <element signature="e#110122#110123#0" expanded="false" />
+            <element signature="e#120795#120796#0" expanded="false" />
+            <element signature="e#120842#120843#0" expanded="false" />
+            <element signature="e#120914#120915#0" expanded="false" />
+            <element signature="e#120970#120971#0" expanded="false" />
+            <element signature="e#121021#121022#0" expanded="false" />
+            <element signature="e#121061#121062#0" expanded="false" />
+            <element signature="e#121254#121255#0" expanded="false" />
+            <element signature="e#121289#121290#0" expanded="false" />
+            <element signature="e#121330#121331#0" expanded="false" />
+            <element signature="e#121355#121356#0" expanded="false" />
+            <element signature="e#121445#121446#0" expanded="false" />
+            <element signature="e#121479#121480#0" expanded="false" />
+            <element signature="e#121696#121697#0" expanded="false" />
+            <element signature="e#121723#121724#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNode.java">
+    <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/common/HdfsServerConstants.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="393">
-          <caret line="1816" column="27" lean-forward="true" selection-start-line="1816" selection-start-column="27" selection-end-line="1816" selection-end-column="27" />
-          <folding>
-            <element signature="e#21642#21643#0" expanded="true" />
-            <element signature="e#21675#21676#0" expanded="true" />
-            <element signature="e#26628#26831#0" expanded="true" />
-            <element signature="e#26830#26831#0" expanded="true" />
-            <element signature="e#30365#30366#0" expanded="true" />
-            <element signature="e#30405#30406#0" expanded="true" />
-            <element signature="e#31502#31503#0" expanded="true" />
-            <element signature="e#31532#31533#0" expanded="true" />
-            <element signature="e#31623#31624#0" expanded="true" />
-            <element signature="e#31665#31666#0" expanded="true" />
-            <element signature="e#31740#31741#0" expanded="true" />
-            <element signature="e#31780#31781#0" expanded="true" />
-            <element signature="e#31877#31878#0" expanded="true" />
-            <element signature="e#31919#31920#0" expanded="true" />
-            <element signature="e#32046#32047#0" expanded="true" />
-            <element signature="e#32116#32117#0" expanded="true" />
-            <element signature="e#32631#32632#0" expanded="true" />
-            <element signature="e#32675#32676#0" expanded="true" />
-            <element signature="e#32873#32874#0" expanded="true" />
-            <element signature="e#32918#32919#0" expanded="true" />
-            <element signature="e#43639#43640#0" expanded="true" />
-            <element signature="e#43674#43675#0" expanded="true" />
-            <element signature="e#57403#57404#0" expanded="true" />
-            <element signature="e#57458#57459#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="288">
+          <caret line="222" column="21" lean-forward="false" selection-start-line="222" selection-start-column="21" selection-end-line="222" selection-end-column="21" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameCache.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="682">
-          <caret line="165" column="0" lean-forward="true" selection-start-line="165" selection-start-column="0" selection-end-line="165" selection-end-column="0" />
+          <caret line="165" column="0" lean-forward="false" selection-start-line="165" selection-start-column="0" selection-end-line="165" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -1318,31 +1286,57 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="782">
           <caret line="319" column="0" lean-forward="false" selection-start-line="319" selection-start-column="0" selection-end-line="319" selection-end-column="0" />
-          <folding>
-            <element signature="e#7110#7126#0" expanded="true" />
-            <element signature="e#8922#8923#0" expanded="true" />
-            <element signature="e#8950#8951#0" expanded="true" />
-            <element signature="e#8991#8992#0" expanded="true" />
-            <element signature="e#9020#9021#0" expanded="true" />
-            <element signature="e#9149#9150#0" expanded="true" />
-            <element signature="e#9214#9215#0" expanded="true" />
-            <element signature="e#9689#9690#0" expanded="true" />
-            <element signature="e#9760#9761#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNodeRpcServer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="782">
-          <caret line="1813" column="0" lean-forward="true" selection-start-line="1813" selection-start-column="0" selection-end-line="1813" selection-end-column="0" />
+        <state relative-caret-position="232">
+          <caret line="1791" column="0" lean-forward="true" selection-start-line="1791" selection-start-column="0" selection-end-line="1791" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#23038#23039#0" expanded="true" />
-            <element signature="e#23076#23077#0" expanded="true" />
-            <element signature="e#23201#23202#0" expanded="true" />
-            <element signature="e#23240#23241#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="183">
+          <caret line="1499" column="42" lean-forward="false" selection-start-line="1499" selection-start-column="21" selection-end-line="1499" selection-end-column="42" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/tools/DFSZKFailoverController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="51" column="54" lean-forward="false" selection-start-line="51" selection-start-column="54" selection-end-line="51" selection-end-column="54" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/ha/ZKFailoverController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="521">
+          <caret line="243" column="23" lean-forward="true" selection-start-line="243" selection-start-column="23" selection-end-line="243" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_11/src.zip!/java/lang/Thread.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="213">
+          <caret line="910" column="16" lean-forward="false" selection-start-line="910" selection-start-column="16" selection-end-line="910" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/ha/HealthMonitor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="638">
+          <caret line="230" column="59" lean-forward="true" selection-start-line="230" selection-start-column="59" selection-end-line="230" selection-end-column="59" />
+          <folding />
         </state>
       </provider>
     </entry>
