@@ -311,6 +311,7 @@ public class DistributedFileSystem extends FileSystem {
     }.resolve(this, absF);
   }
 
+  // 针对hdfs的输出流
   @Override
   public FSDataOutputStream append(Path f, final int bufferSize,
       final Progressable progress) throws IOException {
@@ -394,6 +395,7 @@ public class DistributedFileSystem extends FileSystem {
       @Override
       public FSDataOutputStream doCall(final Path p)
           throws IOException, UnresolvedLinkException {
+        // 这个东西的底层，主要还是调用DFSClient的create()方法，来创建一个针对hdfs的输出流
         final DFSOutputStream dfsos = dfs.create(getPathName(p), permission,
                 cflags, replication, blockSize, progress, bufferSize,
                 checksumOpt);
