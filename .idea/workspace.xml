@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d2cec9df-38d7-4658-8af9-416594532bd5" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/DFSClient.java" afterPath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/DFSClient.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/DFSOutputStream.java" afterPath="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/DFSOutputStream.java" />
     </list>
     <ignored path="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/target/" />
     <ignored path="$PROJECT_DIR$/hadoop-project-dist/target/" />
@@ -90,8 +90,18 @@
       <file leaf-file-name="DFSClient.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/DFSClient.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="493">
-              <caret line="1656" column="60" lean-forward="true" selection-start-line="1656" selection-start-column="60" selection-end-line="1656" selection-end-column="60" />
+            <state relative-caret-position="308">
+              <caret line="667" column="39" lean-forward="true" selection-start-line="667" selection-start-column="39" selection-end-line="667" selection-end-column="39" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="NameNodeProxies.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/NameNodeProxies.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-562">
+              <caret line="204" column="12" lean-forward="true" selection-start-line="204" selection-start-column="12" selection-end-line="204" selection-end-column="12" />
               <folding />
             </state>
           </provider>
@@ -100,8 +110,8 @@
       <file leaf-file-name="DFSOutputStream.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/DFSOutputStream.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="413">
-              <caret line="1712" column="0" lean-forward="true" selection-start-line="1712" selection-start-column="0" selection-end-line="1712" selection-end-column="0" />
+            <state relative-caret-position="288">
+              <caret line="1653" column="1" lean-forward="true" selection-start-line="1653" selection-start-column="1" selection-end-line="1653" selection-end-column="1" />
               <folding />
             </state>
           </provider>
@@ -148,7 +158,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>FSnAM</find>
       <find>FSn啊，</find>
       <find>FSn啊</find>
       <find>FSn</find>
@@ -178,6 +187,7 @@
       <find>dore</find>
       <find>ClientNamenodeProtocolProtos</find>
       <find>main(</find>
+      <find>clientprotocol</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -205,6 +215,7 @@
         <option value="$PROJECT_DIR$/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/ha/ZKFailoverController.java" />
         <option value="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/DistributedFileSystem.java" />
         <option value="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/DFSClient.java" />
+        <option value="$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/DFSOutputStream.java" />
       </list>
     </option>
   </component>
@@ -849,20 +860,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/fs/Hdfs.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="175">
-          <caret line="60" column="13" lean-forward="false" selection-start-line="60" selection-start-column="13" selection-end-line="60" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/fs/HdfsBlockLocation.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="32" column="13" lean-forward="false" selection-start-line="32" selection-start-column="13" selection-end-line="32" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/fs/HdfsVolumeId.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="289">
@@ -1214,18 +1211,34 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/protocol/ClientProtocol.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-237">
+          <caret line="74" column="33" lean-forward="true" selection-start-line="74" selection-start-column="33" selection-end-line="74" selection-end-column="33" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/DFSClient.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="493">
-          <caret line="1656" column="60" lean-forward="true" selection-start-line="1656" selection-start-column="60" selection-end-line="1656" selection-end-column="60" />
+        <state relative-caret-position="308">
+          <caret line="667" column="39" lean-forward="true" selection-start-line="667" selection-start-column="39" selection-end-line="667" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/NameNodeProxies.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-562">
+          <caret line="204" column="12" lean-forward="true" selection-start-line="204" selection-start-column="12" selection-end-line="204" selection-end-column="12" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/DFSOutputStream.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="413">
-          <caret line="1712" column="0" lean-forward="true" selection-start-line="1712" selection-start-column="0" selection-end-line="1712" selection-end-column="0" />
+        <state relative-caret-position="288">
+          <caret line="1653" column="1" lean-forward="true" selection-start-line="1653" selection-start-column="1" selection-end-line="1653" selection-end-column="1" />
           <folding />
         </state>
       </provider>

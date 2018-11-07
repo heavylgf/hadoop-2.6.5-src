@@ -1687,6 +1687,7 @@ public class DFSOutputStream extends FSOutputSummer
   }
 
   /** Construct a new output stream for creating a file. */
+  // 构造用于创建文件的新输出流。
   private DFSOutputStream(DFSClient dfsClient, String src, HdfsFileStatus stat,
       EnumSet<CreateFlag> flag, Progressable progress,
       DataChecksum checksum, String[] favoredNodes) throws IOException {
