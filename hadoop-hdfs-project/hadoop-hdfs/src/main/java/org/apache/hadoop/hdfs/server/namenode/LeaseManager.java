@@ -492,6 +492,7 @@ public class LeaseManager {
       // causing ConcurrentModificationException
       String[] leasePaths = new String[leaseToCheck.getPaths().size()];
       leaseToCheck.getPaths().toArray(leasePaths);
+      
       for(String p : leasePaths) {
         try {
           boolean completed = fsnamesystem.internalReleaseLease(leaseToCheck, p,

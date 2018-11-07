@@ -120,8 +120,8 @@
       <file leaf-file-name="LeaseManager.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/LeaseManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="258">
-              <caret line="477" column="18" lean-forward="true" selection-start-line="477" selection-start-column="16" selection-end-line="477" selection-end-column="18" />
+            <state relative-caret-position="458">
+              <caret line="494" column="6" lean-forward="false" selection-start-line="494" selection-start-column="6" selection-end-line="494" selection-end-column="6" />
               <folding />
             </state>
           </provider>
@@ -1355,8 +1355,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/LeaseManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="258">
-          <caret line="477" column="18" lean-forward="true" selection-start-line="477" selection-start-column="16" selection-end-line="477" selection-end-column="18" />
+        <state relative-caret-position="458">
+          <caret line="494" column="6" lean-forward="false" selection-start-line="494" selection-start-column="6" selection-end-line="494" selection-end-column="6" />
           <folding />
         </state>
       </provider>
