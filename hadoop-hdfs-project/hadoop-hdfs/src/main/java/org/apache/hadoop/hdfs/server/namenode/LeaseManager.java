@@ -265,6 +265,7 @@ public class LeaseManager {
 
     /** @return true if the Hard Limit Timer has expired */
     public boolean expiredHardLimit() {
+      // 当前时间 - 上次续约时间 > 1小时
       return now() - lastUpdate > hardLimit;
     }
 
@@ -474,6 +475,10 @@ public class LeaseManager {
     } catch(NoSuchElementException e) {}
 
     while(leaseToCheck != null) {
+      // 如果最老的一个契约
+      // 所有的契约都有一个续约的时间
+      // 比如说，契约1:10:00:00 契约2:10:05:00, 契约3:10:20:00
+      //
       if (!leaseToCheck.expiredHardLimit()) {
         break;
       }
