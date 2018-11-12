@@ -120,6 +120,9 @@ abstract public class FSOutputSummer extends OutputStream {
       // local buffer is empty and user buffer size >= local buffer size, so
       // simply checksum the user buffer and send it directly to the underlying
       // stream
+      // 这个的意思是说，你写的这个字节数组的大小，直接就达到了一个chunk的大小了
+      // 你传递进来的字节数组的大小 >= 缓冲数组的大小
+      // 所以此时，就不需要将字节数组的数据写入一个缓冲
       final int length = buf.length;
       writeChecksumChunks(b, off, length);
       return length;
