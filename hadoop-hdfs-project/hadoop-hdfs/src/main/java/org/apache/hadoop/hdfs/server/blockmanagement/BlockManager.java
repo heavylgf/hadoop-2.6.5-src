@@ -3070,10 +3070,12 @@ public class BlockManager {
     assert toUC.size() + toAdd.size() + toInvalidate.size() + toCorrupt.size() <= 1
       : "The block should be only in one of the lists.";
 
-    for (StatefulBlockInfo b : toUC) { 
+    for (StatefulBlockInfo b : toUC) {
+      // block under construction, 就是还停留在传输过程中，一个block对应多个packet
       addStoredBlockUnderConstruction(b, storageInfo);
     }
     long numBlocksLogged = 0;
+    // 如果finalized状态，此时一定会将block加入toAdd列表中
     for (BlockInfo b : toAdd) {
       addStoredBlock(b, storageInfo, delHintNode, numBlocksLogged < maxNumBlocksToLog);
       numBlocksLogged++;
@@ -3082,6 +3084,7 @@ public class BlockManager {
       blockLog.info("BLOCK* addBlock: logged info for " + maxNumBlocksToLog
           + " of " + numBlocksLogged + " reported.");
     }
+
     for (Block b : toInvalidate) {
       blockLog.info("BLOCK* addBlock: block "
           + b + " on " + node + " size " + b.getNumBytes()
