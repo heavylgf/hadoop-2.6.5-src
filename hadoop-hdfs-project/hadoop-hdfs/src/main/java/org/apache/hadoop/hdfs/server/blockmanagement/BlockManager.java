@@ -1040,6 +1040,7 @@ public class BlockManager {
   /** Remove the blocks associated to the given datanode. */
   void removeBlocksAssociatedTo(final DatanodeDescriptor node) {
     final Iterator<? extends Block> it = node.getBlockIterator();
+    // 这个datanode
     while(it.hasNext()) {
       removeStoredBlock(it.next(), node);
     }
@@ -2954,6 +2955,8 @@ public class BlockManager {
     }
     assert (namesystem.hasWriteLock());
     {
+      // blocksMap就是存放block的映射关系的
+      // 删除关联关系
       if (!blocksMap.removeNode(block, node)) {
         if(blockLog.isDebugEnabled()) {
           blockLog.debug("BLOCK* removeStoredBlock: "
@@ -3400,6 +3403,8 @@ public class BlockManager {
       }
       NumberReplicas repl = countNodes(block);
       int curExpectedReplicas = getReplication(block);
+      // 判断一下，当前这个block还存在的datanode上的副本数量（可能就只有两个副本）
+      // 期望的副本因子的数量（3个副本）
       if (isNeededReplication(block, curExpectedReplicas, repl.liveReplicas())) {
         neededReplications.update(block, repl.liveReplicas(), repl
             .decommissionedReplicas(), curExpectedReplicas, curReplicasDelta,

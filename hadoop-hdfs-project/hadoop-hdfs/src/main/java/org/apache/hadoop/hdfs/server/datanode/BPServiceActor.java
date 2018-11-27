@@ -795,6 +795,10 @@ class BPServiceActor implements Runnable {
 
         // 这边也是在汇报deleted blocks
         // 这个间隔是5分钟
+        // 就是其实block被datanose接收到以后，不是同步进行通知namenode的，是走的异步
+        // 先加入一个队列里面
+        // 其实就是在BPServiceActor线程，它默认是每隔5分钟将最近接收到，或者是删除掉的block
+        // 一次性批量的上报给namenode
         if (sendImmediateIBR ||
                 (startTime - lastDeletedReport > dnConf.deleteReportInterval)) {
           reportReceivedDeletedBlocks();

@@ -515,6 +515,11 @@ public class DatanodeManager {
   private void removeDatanode(DatanodeDescriptor nodeInfo) {
     assert namesystem.hasWriteLock();
     heartbeatManager.removeDatanode(nodeInfo);
+    // 非常关键，block一切东西你都看明白了
+    // 因为这个datanode已经死掉了，所以说在这里，就会从BlockManager中
+    // 将这个datanode与block的关联关系都删除
+    // 假如说，本来block在datanode01、datanode02、datanode03、上面
+    // 现在datanode02死掉了
     blockManager.removeBlocksAssociatedTo(nodeInfo);
     networktopology.remove(nodeInfo);
     decrementVersionCount(nodeInfo.getSoftwareVersion());
