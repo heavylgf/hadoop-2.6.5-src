@@ -101,6 +101,11 @@ import static org.apache.hadoop.util.ToolRunner.confirmPrompt;
  * The first table is stored on disk and is very precious.
  * The second table is rebuilt every time the NameNode comes up.
  *
+ * *'NameNode'指的是这个类以及'NameNode服务器'。
+ *FSNamesystem类实际上执行大多数文件系统
+ ＊管理。大多数“NameNode”类本身都受到关注
+ *通过向外界公开IPC接口和HTTP服务器，
+ *加上一些配置管理。
  * 'NameNode' refers to both this class as well as the 'NameNode server'.
  * The 'FSNamesystem' class actually performs most of the filesystem
  * management.  The majority of the 'NameNode' class itself is concerned
@@ -509,6 +514,7 @@ public class NameNode implements NameNodeStatusMXBean {
   /**
    * HTTP server address for binding the endpoint. This method is
    * for use by the NameNode and its derivatives. It may return
+   * a different address than the one that should be used by clients to
    * a different address than the one that should be used by clients to
    * connect to the NameNode. See
    * {@link DFSConfigKeys#DFS_NAMENODE_HTTP_BIND_HOST_KEY}

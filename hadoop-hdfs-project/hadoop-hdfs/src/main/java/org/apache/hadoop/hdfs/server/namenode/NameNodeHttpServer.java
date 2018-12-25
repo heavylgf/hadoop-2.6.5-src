@@ -126,7 +126,6 @@ public class NameNodeHttpServer {
       }
     }
 
-
     // 很明显，这个东西是用了一个HttpServer2，这个很明显是人家hadoop自己实现的一套http服务
     // hadoop http server这块，不是在hdfs里的，是在hadoop-common里，就是整个hadoop通用的一套http server机制
     // 在hadoop-common项目的org.apache.hadoop.http包下，有HttpServer2
