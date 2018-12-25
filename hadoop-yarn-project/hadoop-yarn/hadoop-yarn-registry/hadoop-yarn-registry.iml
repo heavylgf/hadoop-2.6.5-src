@@ -95,6 +95,7 @@
     <orderEntry type="library" name="Maven: org.apache.directory.api:api-asn1-api:1.0.0-M20" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.directory.api:api-ldap-client-api:1.0.0-M20" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.directory.api:api-ldap-codec-core:1.0.0-M20" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.apache.directory.api:api-asn1-ber:1.0.0-M20" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.directory.api:api-ldap-extras-aci:1.0.0-M20" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.directory.api:api-ldap-extras-util:1.0.0-M20" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.directory.api:api-ldap-model:1.0.0-M20" level="project" />
@@ -105,6 +106,7 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.directory.server:apacheds-core:2.0.0-M15" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.directory.server:apacheds-interceptors-admin:2.0.0-M15" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.directory.server:apacheds-interceptors-authn:2.0.0-M15" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.apache.directory.api:api-ldap-extras-codec:1.0.0-M20" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.directory.server:apacheds-interceptors-authz:2.0.0-M15" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.directory.server:apacheds-interceptors-changelog:2.0.0-M15" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.directory.server:apacheds-interceptors-collective:2.0.0-M15" level="project" />
@@ -118,9 +120,11 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.directory.server:apacheds-interceptors-subtree:2.0.0-M15" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.directory.server:apacheds-interceptors-trigger:2.0.0-M15" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.directory.api:api-ldap-extras-trigger:1.0.0-M20" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: bouncycastle:bcprov-jdk15:140" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.directory.server:apacheds-protocol-shared:2.0.0-M15" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.directory.server:apacheds-protocol-kerberos:2.0.0-M15" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.directory.server:apacheds-core-shared:2.0.0-M15" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.apache.directory.api:api-ldap-extras-codec-api:1.0.0-M20" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.directory.server:apacheds-ldif-partition:2.0.0-M15" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.directory.server:apacheds-xdbm-partition:2.0.0-M15" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.directory.server:apacheds-mavibot-partition:2.0.0-M15" level="project" />
@@ -129,14 +133,6 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.directory.api:api-all:1.0.0-M20" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: commons-pool:commons-pool:1.6" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: antlr:antlr:2.7.7" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.apache.directory.server:apacheds-jdbm-partition:2.0.0-M15" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.apache.directory.jdbm:apacheds-jdbm1:bundle:2.0.0-M2" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.apache.directory.server:apacheds-protocol-ldap:2.0.0-M15" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.apache.directory.api:api-asn1-ber:1.0.0-M20" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.apache.directory.api:api-ldap-extras-codec-api:1.0.0-M20" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.apache.directory.api:api-ldap-extras-codec:1.0.0-M20" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.apache.directory.api:api-ldap-extras-sp:1.0.0-M20" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: bouncycastle:bcprov-jdk15:140" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-core-asl:1.9.13" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-mapper-asl:1.9.13" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: commons-httpclient:commons-httpclient:3.1" level="project" />
