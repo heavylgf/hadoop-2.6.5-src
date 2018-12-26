@@ -510,6 +510,7 @@ class BPServiceActor implements Runnable {
     lastDeletedReport = startTime;
 
     long brCreateStartTime = now();
+    // 他就会调用底层的管理block文件的组件去获取各个block的信息
     Map<DatanodeStorage, BlockListAsLongs> perVolumeBlockLists =
             dn.getFSDataset().getBlockReports(bpos.getBlockPoolId());
 
@@ -795,9 +796,9 @@ class BPServiceActor implements Runnable {
 
         // 这边也是在汇报deleted blocks
         // 这个间隔是5分钟
-        // 就是其实block被datanose接收到以后，不是同步进行通知namenode的，是走的异步
-        // 先加入一个队列里面
-        // 其实就是在BPServiceActor线程，它默认是每隔5分钟将最近接收到，或者是删除掉的block
+        // 就是其实在block被datanode接收到了以后，不是同步进行通知namenode
+        // 先会加入一个队列里面
+        // 其实就是在BPServiceActor线程，他默认是每隔5分钟将最近接收到，或者是删除掉的block
         // 一次性批量的上报给namenode
         if (sendImmediateIBR ||
                 (startTime - lastDeletedReport > dnConf.deleteReportInterval)) {
@@ -874,7 +875,7 @@ class BPServiceActor implements Runnable {
 
     // 调用了BPOfferService.createRegistration()方法
     // 创建了一个DatanodeRegistration对象，大体上来说相当于是一个datanode注册请求
-    // 这个里面包含了DataNodeI
+    // 这个里面包含了DataNodeID
     // 这样的话，如果namenode收到这个注册的请求，bpRegistration
     // 那么就可以识别出来是哪个datanode发起的注册
     bpRegistration = bpos.createRegistration();
