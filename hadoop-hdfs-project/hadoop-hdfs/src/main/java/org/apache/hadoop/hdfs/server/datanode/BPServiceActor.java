@@ -651,7 +651,7 @@ class BPServiceActor implements Runnable {
             dn.getXmitsInProgress(),
             dn.getXceiverCount(),
             dn.getFSDataset().getNumFailedVolumes());
-  }
+}
 
   //This must be called only by BPOfferService
   void start() {
