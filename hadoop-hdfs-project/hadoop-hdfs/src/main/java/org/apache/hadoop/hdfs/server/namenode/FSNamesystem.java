@@ -2969,7 +2969,7 @@ public class FSNamesystem implements Namesystem, FSClusterStats,
    * Recreate in-memory lease record.
    *
    * @param src path to the file
-   * @param file existing file object
+   * @param iip existing file object
    * @param leaseHolder identifier of the lease holder on this file
    * @param clientMachine identifier of the client machine
    * @param writeToEditLog whether to persist this change to the edit log
@@ -3788,7 +3788,7 @@ public class FSNamesystem implements Namesystem, FSClusterStats,
    * Save allocated block at the given pending filename
    *
    * @param src path to the file
-   * @param inodesInPath representing each of the components of src.
+   * @param inodes representing each of the components of src.
    *                     The last INode is the INode for {@code src} file.
    * @param newBlock newly allocated block to be save
    * @param targets target datanodes where replicas of the new block is placed
