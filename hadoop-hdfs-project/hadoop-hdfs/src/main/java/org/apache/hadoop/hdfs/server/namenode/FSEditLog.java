@@ -658,6 +658,7 @@ public class FSEditLog implements LogsPurgeable {
     try {
       EditLogOutputStream logStream = null;
 
+      // 步骤三：
       // txid = 2的线程，此时也过来了
       // 但是会阻塞在这里，因为这里是synchronized锁的
 
@@ -670,18 +671,23 @@ public class FSEditLog implements LogsPurgeable {
           // 有一个isSyncRunning标志位，如果是true的话，说明有某个线程正在同步buffer到磁盘上去
           // while true的循环和等待，等前面的那个线程先同步完了，他再来同步
 
+          // 步骤一：
           // 三个线程，transactionId分别1、2、3
           // 此时txid = 1的线程，正在执行sync到磁盘的操作
           // 此时txid = 3的线程，获取到了synchronized锁，进入了这个代码块
           // 此时，mytxid = 3 > synctxid = 1，isSyncRunning = true，就会陷入while true等待
 
+          // 步骤四：
           // 过了一会儿，txid = 1的线程已经完成了内存的flush，此时txid = 1的edits log已经进入了磁盘的
           // 一个segment文件中去了，isSyncRunning会修改为false
           // 此时txid = 3的线程就会逃离出这个while true，isSyncRunning = false
 
+          // 步骤七：
           // 此时txid = 2的线程，获取锁，进入了这里
           // mytxid = 2 > synctxid = 1 & isSyncRunning = true
           // 也会在这里卡住
+
+          // 步骤九：
           // txid = 2的线程，此时就会脱离这个while true循环
           while (mytxid > synctxid && isSyncRunning) {
             try {
@@ -692,7 +698,10 @@ public class FSEditLog implements LogsPurgeable {
 
           //
           // If this transaction was already flushed, then nothing to do
+          // 步骤五：
           // mytxid = 3 > synctxid = 1
+
+          // 步骤十：
           // mytxid = 2 < synctxid = 3，此时会进入这个代码片段
           if (mytxid <= synctxid) {
             numTransactionsBatchedInSync++;
@@ -744,12 +753,15 @@ public class FSEditLog implements LogsPurgeable {
           // 他底层会调用所有流的flush()方法
           // 将之前写入缓冲区的数据，此时刷新到磁盘或者网络（journalnode）
 
+          // 步骤二：
           // 这个代码块是不加锁的，txid = 1的线程，正在这里执行sync操作
           // 将内存的数据flush到磁盘上去
 
+          // 步骤六：
           // 此时txid = 3的线程，会同时将txid = 2和txid = 3的两个edits log，都在这里
           // flush到磁盘里去
 
+          // 步骤八：
           // txid = 3的线程，将txid=2和txid=3的两个edits log都成功flush到磁盘里去了
 
           // 如果在这里加synchronized会如何呢？
