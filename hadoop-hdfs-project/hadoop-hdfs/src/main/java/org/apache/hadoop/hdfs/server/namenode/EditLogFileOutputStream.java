@@ -63,7 +63,7 @@ public class EditLogFileOutputStream extends EditLogOutputStream {
 
   /**
    * Creates output buffers and file object.
-   * 
+   *
    * @param conf
    *          Configuration object
    * @param name
@@ -73,7 +73,7 @@ public class EditLogFileOutputStream extends EditLogOutputStream {
    * @throws IOException
    */
   public EditLogFileOutputStream(Configuration conf, File name, int size)
-      throws IOException {
+          throws IOException {
     super();
     shouldSyncWritesAndSkipFsync = conf.getBoolean(
             DFSConfigKeys.DFS_NAMENODE_EDITS_NOEDITLOGCHANNELFLUSH,
@@ -83,7 +83,8 @@ public class EditLogFileOutputStream extends EditLogOutputStream {
     doubleBuf = new EditsDoubleBuffer(size);
     RandomAccessFile rp;
     if (shouldSyncWritesAndSkipFsync) {
-      rp = new RandomAccessFile(name, "rws");
+      rp = new RandomAccessFile(name, "rws"); // 底层都是Java IO的一些东西，RandomAccessFile
+      // 每次都会根据transactionId生成一个文件名
     } else {
       rp = new RandomAccessFile(name, "rw");
     }
@@ -94,6 +95,8 @@ public class EditLogFileOutputStream extends EditLogOutputStream {
 
   @Override
   public void write(FSEditLogOp op) throws IOException {
+    // 什么叫做内存双缓冲机制的输出
+    // 其实就是在将数据写入双缓冲的其中一块缓冲区里面
     doubleBuf.writeOp(op);
   }
 
@@ -107,6 +110,8 @@ public class EditLogFileOutputStream extends EditLogOutputStream {
    * */
   @Override
   public void writeRaw(byte[] bytes, int offset, int length) throws IOException {
+    // 人家也是走的双缓冲的机制
+    // 先写入内存里去，然后再是去flush
     doubleBuf.writeRaw(bytes, offset, length);
   }
 
@@ -125,14 +130,14 @@ public class EditLogFileOutputStream extends EditLogOutputStream {
   /**
    * Write header information for this EditLogFileOutputStream to the provided
    * DataOutputSream.
-   * 
+   *
    * @param layoutVersion the LayoutVersion of the EditLog
    * @param out the output stream to write the header to.
    * @throws IOException in the event of error writing to the stream.
    */
   @VisibleForTesting
   public static void writeHeader(int layoutVersion, DataOutputStream out)
-      throws IOException {
+          throws IOException {
     out.writeInt(layoutVersion);
     LayoutFlags.write(out);
   }
@@ -151,7 +156,7 @@ public class EditLogFileOutputStream extends EditLogOutputStream {
         doubleBuf.close();
         doubleBuf = null;
       }
-      
+
       // remove any preallocated padding bytes from the transaction log.
       if (fc != null && fc.isOpen()) {
         fc.truncate(fc.position());
@@ -168,7 +173,7 @@ public class EditLogFileOutputStream extends EditLogOutputStream {
     }
     fp = null;
   }
-  
+
   @Override
   public void abort() throws IOException {
     if (fp == null) {
@@ -201,6 +206,7 @@ public class EditLogFileOutputStream extends EditLogOutputStream {
       return;
     }
     preallocate(); // preallocate file if necessary
+    // 人家就是调用了
     doubleBuf.flushTo(fp);
     if (durable && !shouldSkipFsyncForTests && !shouldSyncWritesAndSkipFsync) {
       fc.force(false); // metadata updates not needed
@@ -235,7 +241,7 @@ public class EditLogFileOutputStream extends EditLogOutputStream {
     }
     if(FSNamesystem.LOG.isDebugEnabled()) {
       FSNamesystem.LOG.debug("Preallocated " + total + " bytes at the end of " +
-      		"the edit log (offset " + oldSize + ")");
+              "the edit log (offset " + oldSize + ")");
     }
   }
 
@@ -245,7 +251,7 @@ public class EditLogFileOutputStream extends EditLogOutputStream {
   File getFile() {
     return file;
   }
-  
+
   @Override
   public String toString() {
     return "EditLogFileOutputStream(" + file + ")";
@@ -257,17 +263,17 @@ public class EditLogFileOutputStream extends EditLogOutputStream {
   public boolean isOpen() {
     return fp != null;
   }
-  
+
   @VisibleForTesting
   public void setFileChannelForTesting(FileChannel fc) {
     this.fc = fc;
   }
-  
+
   @VisibleForTesting
   public FileChannel getFileChannelForTesting() {
     return fc;
   }
-  
+
   /**
    * For the purposes of unit tests, we don't need to actually
    * write durably to disk. So, we can skip the fsync() calls

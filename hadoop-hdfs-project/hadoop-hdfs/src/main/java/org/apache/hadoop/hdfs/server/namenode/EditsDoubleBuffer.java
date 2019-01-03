@@ -34,10 +34,19 @@ import com.google.common.base.Preconditions;
  * is flushed, the two internal buffers are swapped. This allows edits
  * to progress concurrently to flushes without allocating new buffers each
  * time.
+ *
+ * 新的edits log是写入到第一个buffer缓冲区里面去的，他里面是有两个buffer缓冲区的
+ * 第二个buffer缓冲区是用来刷新内存数据到磁盘上或者网络中去的
+ * 每次双缓冲被刷新的时候（第二个buffer缓冲区被刷新到磁盘或者网络），两个buffer缓冲区会被交换一下
+ * 这个可以允许edits log持续写入内存缓冲的时候，还可以同时将内存缓冲中的数据刷新到磁盘或者网络中
+ *
  */
 @InterfaceAudience.Private
 public class EditsDoubleBuffer {
 
+  // 里面放了两个缓冲区 
+  // 每个缓冲区，都是基于DataOutputSteam来实现的
+  // 其实说白了，就是将数据写入到内存中，这个是JDK IO这块底层的API
   private TxnBuffer bufCurrent; // current buffer for writing
   private TxnBuffer bufReady; // buffer ready for flushing
   private final int initBufferSize;
@@ -48,15 +57,16 @@ public class EditsDoubleBuffer {
     bufReady = new TxnBuffer(initBufferSize);
 
   }
-    
+
   public void writeOp(FSEditLogOp op) throws IOException {
+    // 就是将数据写入bufCurrent这块缓冲区中
     bufCurrent.writeOp(op);
   }
 
   public void writeRaw(byte[] bytes, int offset, int length) throws IOException {
     bufCurrent.write(bytes, offset, length);
   }
-  
+
   public void close() throws IOException {
     Preconditions.checkNotNull(bufCurrent);
     Preconditions.checkNotNull(bufReady);
@@ -64,20 +74,20 @@ public class EditsDoubleBuffer {
     int bufSize = bufCurrent.size();
     if (bufSize != 0) {
       throw new IOException("FSEditStream has " + bufSize
-          + " bytes still to be flushed and cannot be closed.");
+              + " bytes still to be flushed and cannot be closed.");
     }
 
     IOUtils.cleanup(null, bufCurrent, bufReady);
     bufCurrent = bufReady = null;
   }
-  
+
   public void setReadyToFlush() {
     assert isFlushed() : "previous data not flushed yet";
     TxnBuffer tmp = bufReady;
     bufReady = bufCurrent;
     bufCurrent = tmp;
   }
-  
+
   /**
    * Writes the content of the "ready" buffer to the given output stream,
    * and resets it. Does not swap any buffers.
@@ -86,7 +96,7 @@ public class EditsDoubleBuffer {
     bufReady.writeTo(out); // write data to file
     bufReady.reset(); // erase all data in the buffer
   }
-  
+
   public boolean shouldForceSync() {
     return bufCurrent.size() >= initBufferSize;
   }
@@ -94,7 +104,7 @@ public class EditsDoubleBuffer {
   DataOutputBuffer getReadyBuf() {
     return bufReady;
   }
-  
+
   DataOutputBuffer getCurrentBuf() {
     return bufCurrent;
   }
@@ -128,12 +138,12 @@ public class EditsDoubleBuffer {
   public int countReadyBytes() {
     return bufReady.size();
   }
-  
+
   private static class TxnBuffer extends DataOutputBuffer {
     long firstTxId;
     int numTxns;
     private final Writer writer;
-    
+
     public TxnBuffer(int initBufferSize) {
       super(initBufferSize);
       writer = new FSEditLogOp.Writer(this);
@@ -149,7 +159,7 @@ public class EditsDoubleBuffer {
       writer.writeOp(op);
       numTxns++;
     }
-    
+
     @Override
     public DataOutputBuffer reset() {
       super.reset();
