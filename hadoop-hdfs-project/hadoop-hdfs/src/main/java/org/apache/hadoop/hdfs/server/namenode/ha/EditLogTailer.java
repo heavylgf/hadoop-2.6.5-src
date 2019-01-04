@@ -55,14 +55,19 @@ import com.google.common.base.Preconditions;
  * EditLogTailer represents a thread which periodically reads from edits
  * journals and applies the transactions contained within to a given
  * FSNamesystem.
+ *
+ * EditLogTailer代表了一个后台线程，这个后台线程会不断的周期性的从journal nodes集群上拉取edits log数据流
+ * 接着就将edits log数据流给应用到自己的FSNamesystem上去，也就是自己本地的元数据上去
+ *
  */
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
 public class EditLogTailer {
   public static final Log LOG = LogFactory.getLog(EditLogTailer.class);
-  
+
+  // 这个东西一看就是人家内部的线程
   private final EditLogTailerThread tailerThread;
-  
+
   private final Configuration conf;
   private final FSNamesystem namesystem;
   private FSEditLog editLog;
@@ -74,7 +79,7 @@ public class EditLogTailer {
    * The last transaction ID at which an edit log roll was initiated.
    */
   private long lastRollTriggerTxId = HdfsConstants.INVALID_TXID;
-  
+
   /**
    * The highest transaction ID loaded by the Standby.
    */
@@ -98,49 +103,49 @@ public class EditLogTailer {
    * available to be read from.
    */
   private final long sleepTimeMs;
-  
+
   public EditLogTailer(FSNamesystem namesystem, Configuration conf) {
     this.tailerThread = new EditLogTailerThread();
     this.conf = conf;
     this.namesystem = namesystem;
     this.editLog = namesystem.getEditLog();
-    
+
     lastLoadTimestamp = now();
 
     logRollPeriodMs = conf.getInt(DFSConfigKeys.DFS_HA_LOGROLL_PERIOD_KEY,
-        DFSConfigKeys.DFS_HA_LOGROLL_PERIOD_DEFAULT) * 1000;
+            DFSConfigKeys.DFS_HA_LOGROLL_PERIOD_DEFAULT) * 1000;
     if (logRollPeriodMs >= 0) {
       this.activeAddr = getActiveNodeAddress();
       Preconditions.checkArgument(activeAddr.getPort() > 0,
-          "Active NameNode must have an IPC port configured. " +
-          "Got address '%s'", activeAddr);
+              "Active NameNode must have an IPC port configured. " +
+                      "Got address '%s'", activeAddr);
       LOG.info("Will roll logs on active node at " + activeAddr + " every " +
-          (logRollPeriodMs / 1000) + " seconds.");
+              (logRollPeriodMs / 1000) + " seconds.");
     } else {
       LOG.info("Not going to trigger log rolls on active node because " +
-          DFSConfigKeys.DFS_HA_LOGROLL_PERIOD_KEY + " is negative.");
+              DFSConfigKeys.DFS_HA_LOGROLL_PERIOD_KEY + " is negative.");
     }
-    
+
     sleepTimeMs = conf.getInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY,
-        DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_DEFAULT) * 1000;
-    
+            DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_DEFAULT) * 1000;
+
     LOG.debug("logRollPeriodMs=" + logRollPeriodMs +
-        " sleepTime=" + sleepTimeMs);
+            " sleepTime=" + sleepTimeMs);
   }
-  
+
   private InetSocketAddress getActiveNodeAddress() {
     Configuration activeConf = HAUtil.getConfForOtherNode(conf);
     return NameNode.getServiceAddress(activeConf, true);
   }
-  
+
   private NamenodeProtocol getActiveNodeProxy() throws IOException {
     if (cachedActiveProxy == null) {
       int rpcTimeout = conf.getInt(
-          DFSConfigKeys.DFS_HA_LOGROLL_RPC_TIMEOUT_KEY,
-          DFSConfigKeys.DFS_HA_LOGROLL_RPC_TIMEOUT_DEFAULT);
+              DFSConfigKeys.DFS_HA_LOGROLL_RPC_TIMEOUT_KEY,
+              DFSConfigKeys.DFS_HA_LOGROLL_RPC_TIMEOUT_DEFAULT);
       NamenodeProtocolPB proxy = RPC.waitForProxy(NamenodeProtocolPB.class,
-          RPC.getProtocolVersion(NamenodeProtocolPB.class), activeAddr, conf,
-          rpcTimeout, Long.MAX_VALUE);
+              RPC.getProtocolVersion(NamenodeProtocolPB.class), activeAddr, conf,
+              rpcTimeout, Long.MAX_VALUE);
       cachedActiveProxy = new NamenodeProtocolTranslatorPB(proxy);
     }
     assert cachedActiveProxy != null;
@@ -150,7 +155,7 @@ public class EditLogTailer {
   public void start() {
     tailerThread.start();
   }
-  
+
   public void stop() throws IOException {
     tailerThread.setShouldRun(false);
     tailerThread.interrupt();
@@ -161,21 +166,21 @@ public class EditLogTailer {
       throw new IOException(e);
     }
   }
-  
+
   @VisibleForTesting
   FSEditLog getEditLog() {
     return editLog;
   }
-  
+
   @VisibleForTesting
   public void setEditLog(FSEditLog editLog) {
     this.editLog = editLog;
   }
-  
+
   public void catchupDuringFailover() throws IOException {
     Preconditions.checkState(tailerThread == null ||
-        !tailerThread.isAlive(),
-        "Tailer thread should not be running once failover starts");
+                    !tailerThread.isAlive(),
+            "Tailer thread should not be running once failover starts");
     // Important to do tailing as the login user, in case the shared
     // edits storage is implemented by a JournalManager that depends
     // on security credentials to access the logs (eg QuorumJournalManager).
@@ -191,10 +196,10 @@ public class EditLogTailer {
       }
     });
   }
-  
+
   @VisibleForTesting
   void doTailEdits() throws IOException, InterruptedException {
-    // Write lock needs to be interruptible here because the 
+    // Write lock needs to be interruptible here because the
     // transitionToActive RPC takes the write lock before calling
     // tailer.stop() -- so if we're not interruptible, it will
     // deadlock.
@@ -202,31 +207,40 @@ public class EditLogTailer {
     try {
       FSImage image = namesystem.getFSImage();
 
+      // 都能看懂了，lastTxnId，其实说的就是最近一个应用到standby namenode本地
+      // 元数据上的edits log的txid
+      // 比如说，最近一次的txid是171，应用到了本地的元数据中
       long lastTxnId = image.getLastAppliedTxId();
-      
+
       if (LOG.isDebugEnabled()) {
         LOG.debug("lastTxnId: " + lastTxnId);
       }
       Collection<EditLogInputStream> streams;
       try {
+        // selectInputStreams，这里他的意思是说，希望尝试去读取
+        // lastTxnId + 1 = 172，意思说，他希望从journal node上获取txid = 172开始的edits log
         streams = editLog.selectInputStreams(lastTxnId + 1, 0, null, false);
       } catch (IOException ioe) {
         // This is acceptable. If we try to tail edits in the middle of an edits
         // log roll, i.e. the last one has been finalized but the new inprogress
         // edits file hasn't been started yet.
         LOG.warn("Edits tailer failed to find any streams. Will try again " +
-            "later.", ioe);
+                "later.", ioe);
         return;
       }
       if (LOG.isDebugEnabled()) {
         LOG.debug("edit streams to load from: " + streams.size());
       }
-      
+
       // Once we have streams to load, errors encountered are legitimate cause
       // for concern, so we don't catch them here. Simple errors reading from
       // disk are ignored.
       long editsLoaded = 0;
       try {
+        // 执行FSImage的loadEdits()方法，将edits log输入流传入了进去
+        // FSImage代表了人家的这个元数据
+        // 他肯定是说，底层使用了EditLogInputStream从journalnodes读尝试拉取更新的edits log
+        // 如果拉取到了，肯定在这个方法的内部，就会应用到元数据里去
         editsLoaded = image.loadEdits(streams, namesystem);
       } catch (EditLogInputException elie) {
         editsLoaded = elie.getNumEditsLoaded();
@@ -234,13 +248,14 @@ public class EditLogTailer {
       } finally {
         if (editsLoaded > 0 || LOG.isDebugEnabled()) {
           LOG.info(String.format("Loaded %d edits starting from txid %d ",
-              editsLoaded, lastTxnId));
+                  editsLoaded, lastTxnId));
         }
       }
 
       if (editsLoaded > 0) {
         lastLoadTimestamp = now();
       }
+      // 再次更新一下最近一次加载到的lastLoadedTxnId
       lastLoadedTxnId = image.getLastAppliedTxId();
     } finally {
       namesystem.writeUnlock();
@@ -258,8 +273,8 @@ public class EditLogTailer {
    * @return true if the configured log roll period has elapsed.
    */
   private boolean tooLongSinceLastLoad() {
-    return logRollPeriodMs >= 0 && 
-      (now() - lastLoadTimestamp) > logRollPeriodMs ;
+    return logRollPeriodMs >= 0 &&
+            (now() - lastLoadTimestamp) > logRollPeriodMs ;
   }
 
   /**
@@ -281,35 +296,42 @@ public class EditLogTailer {
    */
   private class EditLogTailerThread extends Thread {
     private volatile boolean shouldRun = true;
-    
+
     private EditLogTailerThread() {
       super("Edit log tailer");
     }
-    
+
     private void setShouldRun(boolean shouldRun) {
       this.shouldRun = shouldRun;
     }
-    
+
     @Override
     public void run() {
       SecurityUtil.doAsLoginUserOrFatal(
-          new PrivilegedAction<Object>() {
-          @Override
-          public Object run() {
-            doWork();
-            return null;
-          }
-        });
+              new PrivilegedAction<Object>() {
+                @Override
+                public Object run() {
+                  doWork();
+                  return null;
+                }
+              });
     }
-    
+
     private void doWork() {
+      // 进入了一个while true死循环，不断的运行
       while (shouldRun) {
         try {
           // There's no point in triggering a log roll if the Standby hasn't
           // read any more transactions since the last time a roll was
-          // triggered. 
+          // triggered.
+
+          // 看起来这个好像是说，如果距离上一次roll edits log以后，standby一直没有接收到更多的edits log
+          // 触发一次active namenode的edits log roll
+          // edits log roll是个什么操作？
+          // 大概可以理解为，重新创建一个新的edits_inprogress文件
+          // 之前的文件就固定为startTransactionId~endTransactionId的一个文件
           if (tooLongSinceLastLoad() &&
-              lastRollTriggerTxId < lastLoadedTxnId) {
+                  lastRollTriggerTxId < lastLoadedTxnId) {
             triggerActiveLogRoll();
           }
           /**
@@ -329,11 +351,14 @@ public class EditLogTailer {
           continue;
         } catch (Throwable t) {
           LOG.fatal("Unknown error encountered while tailing edits. " +
-              "Shutting down standby NN.", t);
+                  "Shutting down standby NN.", t);
           terminate(1, t);
         }
 
         try {
+          // 按照默认的配置来说
+          // 这里是standby namenode默认是每隔60秒（1分钟）去尝试获取journal node上的edits log
+          // 这个时间很重要
           Thread.sleep(sleepTimeMs);
         } catch (InterruptedException e) {
           LOG.warn("Edit log tailer interrupted", e);
