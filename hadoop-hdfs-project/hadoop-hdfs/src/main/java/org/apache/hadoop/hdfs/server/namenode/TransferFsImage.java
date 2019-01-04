@@ -70,7 +70,7 @@ import org.mortbay.jetty.EofException;
  */
 @InterfaceAudience.Private
 public class TransferFsImage {
-  
+
   public final static String CONTENT_LENGTH = "Content-Length";
   public final static String FILE_LENGTH = "File-Length";
   public final static String MD5_HEADER = "X-MD5-Digest";
@@ -86,40 +86,40 @@ public class TransferFsImage {
   static {
     Configuration conf = new Configuration();
     connectionFactory = URLConnectionFactory
-        .newDefaultURLConnectionFactory(conf);
+            .newDefaultURLConnectionFactory(conf);
     isSpnegoEnabled = UserGroupInformation.isSecurityEnabled();
   }
 
   private static final Log LOG = LogFactory.getLog(TransferFsImage.class);
-  
+
   public static void downloadMostRecentImageToDirectory(URL infoServer,
-      File dir) throws IOException {
+                                                        File dir) throws IOException {
     String fileId = ImageServlet.getParamStringForMostRecentImage();
     getFileClient(infoServer, fileId, Lists.newArrayList(dir),
-        null, false);
+            null, false);
   }
 
   public static MD5Hash downloadImageToStorage(URL fsName, long imageTxId,
-      Storage dstStorage, boolean needDigest) throws IOException {
+                                               Storage dstStorage, boolean needDigest) throws IOException {
     String fileid = ImageServlet.getParamStringForImage(null,
-        imageTxId, dstStorage);
+            imageTxId, dstStorage);
     String fileName = NNStorage.getCheckpointImageFileName(imageTxId);
-    
+
     List<File> dstFiles = dstStorage.getFiles(
-        NameNodeDirType.IMAGE, fileName);
+            NameNodeDirType.IMAGE, fileName);
     if (dstFiles.isEmpty()) {
       throw new IOException("No targets in destination storage!");
     }
-    
+
     MD5Hash hash = getFileClient(fsName, fileid, dstFiles, dstStorage, needDigest);
     LOG.info("Downloaded file " + dstFiles.get(0).getName() + " size " +
-        dstFiles.get(0).length() + " bytes.");
+            dstFiles.get(0).length() + " bytes.");
     return hash;
   }
 
   static MD5Hash handleUploadImageRequest(HttpServletRequest request,
-      long imageTxId, Storage dstStorage, InputStream stream,
-      long advertisedSize, DataTransferThrottler throttler) throws IOException {
+                                          long imageTxId, Storage dstStorage, InputStream stream,
+                                          long advertisedSize, DataTransferThrottler throttler) throws IOException {
 
     String fileName = NNStorage.getCheckpointImageFileName(imageTxId);
 
@@ -130,29 +130,29 @@ public class TransferFsImage {
 
     MD5Hash advertisedDigest = parseMD5Header(request);
     MD5Hash hash = receiveFile(fileName, dstFiles, dstStorage, true,
-        advertisedSize, advertisedDigest, fileName, stream, throttler);
+            advertisedSize, advertisedDigest, fileName, stream, throttler);
     LOG.info("Downloaded file " + dstFiles.get(0).getName() + " size "
-        + dstFiles.get(0).length() + " bytes.");
+            + dstFiles.get(0).length() + " bytes.");
     return hash;
   }
 
   static void downloadEditsToStorage(URL fsName, RemoteEditLog log,
-      NNStorage dstStorage) throws IOException {
+                                     NNStorage dstStorage) throws IOException {
     assert log.getStartTxId() > 0 && log.getEndTxId() > 0 :
-      "bad log: " + log;
+            "bad log: " + log;
     String fileid = ImageServlet.getParamStringForLog(
-        log, dstStorage);
+            log, dstStorage);
     String finalFileName = NNStorage.getFinalizedEditsFileName(
-        log.getStartTxId(), log.getEndTxId());
+            log.getStartTxId(), log.getEndTxId());
 
     List<File> finalFiles = dstStorage.getFiles(NameNodeDirType.EDITS,
-        finalFileName);
+            finalFileName);
     assert !finalFiles.isEmpty() : "No checkpoint targets.";
-    
+
     for (File f : finalFiles) {
       if (f.exists() && FileUtil.canRead(f)) {
         LOG.info("Skipping download of remote edit log " +
-            log + " since it already is stored locally at " + f);
+                log + " since it already is stored locally at " + f);
         return;
       } else if (LOG.isDebugEnabled()) {
         LOG.debug("Dest file: " + f);
@@ -161,31 +161,31 @@ public class TransferFsImage {
 
     final long milliTime = Time.monotonicNow();
     String tmpFileName = NNStorage.getTemporaryEditsFileName(
-        log.getStartTxId(), log.getEndTxId(), milliTime);
+            log.getStartTxId(), log.getEndTxId(), milliTime);
     List<File> tmpFiles = dstStorage.getFiles(NameNodeDirType.EDITS,
-        tmpFileName);
+            tmpFileName);
     getFileClient(fsName, fileid, tmpFiles, dstStorage, false);
     LOG.info("Downloaded file " + tmpFiles.get(0).getName() + " size " +
-        finalFiles.get(0).length() + " bytes.");
+            finalFiles.get(0).length() + " bytes.");
 
     CheckpointFaultInjector.getInstance().beforeEditsRename();
 
     for (StorageDirectory sd : dstStorage.dirIterable(NameNodeDirType.EDITS)) {
       File tmpFile = NNStorage.getTemporaryEditsFile(sd,
-          log.getStartTxId(), log.getEndTxId(), milliTime);
+              log.getStartTxId(), log.getEndTxId(), milliTime);
       File finalizedFile = NNStorage.getFinalizedEditsFile(sd,
-          log.getStartTxId(), log.getEndTxId());
+              log.getStartTxId(), log.getEndTxId());
       if (LOG.isDebugEnabled()) {
         LOG.debug("Renaming " + tmpFile + " to " + finalizedFile);
       }
       boolean success = tmpFile.renameTo(finalizedFile);
       if (!success) {
         LOG.warn("Unable to rename edits file from " + tmpFile
-            + " to " + finalizedFile);
+                + " to " + finalizedFile);
       }
     }
   }
- 
+
   /**
    * Requests that the NameNode download an image from this node.
    *
@@ -197,7 +197,7 @@ public class TransferFsImage {
    * @throws IOException if there is an I/O error
    */
   public static void uploadImageFromStorage(URL fsName, Configuration conf,
-      NNStorage storage, NameNodeFile nnf, long txid) throws IOException {
+                                            NNStorage storage, NameNodeFile nnf, long txid) throws IOException {
     uploadImageFromStorage(fsName, conf, storage, nnf, txid, null);
   }
 
@@ -214,8 +214,8 @@ public class TransferFsImage {
    * @throws IOException if there is an I/O error or cancellation
    */
   public static void uploadImageFromStorage(URL fsName, Configuration conf,
-      NNStorage storage, NameNodeFile nnf, long txid, Canceler canceler)
-      throws IOException {
+                                            NNStorage storage, NameNodeFile nnf, long txid, Canceler canceler)
+          throws IOException {
     URL url = new URL(fsName, ImageServlet.PATH_SPEC);
     long startTime = Time.monotonicNow();
     try {
@@ -224,26 +224,26 @@ public class TransferFsImage {
       if (e.getResponseCode() == HttpServletResponse.SC_CONFLICT) {
         // this is OK - this means that a previous attempt to upload
         // this checkpoint succeeded even though we thought it failed.
-        LOG.info("Image upload with txid " + txid + 
-            " conflicted with a previous image upload to the " +
-            "same NameNode. Continuing...", e);
+        LOG.info("Image upload with txid " + txid +
+                " conflicted with a previous image upload to the " +
+                "same NameNode. Continuing...", e);
         return;
       } else {
         throw e;
       }
     }
     double xferSec = Math.max(
-        ((float) (Time.monotonicNow() - startTime)) / 1000.0, 0.001);
+            ((float) (Time.monotonicNow() - startTime)) / 1000.0, 0.001);
     LOG.info("Uploaded image with txid " + txid + " to namenode at " + fsName
-        + " in " + xferSec + " seconds");
+            + " in " + xferSec + " seconds");
   }
 
   /*
    * Uploads the imagefile using HTTP PUT method
    */
   private static void uploadImage(URL url, Configuration conf,
-      NNStorage storage, NameNodeFile nnf, long txId, Canceler canceler)
-      throws IOException {
+                                  NNStorage storage, NameNodeFile nnf, long txId, Canceler canceler)
+          throws IOException {
 
     File imageFile = storage.findImageFile(nnf, txId);
     if (imageFile == null) {
@@ -257,22 +257,22 @@ public class TransferFsImage {
       // write all params for image upload request as query itself.
       // Request body contains the image to be uploaded.
       Map<String, String> params = ImageServlet.getParamsForPutImage(storage,
-          txId, imageFile.length(), nnf);
+              txId, imageFile.length(), nnf);
       for (Entry<String, String> entry : params.entrySet()) {
         uriBuilder.addParameter(entry.getKey(), entry.getValue());
       }
 
       URL urlWithParams = uriBuilder.build().toURL();
       connection = (HttpURLConnection) connectionFactory.openConnection(
-          urlWithParams, UserGroupInformation.isSecurityEnabled());
+              urlWithParams, UserGroupInformation.isSecurityEnabled());
       // Set the request to PUT
       connection.setRequestMethod("PUT");
       connection.setDoOutput(true);
 
-      
+
       int chunkSize = conf.getInt(
-          DFSConfigKeys.DFS_IMAGE_TRANSFER_CHUNKSIZE_KEY,
-          DFSConfigKeys.DFS_IMAGE_TRANSFER_CHUNKSIZE_DEFAULT);
+              DFSConfigKeys.DFS_IMAGE_TRANSFER_CHUNKSIZE_KEY,
+              DFSConfigKeys.DFS_IMAGE_TRANSFER_CHUNKSIZE_DEFAULT);
       if (imageFile.length() > chunkSize) {
         // using chunked streaming mode to support upload of 2GB+ files and to
         // avoid internal buffering.
@@ -292,7 +292,7 @@ public class TransferFsImage {
       int responseCode = connection.getResponseCode();
       if (responseCode != HttpURLConnection.HTTP_OK) {
         throw new HttpPutFailedException(connection.getResponseMessage(),
-            responseCode);
+                responseCode);
       }
     } catch (AuthenticationException e) {
       throw new IOException(e);
@@ -306,15 +306,17 @@ public class TransferFsImage {
   }
 
   private static void writeFileToPutRequest(Configuration conf,
-      HttpURLConnection connection, File imageFile, Canceler canceler)
-      throws FileNotFoundException, IOException {
+                                            HttpURLConnection connection, File imageFile, Canceler canceler)
+          throws FileNotFoundException, IOException {
     connection.setRequestProperty(CONTENT_TYPE, "application/octet-stream");
     connection.setRequestProperty(CONTENT_TRANSFER_ENCODING, "binary");
     OutputStream output = connection.getOutputStream();
     FileInputStream input = new FileInputStream(imageFile);
     try {
+      // 一边从自己本地磁盘文件读取fsimage文件，构造一个FileInputStream输入流
+      // 一边将这个文件输出到针对active namenode的HttpServer的输出流里去，通过http上传fsiamge文件
       copyFileToStream(output, imageFile, input,
-          ImageServlet.getThrottler(conf), canceler);
+              ImageServlet.getThrottler(conf), canceler);
     } finally {
       IOUtils.closeStream(input);
       IOUtils.closeStream(output);
@@ -326,45 +328,45 @@ public class TransferFsImage {
    * Copies the contents of the local file into the output stream.
    */
   public static void copyFileToStream(OutputStream out, File localfile,
-      FileInputStream infile, DataTransferThrottler throttler)
-    throws IOException {
+                                      FileInputStream infile, DataTransferThrottler throttler)
+          throws IOException {
     copyFileToStream(out, localfile, infile, throttler, null);
   }
 
   private static void copyFileToStream(OutputStream out, File localfile,
-      FileInputStream infile, DataTransferThrottler throttler,
-      Canceler canceler) throws IOException {
+                                       FileInputStream infile, DataTransferThrottler throttler,
+                                       Canceler canceler) throws IOException {
     byte buf[] = new byte[HdfsConstants.IO_FILE_BUFFER_SIZE];
     try {
       CheckpointFaultInjector.getInstance()
-          .aboutToSendFile(localfile);
+              .aboutToSendFile(localfile);
 
       if (CheckpointFaultInjector.getInstance().
-            shouldSendShortFile(localfile)) {
-          // Test sending image shorter than localfile
-          long len = localfile.length();
-          buf = new byte[(int)Math.min(len/2, HdfsConstants.IO_FILE_BUFFER_SIZE)];
-          // This will read at most half of the image
-          // and the rest of the image will be sent over the wire
-          infile.read(buf);
+              shouldSendShortFile(localfile)) {
+        // Test sending image shorter than localfile
+        long len = localfile.length();
+        buf = new byte[(int)Math.min(len/2, HdfsConstants.IO_FILE_BUFFER_SIZE)];
+        // This will read at most half of the image
+        // and the rest of the image will be sent over the wire
+        infile.read(buf);
       }
       int num = 1;
       while (num > 0) {
         if (canceler != null && canceler.isCancelled()) {
           throw new SaveNamespaceCancelledException(
-            canceler.getCancellationReason());
+                  canceler.getCancellationReason());
         }
         num = infile.read(buf);
         if (num <= 0) {
           break;
         }
         if (CheckpointFaultInjector.getInstance()
-              .shouldCorruptAByte(localfile)) {
+                .shouldCorruptAByte(localfile)) {
           // Simulate a corrupted byte on the wire
           LOG.warn("SIMULATING A CORRUPT BYTE IN IMAGE TRANSFER!");
           buf[0]++;
         }
-        
+
         out.write(buf, 0, num);
         if (throttler != null) {
           throttler.throttle(num, canceler);
@@ -384,23 +386,23 @@ public class TransferFsImage {
    * Client-side Method to fetch file from a server
    * Copies the response from the URL to a list of local files.
    * @param dstStorage if an error occurs writing to one of the files,
-   *                   this storage object will be notified. 
+   *                   this storage object will be notified.
    * @Return a digest of the received file if getChecksum is true
    */
   static MD5Hash getFileClient(URL infoServer,
-      String queryString, List<File> localPaths,
-      Storage dstStorage, boolean getChecksum) throws IOException {
+                               String queryString, List<File> localPaths,
+                               Storage dstStorage, boolean getChecksum) throws IOException {
     URL url = new URL(infoServer, ImageServlet.PATH_SPEC + "?" + queryString);
     LOG.info("Opening connection to " + url);
     return doGetUrl(url, localPaths, dstStorage, getChecksum);
   }
-  
+
   public static MD5Hash doGetUrl(URL url, List<File> localPaths,
-      Storage dstStorage, boolean getChecksum) throws IOException {
+                                 Storage dstStorage, boolean getChecksum) throws IOException {
     HttpURLConnection connection;
     try {
       connection = (HttpURLConnection)
-        connectionFactory.openConnection(url, isSpnegoEnabled);
+              connectionFactory.openConnection(url, isSpnegoEnabled);
     } catch (AuthenticationException e) {
       throw new IOException(e);
     }
@@ -409,37 +411,37 @@ public class TransferFsImage {
 
     if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
       throw new HttpGetFailedException(
-          "Image transfer servlet at " + url +
-          " failed with status code " + connection.getResponseCode() +
-          "\nResponse message:\n" + connection.getResponseMessage(),
-          connection);
+              "Image transfer servlet at " + url +
+                      " failed with status code " + connection.getResponseCode() +
+                      "\nResponse message:\n" + connection.getResponseMessage(),
+              connection);
     }
-    
+
     long advertisedSize;
     String contentLength = connection.getHeaderField(CONTENT_LENGTH);
     if (contentLength != null) {
       advertisedSize = Long.parseLong(contentLength);
     } else {
       throw new IOException(CONTENT_LENGTH + " header is not provided " +
-                            "by the namenode when trying to fetch " + url);
+              "by the namenode when trying to fetch " + url);
     }
     MD5Hash advertisedDigest = parseMD5Header(connection);
     String fsImageName = connection
-        .getHeaderField(ImageServlet.HADOOP_IMAGE_EDITS_HEADER);
+            .getHeaderField(ImageServlet.HADOOP_IMAGE_EDITS_HEADER);
     InputStream stream = connection.getInputStream();
 
     return receiveFile(url.toExternalForm(), localPaths, dstStorage,
-        getChecksum, advertisedSize, advertisedDigest, fsImageName, stream,
-        null);
+            getChecksum, advertisedSize, advertisedDigest, fsImageName, stream,
+            null);
   }
 
   private static void setTimeout(HttpURLConnection connection) {
     if (timeout <= 0) {
       Configuration conf = new HdfsConfiguration();
       timeout = conf.getInt(DFSConfigKeys.DFS_IMAGE_TRANSFER_TIMEOUT_KEY,
-          DFSConfigKeys.DFS_IMAGE_TRANSFER_TIMEOUT_DEFAULT);
+              DFSConfigKeys.DFS_IMAGE_TRANSFER_TIMEOUT_DEFAULT);
       LOG.info("Image Transfer timeout configured to " + timeout
-          + " milliseconds");
+              + " milliseconds");
     }
 
     if (timeout > 0) {
@@ -449,9 +451,9 @@ public class TransferFsImage {
   }
 
   private static MD5Hash receiveFile(String url, List<File> localPaths,
-      Storage dstStorage, boolean getChecksum, long advertisedSize,
-      MD5Hash advertisedDigest, String fsImageName, InputStream stream,
-      DataTransferThrottler throttler) throws IOException {
+                                     Storage dstStorage, boolean getChecksum, long advertisedSize,
+                                     MD5Hash advertisedDigest, String fsImageName, InputStream stream,
+                                     DataTransferThrottler throttler) throws IOException {
     long startTime = Time.monotonicNow();
     if (localPaths != null) {
       // If the local paths refer to directories, use the server-provided header
@@ -469,7 +471,7 @@ public class TransferFsImage {
       }
       localPaths = newLocalPaths;
     }
-    
+
 
     long received = 0;
     MessageDigest digester = null;
@@ -487,7 +489,7 @@ public class TransferFsImage {
           try {
             if (f.exists()) {
               LOG.warn("Overwriting existing file " + f
-                  + " with file downloaded from " + url);
+                      + " with file downloaded from " + url);
             }
             outputStreams.add(new FileOutputStream(f));
           } catch (IOException ioe) {
@@ -495,24 +497,27 @@ public class TransferFsImage {
             // This will be null if we're downloading the fsimage to a file
             // outside of an NNStorage directory.
             if (dstStorage != null &&
-                (dstStorage instanceof StorageErrorReporter)) {
+                    (dstStorage instanceof StorageErrorReporter)) {
               ((StorageErrorReporter)dstStorage).reportErrorOnFile(f);
             }
           }
         }
-        
+
         if (outputStreams.isEmpty()) {
           throw new IOException(
-              "Unable to download to any storage directory");
+                  "Unable to download to any storage directory");
         }
       }
-      
+
       int num = 1;
       byte[] buf = new byte[HdfsConstants.IO_FILE_BUFFER_SIZE];
       while (num > 0) {
+        // 流对拷
+        // stream.read()不断的从standby namenode读取fsimage的数据
         num = stream.read(buf);
         if (num > 0) {
           received += num;
+          // 通过FileOutputStream写到他自己本地的磁盘文件上去
           for (FileOutputStream fos : outputStreams) {
             fos.write(buf, 0, num);
           }
@@ -533,29 +538,29 @@ public class TransferFsImage {
         // -- otherwise a client-side IOException would be masked by this
         // exception that makes it look like a server-side problem!
         throw new IOException("File " + url + " received length " + received +
-                              " is not of the advertised size " +
-                              advertisedSize);
+                " is not of the advertised size " +
+                advertisedSize);
       }
     }
     double xferSec = Math.max(
-        ((float)(Time.monotonicNow() - startTime)) / 1000.0, 0.001);
+            ((float)(Time.monotonicNow() - startTime)) / 1000.0, 0.001);
     long xferKb = received / 1024;
     LOG.info(String.format("Transfer took %.2fs at %.2f KB/s",
-        xferSec, xferKb / xferSec));
+            xferSec, xferKb / xferSec));
 
     if (digester != null) {
       MD5Hash computedDigest = new MD5Hash(digester.digest());
-      
+
       if (advertisedDigest != null &&
-          !computedDigest.equals(advertisedDigest)) {
+              !computedDigest.equals(advertisedDigest)) {
         throw new IOException("File " + url + " computed digest " +
-            computedDigest + " does not match advertised digest " + 
-            advertisedDigest);
+                computedDigest + " does not match advertised digest " +
+                advertisedDigest);
       }
       return computedDigest;
     } else {
       return null;
-    }    
+    }
   }
 
   private static MD5Hash parseMD5Header(HttpURLConnection connection) {
@@ -576,7 +581,7 @@ public class TransferFsImage {
       super(msg);
       this.responseCode = connection.getResponseCode();
     }
-    
+
     public int getResponseCode() {
       return responseCode;
     }
