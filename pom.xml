@@ -466,10 +466,12 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
               <cloverDatabase>${cloverDatabase}</cloverDatabase>
               <targetPercentage>50%</targetPercentage>
               <outputDirectory>${project.build.directory}/clover</outputDirectory>
+<!--
               <alwaysReport>${cloverAlwaysReport}</alwaysReport>
               <generateHtml>${cloverGenHtml}</generateHtml>
               <generateXml>${cloverGenXml}</generateXml>
               <generateHistorical>${cloverGenHistorical}</generateHistorical>
+-->
               <excludes>
                 <exclude>**/examples/**/*.java</exclude>
                 <exclude>**/hamlet/*.java</exclude>

@@ -55,19 +55,19 @@ import com.google.common.base.Preconditions;
  * EditLogTailer represents a thread which periodically reads from edits
  * journals and applies the transactions contained within to a given
  * FSNamesystem.
- *
- * EditLogTailerä»£è¡¨äº†ä¸€ä¸ªåå°çº¿ç¨‹ï¼Œè¿™ä¸ªåå°çº¿ç¨‹ä¼šä¸æ–­çš„å‘¨æœŸæ€§çš„ä»journal nodesé›†ç¾¤ä¸Šæ‹‰å–edits logæ•°æ®æµ
- * æ¥ç€å°±å°†edits logæ•°æ®æµç»™åº”ç”¨åˆ°è‡ªå·±çš„FSNamesystemä¸Šå»ï¼Œä¹Ÿå°±æ˜¯è‡ªå·±æœ¬åœ°çš„å…ƒæ•°æ®ä¸Šå»
- *
+ * 
+ * EditLogTailer´ú±íÁËÒ»¸öºóÌ¨Ïß³Ì£¬Õâ¸öºóÌ¨Ïß³Ì»á²»¶ÏµÄÖÜÆÚĞÔµÄ´Ójournal nodes¼¯ÈºÉÏÀ­È¡edits logÊı¾İÁ÷
+ * ½Ó×Å¾Í½«edits logÊı¾İÁ÷¸øÓ¦ÓÃµ½×Ô¼ºµÄFSNamesystemÉÏÈ¥£¬Ò²¾ÍÊÇ×Ô¼º±¾µØµÄÔªÊı¾İÉÏÈ¥
+ * 
  */
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
 public class EditLogTailer {
   public static final Log LOG = LogFactory.getLog(EditLogTailer.class);
-
-  // è¿™ä¸ªä¸œè¥¿ä¸€çœ‹å°±æ˜¯äººå®¶å†…éƒ¨çš„çº¿ç¨‹
+  
+  // Õâ¸ö¶«Î÷Ò»¿´¾ÍÊÇÈË¼ÒÄÚ²¿µÄÏß³Ì
   private final EditLogTailerThread tailerThread;
-
+  
   private final Configuration conf;
   private final FSNamesystem namesystem;
   private FSEditLog editLog;
@@ -79,7 +79,7 @@ public class EditLogTailer {
    * The last transaction ID at which an edit log roll was initiated.
    */
   private long lastRollTriggerTxId = HdfsConstants.INVALID_TXID;
-
+  
   /**
    * The highest transaction ID loaded by the Standby.
    */
@@ -103,49 +103,49 @@ public class EditLogTailer {
    * available to be read from.
    */
   private final long sleepTimeMs;
-
+  
   public EditLogTailer(FSNamesystem namesystem, Configuration conf) {
     this.tailerThread = new EditLogTailerThread();
     this.conf = conf;
     this.namesystem = namesystem;
     this.editLog = namesystem.getEditLog();
-
+    
     lastLoadTimestamp = now();
 
     logRollPeriodMs = conf.getInt(DFSConfigKeys.DFS_HA_LOGROLL_PERIOD_KEY,
-            DFSConfigKeys.DFS_HA_LOGROLL_PERIOD_DEFAULT) * 1000;
+        DFSConfigKeys.DFS_HA_LOGROLL_PERIOD_DEFAULT) * 1000;
     if (logRollPeriodMs >= 0) {
       this.activeAddr = getActiveNodeAddress();
       Preconditions.checkArgument(activeAddr.getPort() > 0,
-              "Active NameNode must have an IPC port configured. " +
-                      "Got address '%s'", activeAddr);
+          "Active NameNode must have an IPC port configured. " +
+          "Got address '%s'", activeAddr);
       LOG.info("Will roll logs on active node at " + activeAddr + " every " +
-              (logRollPeriodMs / 1000) + " seconds.");
+          (logRollPeriodMs / 1000) + " seconds.");
     } else {
       LOG.info("Not going to trigger log rolls on active node because " +
-              DFSConfigKeys.DFS_HA_LOGROLL_PERIOD_KEY + " is negative.");
+          DFSConfigKeys.DFS_HA_LOGROLL_PERIOD_KEY + " is negative.");
     }
-
+    
     sleepTimeMs = conf.getInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY,
-            DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_DEFAULT) * 1000;
-
+        DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_DEFAULT) * 1000;
+    
     LOG.debug("logRollPeriodMs=" + logRollPeriodMs +
-            " sleepTime=" + sleepTimeMs);
+        " sleepTime=" + sleepTimeMs);
   }
-
+  
   private InetSocketAddress getActiveNodeAddress() {
     Configuration activeConf = HAUtil.getConfForOtherNode(conf);
     return NameNode.getServiceAddress(activeConf, true);
   }
-
+  
   private NamenodeProtocol getActiveNodeProxy() throws IOException {
     if (cachedActiveProxy == null) {
       int rpcTimeout = conf.getInt(
-              DFSConfigKeys.DFS_HA_LOGROLL_RPC_TIMEOUT_KEY,
-              DFSConfigKeys.DFS_HA_LOGROLL_RPC_TIMEOUT_DEFAULT);
+          DFSConfigKeys.DFS_HA_LOGROLL_RPC_TIMEOUT_KEY,
+          DFSConfigKeys.DFS_HA_LOGROLL_RPC_TIMEOUT_DEFAULT);
       NamenodeProtocolPB proxy = RPC.waitForProxy(NamenodeProtocolPB.class,
-              RPC.getProtocolVersion(NamenodeProtocolPB.class), activeAddr, conf,
-              rpcTimeout, Long.MAX_VALUE);
+          RPC.getProtocolVersion(NamenodeProtocolPB.class), activeAddr, conf,
+          rpcTimeout, Long.MAX_VALUE);
       cachedActiveProxy = new NamenodeProtocolTranslatorPB(proxy);
     }
     assert cachedActiveProxy != null;
@@ -155,7 +155,7 @@ public class EditLogTailer {
   public void start() {
     tailerThread.start();
   }
-
+  
   public void stop() throws IOException {
     tailerThread.setShouldRun(false);
     tailerThread.interrupt();
@@ -166,21 +166,21 @@ public class EditLogTailer {
       throw new IOException(e);
     }
   }
-
+  
   @VisibleForTesting
   FSEditLog getEditLog() {
     return editLog;
   }
-
+  
   @VisibleForTesting
   public void setEditLog(FSEditLog editLog) {
     this.editLog = editLog;
   }
-
+  
   public void catchupDuringFailover() throws IOException {
     Preconditions.checkState(tailerThread == null ||
-                    !tailerThread.isAlive(),
-            "Tailer thread should not be running once failover starts");
+        !tailerThread.isAlive(),
+        "Tailer thread should not be running once failover starts");
     // Important to do tailing as the login user, in case the shared
     // edits storage is implemented by a JournalManager that depends
     // on security credentials to access the logs (eg QuorumJournalManager).
@@ -196,10 +196,10 @@ public class EditLogTailer {
       }
     });
   }
-
+  
   @VisibleForTesting
   void doTailEdits() throws IOException, InterruptedException {
-    // Write lock needs to be interruptible here because the
+    // Write lock needs to be interruptible here because the 
     // transitionToActive RPC takes the write lock before calling
     // tailer.stop() -- so if we're not interruptible, it will
     // deadlock.
@@ -207,40 +207,40 @@ public class EditLogTailer {
     try {
       FSImage image = namesystem.getFSImage();
 
-      // éƒ½èƒ½çœ‹æ‡‚äº†ï¼ŒlastTxnIdï¼Œå…¶å®è¯´çš„å°±æ˜¯æœ€è¿‘ä¸€ä¸ªåº”ç”¨åˆ°standby namenodeæœ¬åœ°
-      // å…ƒæ•°æ®ä¸Šçš„edits logçš„txid
-      // æ¯”å¦‚è¯´ï¼Œæœ€è¿‘ä¸€æ¬¡çš„txidæ˜¯171ï¼Œåº”ç”¨åˆ°äº†æœ¬åœ°çš„å…ƒæ•°æ®ä¸­
+      // ¶¼ÄÜ¿´¶®ÁË£¬lastTxnId£¬ÆäÊµËµµÄ¾ÍÊÇ×î½üÒ»¸öÓ¦ÓÃµ½standby namenode±¾µØ
+      // ÔªÊı¾İÉÏµÄedits logµÄtxid
+      // ±ÈÈçËµ£¬×î½üÒ»´ÎµÄtxidÊÇ171£¬Ó¦ÓÃµ½ÁË±¾µØµÄÔªÊı¾İÖĞ
       long lastTxnId = image.getLastAppliedTxId();
-
+      
       if (LOG.isDebugEnabled()) {
         LOG.debug("lastTxnId: " + lastTxnId);
       }
       Collection<EditLogInputStream> streams;
       try {
-        // selectInputStreamsï¼Œè¿™é‡Œä»–çš„æ„æ€æ˜¯è¯´ï¼Œå¸Œæœ›å°è¯•å»è¯»å–
-        // lastTxnId + 1 = 172ï¼Œæ„æ€è¯´ï¼Œä»–å¸Œæœ›ä»journal nodeä¸Šè·å–txid = 172å¼€å§‹çš„edits log
+    	// selectInputStreams£¬ÕâÀïËûµÄÒâË¼ÊÇËµ£¬Ï£Íû³¢ÊÔÈ¥¶ÁÈ¡
+    	// lastTxnId + 1 = 172£¬ÒâË¼Ëµ£¬ËûÏ£Íû´Ójournal nodeÉÏ»ñÈ¡txid = 172¿ªÊ¼µÄedits log
         streams = editLog.selectInputStreams(lastTxnId + 1, 0, null, false);
       } catch (IOException ioe) {
         // This is acceptable. If we try to tail edits in the middle of an edits
         // log roll, i.e. the last one has been finalized but the new inprogress
         // edits file hasn't been started yet.
         LOG.warn("Edits tailer failed to find any streams. Will try again " +
-                "later.", ioe);
+            "later.", ioe);
         return;
       }
       if (LOG.isDebugEnabled()) {
         LOG.debug("edit streams to load from: " + streams.size());
       }
-
+      
       // Once we have streams to load, errors encountered are legitimate cause
       // for concern, so we don't catch them here. Simple errors reading from
       // disk are ignored.
       long editsLoaded = 0;
       try {
-        // æ‰§è¡ŒFSImageçš„loadEdits()æ–¹æ³•ï¼Œå°†edits logè¾“å…¥æµä¼ å…¥äº†è¿›å»
-        // FSImageä»£è¡¨äº†äººå®¶çš„è¿™ä¸ªå…ƒæ•°æ®
-        // ä»–è‚¯å®šæ˜¯è¯´ï¼Œåº•å±‚ä½¿ç”¨äº†EditLogInputStreamä»journalnodesè¯»å°è¯•æ‹‰å–æ›´æ–°çš„edits log
-        // å¦‚æœæ‹‰å–åˆ°äº†ï¼Œè‚¯å®šåœ¨è¿™ä¸ªæ–¹æ³•çš„å†…éƒ¨ï¼Œå°±ä¼šåº”ç”¨åˆ°å…ƒæ•°æ®é‡Œå»
+    	// Ö´ĞĞFSImageµÄloadEdits()·½·¨£¬½«edits logÊäÈëÁ÷´«ÈëÁË½øÈ¥
+    	// FSImage´ú±íÁËÈË¼ÒµÄÕâ¸öÔªÊı¾İ
+    	// Ëû¿Ï¶¨ÊÇËµ£¬µ×²ãÊ¹ÓÃÁËEditLogInputStream´Ójournalnodes¶Á³¢ÊÔÀ­È¡¸üĞÂµÄedits log
+    	// Èç¹ûÀ­È¡µ½ÁË£¬¿Ï¶¨ÔÚÕâ¸ö·½·¨µÄÄÚ²¿£¬¾Í»áÓ¦ÓÃµ½ÔªÊı¾İÀïÈ¥
         editsLoaded = image.loadEdits(streams, namesystem);
       } catch (EditLogInputException elie) {
         editsLoaded = elie.getNumEditsLoaded();
@@ -248,14 +248,14 @@ public class EditLogTailer {
       } finally {
         if (editsLoaded > 0 || LOG.isDebugEnabled()) {
           LOG.info(String.format("Loaded %d edits starting from txid %d ",
-                  editsLoaded, lastTxnId));
+              editsLoaded, lastTxnId));
         }
       }
 
       if (editsLoaded > 0) {
         lastLoadTimestamp = now();
       }
-      // å†æ¬¡æ›´æ–°ä¸€ä¸‹æœ€è¿‘ä¸€æ¬¡åŠ è½½åˆ°çš„lastLoadedTxnId
+      // ÔÙ´Î¸üĞÂÒ»ÏÂ×î½üÒ»´Î¼ÓÔØµ½µÄlastLoadedTxnId
       lastLoadedTxnId = image.getLastAppliedTxId();
     } finally {
       namesystem.writeUnlock();
@@ -273,8 +273,8 @@ public class EditLogTailer {
    * @return true if the configured log roll period has elapsed.
    */
   private boolean tooLongSinceLastLoad() {
-    return logRollPeriodMs >= 0 &&
-            (now() - lastLoadTimestamp) > logRollPeriodMs ;
+    return logRollPeriodMs >= 0 && 
+      (now() - lastLoadTimestamp) > logRollPeriodMs ;
   }
 
   /**
@@ -296,42 +296,42 @@ public class EditLogTailer {
    */
   private class EditLogTailerThread extends Thread {
     private volatile boolean shouldRun = true;
-
+    
     private EditLogTailerThread() {
       super("Edit log tailer");
     }
-
+    
     private void setShouldRun(boolean shouldRun) {
       this.shouldRun = shouldRun;
     }
-
+    
     @Override
     public void run() {
       SecurityUtil.doAsLoginUserOrFatal(
-              new PrivilegedAction<Object>() {
-                @Override
-                public Object run() {
-                  doWork();
-                  return null;
-                }
-              });
+          new PrivilegedAction<Object>() {
+          @Override
+          public Object run() {
+            doWork();
+            return null;
+          }
+        });
     }
-
+    
     private void doWork() {
-      // è¿›å…¥äº†ä¸€ä¸ªwhile trueæ­»å¾ªç¯ï¼Œä¸æ–­çš„è¿è¡Œ
+      // ½øÈëÁËÒ»¸öwhile trueËÀÑ­»·£¬²»¶ÏµÄÔËĞĞ
       while (shouldRun) {
         try {
           // There's no point in triggering a log roll if the Standby hasn't
           // read any more transactions since the last time a roll was
-          // triggered.
-
-          // çœ‹èµ·æ¥è¿™ä¸ªå¥½åƒæ˜¯è¯´ï¼Œå¦‚æœè·ç¦»ä¸Šä¸€æ¬¡roll edits logä»¥åï¼Œstandbyä¸€ç›´æ²¡æœ‰æ¥æ”¶åˆ°æ›´å¤šçš„edits log
-          // è§¦å‘ä¸€æ¬¡active namenodeçš„edits log roll
-          // edits log rollæ˜¯ä¸ªä»€ä¹ˆæ“ä½œï¼Ÿ
-          // å¤§æ¦‚å¯ä»¥ç†è§£ä¸ºï¼Œé‡æ–°åˆ›å»ºä¸€ä¸ªæ–°çš„edits_inprogressæ–‡ä»¶
-          // ä¹‹å‰çš„æ–‡ä»¶å°±å›ºå®šä¸ºstartTransactionId~endTransactionIdçš„ä¸€ä¸ªæ–‡ä»¶
+          // triggered. 
+        	
+          // ¿´ÆğÀ´Õâ¸öºÃÏñÊÇËµ£¬Èç¹û¾àÀëÉÏÒ»´Îroll edits logÒÔºó£¬standbyÒ»Ö±Ã»ÓĞ½ÓÊÕµ½¸ü¶àµÄedits log
+          // ´¥·¢Ò»´Îactive namenodeµÄedits log roll
+          // edits log rollÊÇ¸öÊ²Ã´²Ù×÷£¿
+          // ´ó¸Å¿ÉÒÔÀí½âÎª£¬ÖØĞÂ´´½¨Ò»¸öĞÂµÄedits_inprogressÎÄ¼ş
+          // Ö®Ç°µÄÎÄ¼ş¾Í¹Ì¶¨ÎªstartTransactionId~endTransactionIdµÄÒ»¸öÎÄ¼ş
           if (tooLongSinceLastLoad() &&
-                  lastRollTriggerTxId < lastLoadedTxnId) {
+              lastRollTriggerTxId < lastLoadedTxnId) {
             triggerActiveLogRoll();
           }
           /**
@@ -351,14 +351,14 @@ public class EditLogTailer {
           continue;
         } catch (Throwable t) {
           LOG.fatal("Unknown error encountered while tailing edits. " +
-                  "Shutting down standby NN.", t);
+              "Shutting down standby NN.", t);
           terminate(1, t);
         }
 
         try {
-          // æŒ‰ç…§é»˜è®¤çš„é…ç½®æ¥è¯´
-          // è¿™é‡Œæ˜¯standby namenodeé»˜è®¤æ˜¯æ¯éš”60ç§’ï¼ˆ1åˆ†é’Ÿï¼‰å»å°è¯•è·å–journal nodeä¸Šçš„edits log
-          // è¿™ä¸ªæ—¶é—´å¾ˆé‡è¦
+          // °´ÕÕÄ¬ÈÏµÄÅäÖÃÀ´Ëµ
+          // ÕâÀïÊÇstandby namenodeÄ¬ÈÏÊÇÃ¿¸ô60Ãë£¨1·ÖÖÓ£©È¥³¢ÊÔ»ñÈ¡journal nodeÉÏµÄedits log
+          // Õâ¸öÊ±¼äºÜÖØÒª
           Thread.sleep(sleepTimeMs);
         } catch (InterruptedException e) {
           LOG.warn("Edit log tailer interrupted", e);

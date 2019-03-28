@@ -49,18 +49,18 @@ public class NameNodeHttpServer {
   private HttpServer2 httpServer;
   private final Configuration conf;
   private final NameNode nn;
-
+  
   private InetSocketAddress httpAddress;
   private InetSocketAddress httpsAddress;
   private final InetSocketAddress bindAddress;
-
+  
   public static final String NAMENODE_ADDRESS_ATTRIBUTE_KEY = "name.node.address";
   public static final String FSIMAGE_ATTRIBUTE_KEY = "name.system.image";
   protected static final String NAMENODE_ATTRIBUTE_KEY = "name.node";
   public static final String STARTUP_PROGRESS_ATTRIBUTE_KEY = "startup.progress";
 
   NameNodeHttpServer(Configuration conf, NameNode nn,
-                     InetSocketAddress bindAddress) {
+      InetSocketAddress bindAddress) {
     this.conf = conf;
     this.nn = nn;
     this.bindAddress = bindAddress;
@@ -70,26 +70,26 @@ public class NameNodeHttpServer {
     if (WebHdfsFileSystem.isEnabled(conf, HttpServer2.LOG)) {
       // set user pattern based on configuration file
       UserParam.setUserPattern(conf.get(
-              DFSConfigKeys.DFS_WEBHDFS_USER_PATTERN_KEY,
-              DFSConfigKeys.DFS_WEBHDFS_USER_PATTERN_DEFAULT));
+          DFSConfigKeys.DFS_WEBHDFS_USER_PATTERN_KEY,
+          DFSConfigKeys.DFS_WEBHDFS_USER_PATTERN_DEFAULT));
 
       // add authentication filter for webhdfs
       final String className = conf.get(
-              DFSConfigKeys.DFS_WEBHDFS_AUTHENTICATION_FILTER_KEY,
-              DFSConfigKeys.DFS_WEBHDFS_AUTHENTICATION_FILTER_DEFAULT);
+          DFSConfigKeys.DFS_WEBHDFS_AUTHENTICATION_FILTER_KEY,
+          DFSConfigKeys.DFS_WEBHDFS_AUTHENTICATION_FILTER_DEFAULT);
       final String name = className;
 
       final String pathSpec = WebHdfsFileSystem.PATH_PREFIX + "/*";
       Map<String, String> params = getAuthFilterParams(conf);
       HttpServer2.defineFilter(httpServer.getWebAppContext(), name, className,
-              params, new String[] { pathSpec });
+          params, new String[] { pathSpec });
       HttpServer2.LOG.info("Added filter '" + name + "' (class=" + className
-              + ")");
+          + ")");
 
       // add webhdfs packages
       httpServer.addJerseyResourcePackage(NamenodeWebHdfsMethods.class
-                      .getPackage().getName() + ";" + Param.class.getPackage().getName(),
-              pathSpec);
+          .getPackage().getName() + ";" + Param.class.getPackage().getName(),
+          pathSpec);
     }
   }
 
@@ -104,9 +104,9 @@ public class NameNodeHttpServer {
 
     final InetSocketAddress httpAddr = bindAddress;
     final String httpsAddrString = conf.get(
-            DFSConfigKeys.DFS_NAMENODE_HTTPS_ADDRESS_KEY,
-            DFSConfigKeys.DFS_NAMENODE_HTTPS_ADDRESS_DEFAULT);
-
+        DFSConfigKeys.DFS_NAMENODE_HTTPS_ADDRESS_KEY,
+        DFSConfigKeys.DFS_NAMENODE_HTTPS_ADDRESS_DEFAULT);
+    
     // bindAddress，就是http server绑定在哪个端口上
     // 明显是可以自己配置，也是有自己的默认值的，默认的http端口号就是50070
     // 而且大家是否还记得，我们之前每次启动了hdfs集群之后，就会访问他的50070的端口号
@@ -120,37 +120,38 @@ public class NameNodeHttpServer {
       // If DFS_NAMENODE_HTTPS_BIND_HOST_KEY exists then it overrides the
       // host name portion of DFS_NAMENODE_HTTPS_ADDRESS_KEY.
       final String bindHost =
-              conf.getTrimmed(DFSConfigKeys.DFS_NAMENODE_HTTPS_BIND_HOST_KEY);
+          conf.getTrimmed(DFSConfigKeys.DFS_NAMENODE_HTTPS_BIND_HOST_KEY);
       if (bindHost != null && !bindHost.isEmpty()) {
         httpsAddr = new InetSocketAddress(bindHost, httpsAddr.getPort());
       }
     }
 
+    
     // 很明显，这个东西是用了一个HttpServer2，这个很明显是人家hadoop自己实现的一套http服务
     // hadoop http server这块，不是在hdfs里的，是在hadoop-common里，就是整个hadoop通用的一套http server机制
     // 在hadoop-common项目的org.apache.hadoop.http包下，有HttpServer2
     // 其实就是实现了一套可以接收http请求的一套机制
     HttpServer2.Builder builder = DFSUtil.httpServerTemplateForNNAndJN(conf,
-            httpAddr, httpsAddr, "hdfs",
-            DFSConfigKeys.DFS_NAMENODE_KERBEROS_INTERNAL_SPNEGO_PRINCIPAL_KEY,
-            DFSConfigKeys.DFS_NAMENODE_KEYTAB_FILE_KEY);
+        httpAddr, httpsAddr, "hdfs",
+        DFSConfigKeys.DFS_NAMENODE_KERBEROS_INTERNAL_SPNEGO_PRINCIPAL_KEY,
+        DFSConfigKeys.DFS_NAMENODE_KEYTAB_FILE_KEY);
 
     httpServer = builder.build();
 
     if (policy.isHttpsEnabled()) {
       // assume same ssl port for all datanodes
       InetSocketAddress datanodeSslPort = NetUtils.createSocketAddr(conf.get(
-              DFSConfigKeys.DFS_DATANODE_HTTPS_ADDRESS_KEY, infoHost + ":"
-                      + DFSConfigKeys.DFS_DATANODE_HTTPS_DEFAULT_PORT));
+          DFSConfigKeys.DFS_DATANODE_HTTPS_ADDRESS_KEY, infoHost + ":"
+              + DFSConfigKeys.DFS_DATANODE_HTTPS_DEFAULT_PORT));
       httpServer.setAttribute(DFSConfigKeys.DFS_DATANODE_HTTPS_PORT_KEY,
-              datanodeSslPort.getPort());
+          datanodeSslPort.getPort());
     }
 
     initWebHdfs(conf);
 
     httpServer.setAttribute(NAMENODE_ATTRIBUTE_KEY, nn);
     httpServer.setAttribute(JspHelper.CURRENT_CONF, conf);
-
+    
     // 这块代码是比较关键的
     // 就是在HttpServer2里面绑定了一堆servlet，就是这些servlet有什么用呢？
     // 这些servlet相当于就是定义好了，自己可以接收哪些http请求，接收到了这些请求之后，由谁来处理
@@ -162,51 +163,51 @@ public class NameNodeHttpServer {
     if (policy.isHttpEnabled()) {
       httpAddress = httpServer.getConnectorAddress(connIdx++);
       conf.set(DFSConfigKeys.DFS_NAMENODE_HTTP_ADDRESS_KEY,
-              NetUtils.getHostPortString(httpAddress));
+          NetUtils.getHostPortString(httpAddress));
     }
 
     if (policy.isHttpsEnabled()) {
       httpsAddress = httpServer.getConnectorAddress(connIdx);
       conf.set(DFSConfigKeys.DFS_NAMENODE_HTTPS_ADDRESS_KEY,
-              NetUtils.getHostPortString(httpsAddress));
+          NetUtils.getHostPortString(httpsAddress));
     }
   }
-
+  
   private Map<String, String> getAuthFilterParams(Configuration conf)
-          throws IOException {
+      throws IOException {
     Map<String, String> params = new HashMap<String, String>();
     String principalInConf = conf
-            .get(DFSConfigKeys.DFS_WEB_AUTHENTICATION_KERBEROS_PRINCIPAL_KEY);
+        .get(DFSConfigKeys.DFS_WEB_AUTHENTICATION_KERBEROS_PRINCIPAL_KEY);
     if (principalInConf != null && !principalInConf.isEmpty()) {
       params
-              .put(
-                      DFSConfigKeys.DFS_WEB_AUTHENTICATION_KERBEROS_PRINCIPAL_KEY,
-                      SecurityUtil.getServerPrincipal(principalInConf,
-                              bindAddress.getHostName()));
+          .put(
+              DFSConfigKeys.DFS_WEB_AUTHENTICATION_KERBEROS_PRINCIPAL_KEY,
+              SecurityUtil.getServerPrincipal(principalInConf,
+                                              bindAddress.getHostName()));
     } else if (UserGroupInformation.isSecurityEnabled()) {
       HttpServer2.LOG.error(
-              "WebHDFS and security are enabled, but configuration property '" +
-                      DFSConfigKeys.DFS_WEB_AUTHENTICATION_KERBEROS_PRINCIPAL_KEY +
-                      "' is not set.");
+          "WebHDFS and security are enabled, but configuration property '" +
+          DFSConfigKeys.DFS_WEB_AUTHENTICATION_KERBEROS_PRINCIPAL_KEY +
+          "' is not set.");
     }
     String httpKeytab = conf.get(DFSUtil.getSpnegoKeytabKey(conf,
-            DFSConfigKeys.DFS_NAMENODE_KEYTAB_FILE_KEY));
+        DFSConfigKeys.DFS_NAMENODE_KEYTAB_FILE_KEY));
     if (httpKeytab != null && !httpKeytab.isEmpty()) {
       params.put(
-              DFSConfigKeys.DFS_WEB_AUTHENTICATION_KERBEROS_KEYTAB_KEY,
-              httpKeytab);
+          DFSConfigKeys.DFS_WEB_AUTHENTICATION_KERBEROS_KEYTAB_KEY,
+          httpKeytab);
     } else if (UserGroupInformation.isSecurityEnabled()) {
       HttpServer2.LOG.error(
-              "WebHDFS and security are enabled, but configuration property '" +
-                      DFSConfigKeys.DFS_WEB_AUTHENTICATION_KERBEROS_KEYTAB_KEY +
-                      "' is not set.");
+          "WebHDFS and security are enabled, but configuration property '" +
+          DFSConfigKeys.DFS_WEB_AUTHENTICATION_KERBEROS_KEYTAB_KEY +
+          "' is not set.");
     }
     String anonymousAllowed = conf
-            .get(DFSConfigKeys.DFS_WEB_AUTHENTICATION_SIMPLE_ANONYMOUS_ALLOWED);
+      .get(DFSConfigKeys.DFS_WEB_AUTHENTICATION_SIMPLE_ANONYMOUS_ALLOWED);
     if (anonymousAllowed != null && !anonymousAllowed.isEmpty()) {
-      params.put(
-              DFSConfigKeys.DFS_WEB_AUTHENTICATION_SIMPLE_ANONYMOUS_ALLOWED,
-              anonymousAllowed);
+    params.put(
+        DFSConfigKeys.DFS_WEB_AUTHENTICATION_SIMPLE_ANONYMOUS_ALLOWED,
+        anonymousAllowed);
     }
     return params;
   }
@@ -227,7 +228,7 @@ public class NameNodeHttpServer {
 
   /**
    * Sets fsimage for use by servlets.
-   *
+   * 
    * @param fsImage FSImage to set
    */
   void setFSImage(FSImage fsImage) {
@@ -236,17 +237,17 @@ public class NameNodeHttpServer {
 
   /**
    * Sets address of namenode for use by servlets.
-   *
+   * 
    * @param nameNodeAddress InetSocketAddress to set
    */
   void setNameNodeAddress(InetSocketAddress nameNodeAddress) {
     httpServer.setAttribute(NAMENODE_ADDRESS_ATTRIBUTE_KEY,
-            NetUtils.getConnectAddress(nameNodeAddress));
+        NetUtils.getConnectAddress(nameNodeAddress));
   }
 
   /**
    * Sets startup progress of namenode for use by servlets.
-   *
+   * 
    * @param prog StartupProgress to set
    */
   void setStartupProgress(StartupProgress prog) {
@@ -254,37 +255,39 @@ public class NameNodeHttpServer {
   }
 
   private static void setupServlets(HttpServer2 httpServer, Configuration conf) {
-    // HttpServer2是一种通用的http服务的技术
-    // 他底层的架构，他一定是这样子的，他就是说可以针对你指定的这个端口号来进行监听
-    // 如果有人给这个端口发送请求，会被HttpServer2给拦截到，他会做统一的请求转发和处理
-    // 比如说你请求了一个http://192.168.31.19:50070/listDirs?dir=/user/warehouse
-    // 此时HttpServer2就需要将这个/listDirs这个接口转发给对应的servlet，哪个servlet在监听这个/listDirs的请求
-    // 同时将dir=/user/warehouse的参数转发给那个servlet
-    // 由那个servlet来进行处理，然后将结果返回给浏览器
+	// HttpServer2是一种通用的http服务的技术
+	// 他底层的架构，他一定是这样子的，他就是说可以针对你指定的这个端口号来进行监听
+	// 如果有人给这个端口发送请求，会被HttpServer2给拦截到，他会做统一的请求转发和处理
+	// 比如说你请求了一个http://192.168.31.19:50070/listDirs?dir=/user/warehouse
+	// 此时HttpServer2就需要将这个/listDirs这个接口转发给对应的servlet，哪个servlet在监听这个/listDirs的请求
+	// 同时将dir=/user/warehouse的参数转发给那个servlet
+	// 由那个servlet来进行处理，然后将结果返回给浏览器
     httpServer.addInternalServlet("startupProgress",
-            StartupProgressServlet.PATH_SPEC, StartupProgressServlet.class);
+        StartupProgressServlet.PATH_SPEC, StartupProgressServlet.class);
     httpServer.addInternalServlet("getDelegationToken",
-            GetDelegationTokenServlet.PATH_SPEC,
-            GetDelegationTokenServlet.class, true);
-    httpServer.addInternalServlet("renewDelegationToken",
-            RenewDelegationTokenServlet.PATH_SPEC,
-            RenewDelegationTokenServlet.class, true);
-    httpServer.addInternalServlet("cancelDelegationToken",
-            CancelDelegationTokenServlet.PATH_SPEC,
-            CancelDelegationTokenServlet.class, true);
+        GetDelegationTokenServlet.PATH_SPEC, 
+        GetDelegationTokenServlet.class, true);
+    httpServer.addInternalServlet("renewDelegationToken", 
+        RenewDelegationTokenServlet.PATH_SPEC, 
+        RenewDelegationTokenServlet.class, true);
+    httpServer.addInternalServlet("cancelDelegationToken", 
+        CancelDelegationTokenServlet.PATH_SPEC, 
+        CancelDelegationTokenServlet.class, true);
     httpServer.addInternalServlet("fsck", "/fsck", FsckServlet.class,
-            true);
+        true);
+    // 人家active namenode是提供了imagetransfer的一个接口
+    // 专门用来接收standby namenode执行完checkpoint之后发送过来的fsimage文件
     httpServer.addInternalServlet("imagetransfer", ImageServlet.PATH_SPEC,
-            ImageServlet.class, true);
+        ImageServlet.class, true);
     // 很明显，就是ListPathsServlet就是映射到/listPaths/*这种请求的，比如你要查询个什么目录
     httpServer.addInternalServlet("listPaths", "/listPaths/*",
-            ListPathsServlet.class, false);
+        ListPathsServlet.class, false);
     httpServer.addInternalServlet("data", "/data/*",
-            FileDataServlet.class, false);
+        FileDataServlet.class, false);
     httpServer.addInternalServlet("checksum", "/fileChecksum/*",
-            FileChecksumServlets.RedirectServlet.class, false);
+        FileChecksumServlets.RedirectServlet.class, false);
     httpServer.addInternalServlet("contentSummary", "/contentSummary/*",
-            ContentSummaryServlet.class, false);
+        ContentSummaryServlet.class, false);
   }
 
   static FSImage getFsImageFromContext(ServletContext context) {
@@ -300,19 +303,19 @@ public class NameNodeHttpServer {
   }
 
   public static InetSocketAddress getNameNodeAddressFromContext(
-          ServletContext context) {
+      ServletContext context) {
     return (InetSocketAddress)context.getAttribute(
-            NAMENODE_ADDRESS_ATTRIBUTE_KEY);
+        NAMENODE_ADDRESS_ATTRIBUTE_KEY);
   }
 
   /**
    * Returns StartupProgress associated with ServletContext.
-   *
+   * 
    * @param context ServletContext to get
    * @return StartupProgress associated with context
    */
   static StartupProgress getStartupProgressFromContext(
-          ServletContext context) {
+      ServletContext context) {
     return (StartupProgress)context.getAttribute(STARTUP_PROGRESS_ATTRIBUTE_KEY);
   }
 }

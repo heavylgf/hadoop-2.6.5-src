@@ -45,6 +45,7 @@ public class HAServiceProtocolHelper {
       StateChangeRequestInfo reqInfo)
       throws IOException {
     try {
+      // 调用standby namenode的transitionToActive()的rpc接口
       svc.transitionToActive(reqInfo);
     } catch (RemoteException e) {
       throw e.unwrapRemoteException(ServiceFailedException.class);

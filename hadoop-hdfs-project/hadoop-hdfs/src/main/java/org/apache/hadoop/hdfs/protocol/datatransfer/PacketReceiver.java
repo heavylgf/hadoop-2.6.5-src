@@ -124,11 +124,18 @@ public class PacketReceiver implements Closeable {
     //            = length(HEADER)
     //
     // HEADER:    the actual packet header fields, encoded in protobuf
+	
+	// 一个packet是多个chunk组合而成的
+	// 每个chunk其实包含两个部分，一个部分是数据，一个部分是checksum
+	  
     // CHECKSUMS: the crcs for the data chunk. May be missing if
     //            checksums were not requested
     // DATA       the actual block data
     Preconditions.checkState(curHeader == null || !curHeader.isLastPacketInBlock());
 
+    // java架构课程，讲解到了底层的并发那个部分
+    // 并发结束了以后，就会进入到IO、网络、Netty的部分，在那里都会有这些IO、NIO、Netty、网络、输入输出流
+    
     curPacketBuf.clear();
     curPacketBuf.limit(PacketHeader.PKT_LENGTHS_LEN);
     doReadFully(ch, in, curPacketBuf);

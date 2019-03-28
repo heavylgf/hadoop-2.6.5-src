@@ -65,6 +65,11 @@ import com.google.common.annotations.VisibleForTesting;
 /** A class that receives a block and writes to its own disk, meanwhile
  * may copies it to another site. If a throttler is provided,
  * streaming throttling is also supported.
+ * 
+ * 这是一个组件，负责通过socket输入流，从上游节点读取block的数据，一个一个的packet数据包
+ * 他每次接收到一个packet数据包，都会写入自己本地的磁盘文件
+ * 同时也会将这个packet复制一份，发送到pipeline里面的下游datanode去
+ * 
  **/
 class BlockReceiver implements Closeable {
   public static final Log LOG = DataNode.LOG;
@@ -134,6 +139,9 @@ class BlockReceiver implements Closeable {
   private long lastSentTime;
   private long maxSendIdleTime;
 
+  // 一个block就对应了一个BockReceiver
+  // 所以对一个block最大的初始化的一个操作，其实是为这个block初始化一个BlockReceiver组件
+  // 这个BlockReceiver组件专门负责接收这个block的packet数据包
   BlockReceiver(final ExtendedBlock block, final StorageType storageType,
       final DataInputStream in,
       final String inAddr, final String myAddr,
@@ -189,8 +197,16 @@ class BlockReceiver implements Closeable {
         replicaInfo = datanode.data.createTemporary(storageType, block);
       } else {
         switch (stage) {
+        // 刚开始的一个阶段，应该是PIPELINE_SETUP_CREATE
+        // 数据管道初始化的一个阶段
         case PIPELINE_SETUP_CREATE:
+          // 我们感觉过来了一个block，是不是除了初始化BlockReceiver准备接收packet以外
+          // 还要干点别的什么事儿啊？
+          // FSDataset专门负责管理datanode本地的磁盘文件
           replicaInfo = datanode.data.createRbw(storageType, block, allowLazyPersist);
+          // 还调用了一下namenode接口，通知人家说，自己正在接收block
+          // 用屁股想想都能想到，就是namenode接收到了这个东西，肯定是说，他会记录一下
+          // 有一个block正处于under construction，正在构造，正在接收数据中
           datanode.notifyNamenodeReceivingBlock(
               block, replicaInfo.getStorageUuid());
           break;
@@ -430,8 +446,11 @@ class BlockReceiver implements Closeable {
       throw ioe;
     } else { // encounter an error while writing to mirror
       // continue to run even if can not write to mirror
+      // 如果数据管道中传输失败了，第一个datanode写入第二个datanode失败了，不影响，继续运行
       // notify client of the error
+      // 通知hdfs客户端这个异常的发生，而且会等待hdfs客户端感知到这个问题来关闭这个数据管道
       // and wait for the client to shut down the pipeline
+      // 标志位：mirrorError = true
       mirrorError = true;
     }
   }
@@ -490,9 +509,21 @@ class BlockReceiver implements Closeable {
   /** 
    * Receives and processes a packet. It can contain many chunks.
    * returns the number of data bytes that the packet has.
+   * 
+   * 接收和处理一个packet，一个packet可以包含很多个chunk
+   * 最后这个方法他会返回这个packet所拥有的数据的字节
+   * 
    */
   private int receivePacket() throws IOException {
     // read the next packet
+	// 各位的java基础如何，哪怕是参加几个月的培训班，其实起码也该会一些socket网络编程
+	// 如果你会socket网络编程的话，应该他在这里都是基于IO流通信
+	// 很有可能说通过这个输入流可以读取到连续的两个packet的数据，但是在这里，他会自动做一个区分
+	// 也就是说在这里，他会自动区分出来哪个packet是哪部分的数据
+	// 在输入流里接收到数据的时候，肯定比如说你可以读取到一些特殊的字符，packet header
+	  
+	// 在这里说的很清楚了，他通过PacketReceiver的这个组件，就是通过输入流，仅仅是读取一个Packet数据出来
+	  
     packetReceiver.receiveNextPacket(in);
 
     PacketHeader header = packetReceiver.getHeader();
@@ -545,6 +576,7 @@ class BlockReceiver implements Closeable {
     }
 
     //First write the packet to the mirror:
+    // 将接收到的packet写入到下一个datanode中去
     if (mirrorOut != null && !mirrorError) {
       try {
         long begin = Time.monotonicNow();
@@ -586,6 +618,12 @@ class BlockReceiver implements Closeable {
 
       if (checksumReceivedLen > 0 && shouldVerifyChecksum()) {
         try {
+          // 大家大概可以思考一下是什么意思？
+          // checksum，hdfs客户端传输过来的时候，有一个chunk -> checksum（基于chunk的内容用crc算法算出来的）
+          // 现在check传输到了datanode这边了，datanode为了确保传输的过程中chunk数据没有破损
+          // 就需要重新基于chunk的内容算一下checksum，跟hdfs客户端发送过来的checksum对比一下，看看是否一致
+          // 正常情况下如果chunk的内容都是一样的，肯定checksum是一样的
+          // 如果过程中，chunk的内容被修改了，那么checksum肯定是不一样的
           verifyChunks(dataBuf, checksumBuf);
         } catch (IOException ioe) {
           // checksum error detected locally. there is no reason to continue.
@@ -685,6 +723,8 @@ class BlockReceiver implements Closeable {
           
           // Write data to disk.
           long begin = Time.monotonicNow();
+          // 最最核心的代码，在这里，dataBuf里是什么东西？
+          // 其实就是直接将packet数据全部输入本地磁盘中的blk_000001文件里面去
           out.write(dataBuf.array(), startByteToDisk, numBytesToDisk);
           long duration = Time.monotonicNow() - begin;
           if (duration > datanodeSlowLogThresholdMs) {
@@ -720,6 +760,8 @@ class BlockReceiver implements Closeable {
               byte[] buf = FSOutputSummer.convertToByteStream(partialCrc,
                   checksumSize);
               crcBytes = copyLastChunkChecksum(buf, checksumSize, buf.length);
+              // 其实又写了一个packet数据对应的crc算法算出来的checksum
+              // 写入了本地磁盘的blk_0000001对应的校验和的文件
               checksumOut.write(buf);
               if(LOG.isDebugEnabled()) {
                 LOG.debug("Writing out partial crc for data len " + len +
@@ -888,6 +930,9 @@ class BlockReceiver implements Closeable {
         responder.start(); // start thread to processes responses
       }
 
+      // 核心的接收packet的逻辑
+      // 封装在这里有一个receivePacket()方法，这里面都是网络的输入输出流，做了一个封装
+      // 分布式系统通信，rpc、tcp、流式、接口、http
       while (receivePacket() >= 0) { /* Receive until the last packet */ }
 
       // wait for all outstanding packet responses. And then
@@ -1272,6 +1317,7 @@ class BlockReceiver implements Closeable {
           try {
             if (type != PacketResponderType.LAST_IN_PIPELINE && !mirrorError) {
               // read an ack from downstream datanode
+              // 他会从下游读取那个packet的ack的消息
               ack.readFields(downstreamIn);
               ackRecvNanoTime = System.nanoTime();
               if (LOG.isDebugEnabled()) {
@@ -1318,6 +1364,8 @@ class BlockReceiver implements Closeable {
                   datanode.metrics.addPacketAckRoundTripTimeNanos(ackTimeNanos);
                 }
               }
+              // 最后一个datanode如果收到的是空包
+              // 此时这个lastPacketInBlock标志位，其实就是true，表示的是当前处理的是一个空包
               lastPacketInBlock = pkt.lastPacketInBlock;
             }
           } catch (InterruptedException ine) {
@@ -1364,9 +1412,13 @@ class BlockReceiver implements Closeable {
 
           if (lastPacketInBlock) {
             // Finalize the block and close the block file
+        	// 如果收到的是一个空packet，就认为是block中的最后一个packet
             finalizeBlock(startTime);
           }
 
+          // 往上游发送一个ack消息
+          // 咱们也别去扣这些细节了，人家的注释写的很清楚了，如果出现了mirrorError的话
+          // 一定会通知hdfs客户端管道传输故障
           sendAckUpstream(ack, expected, totalAckTimeNanos,
               (pkt != null ? pkt.offsetInBlock : 0), 
               (pkt != null ? pkt.ackStatus : Status.SUCCESS));
@@ -1400,6 +1452,7 @@ class BlockReceiver implements Closeable {
      * @param startTime time when BlockReceiver started receiving the block
      */
     private void finalizeBlock(long startTime) throws IOException {
+      // 关闭BlockReceiver
       BlockReceiver.this.close();
       final long endTime = ClientTraceLog.isInfoEnabled() ? System.nanoTime()
           : 0;
@@ -1507,6 +1560,7 @@ class BlockReceiver implements Closeable {
       // send my ack back to upstream datanode
       long begin = Time.monotonicNow();
       replyAck.write(upstreamOut);
+      // 构造了一个packet已经处理成功的ack的消息给上游节点
       upstreamOut.flush();
       long duration = Time.monotonicNow() - begin;
       if (duration > datanodeSlowLogThresholdMs) {

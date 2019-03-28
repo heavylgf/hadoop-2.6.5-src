@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="Encoding">
+  <component name="Encoding" defaultCharsetForPropertiesFiles="UTF-8">
     <file url="file://$PROJECT_DIR$" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/hadoop-assemblies" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/hadoop-build-tools" charset="UTF-8" />
@@ -10,6 +10,8 @@
     <file url="file://$PROJECT_DIR$/hadoop-common-project/hadoop-auth" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/hadoop-common-project/hadoop-auth-examples" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/hadoop-common-project/hadoop-common" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/ha/HealthMonitor.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/ha/ZKFailoverController.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/hadoop-common-project/hadoop-kms" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/hadoop-common-project/hadoop-minikdc" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/hadoop-common-project/hadoop-nfs" charset="UTF-8" />
@@ -19,6 +21,35 @@
     <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs-httpfs" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs-nfs" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/contrib/bkjournal" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/DFSClient.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/DFSInputStream.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/DFSOutputStream.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/LeaseRenewer.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/NameNodeProxies.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/qjournal/client/IPCLoggerChannel.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/qjournal/client/QuorumJournalManager.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/qjournal/client/QuorumOutputStream.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/qjournal/server/GetJournalEditServlet.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/qjournal/server/JournalNode.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/qjournal/server/JournalNodeHttpServer.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/qjournal/server/JournalNodeRpcServer.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/FSDirectory.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/FSEditLog.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/FSEditLogLoader.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/FSImage.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/FSNamesystem.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/FileJournalManager.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/INode.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/INodeDirectory.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/INodeFile.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/INodeMap.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/ImageServlet.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNode.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNodeHttpServer.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNodeResourceChecker.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNodeResourcePolicy.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/NameNodeRpcServer.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/ha/StandbyCheckpointer.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/hadoop-mapreduce-project" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-app" charset="UTF-8" />
@@ -64,5 +95,6 @@
     <file url="file://$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-tests" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-web-proxy" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-site" charset="UTF-8" />
+    <file url="PROJECT" charset="GBK" />
   </component>
 </project>

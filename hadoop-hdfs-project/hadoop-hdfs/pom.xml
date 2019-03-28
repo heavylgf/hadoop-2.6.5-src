@@ -216,9 +216,8 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <systemPropertyVariables>
-            <!--
             <startKdc>${startKdc}</startKdc>
-            <kdc.resource.dir>${kdc.resource.dir}</kdc.resource.dir> -->
+            <kdc.resource.dir>${kdc.resource.dir}</kdc.resource.dir>
             <runningWithNative>${runningWithNative}</runningWithNative>
           </systemPropertyVariables>
           <properties>
@@ -350,8 +349,7 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
         <configuration>
-          <!--
-          <skipTests>false</skipTests> -->
+          <skipTests>false</skipTests>
         </configuration>
         <executions>
           <execution>
@@ -600,8 +598,7 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
                 <phase>test</phase>
                 <goals><goal>run</goal></goals>
                 <configuration>
-                  <!--
-                  <skip>${skipTests}</skip>   -->
+                  <skip>${skipTests}</skip>
                   <target>
                     <property name="compile_classpath" refid="maven.compile.classpath"/>
                     <property name="test_classpath" refid="maven.test.classpath"/>
@@ -610,7 +607,7 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
                       <sequential>
                         <echo message="Running @{test}"/>
                         <exec executable="${project.build.directory}/native/RelWithDebInfo/@{test}" failonerror="true" dir="${project.build.directory}/native/">
-                          <!-- <env key="CLASSPATH" value="${test_classpath}:${compile_classpath}"/> -->
+                          <env key="CLASSPATH" value="${test_classpath}:${compile_classpath}"/>
                           <!-- HADOOP_HOME required to find winutils. -->
                           <env key="HADOOP_HOME" value="${hadoop.common.build.dir}"/>
                           <!-- Make sure hadoop.dll and jvm.dll are on PATH. -->
@@ -660,7 +657,6 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
                     </exec>
                     <!-- The second make is a workaround for HADOOP-9215.  It can
                          be removed when version 2.6 of cmake is no longer supported . -->
-                    <!-- -->
                     <exec executable="make" dir="${project.build.directory}/native" failonerror="true"></exec>
                   </target>
                 </configuration>
@@ -670,8 +666,7 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
                 <phase>test</phase>
                 <goals><goal>run</goal></goals>
                 <configuration>
-                  <!--
-                  <skip>${skipTests}</skip>-->
+                  <skip>${skipTests}</skip>
                   <target>
                     <property name="compile_classpath" refid="maven.compile.classpath"/>
                     <property name="test_classpath" refid="maven.test.classpath"/>
@@ -680,9 +675,9 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
                       <sequential>
                         <echo message="Running @{test}"/>
                         <exec executable="${project.build.directory}/native/@{test}" failonerror="true" dir="${project.build.directory}/native/">
-                          <!-- <env key="CLASSPATH" value="${test_classpath}:${compile_classpath}"/> -->
+                          <env key="CLASSPATH" value="${test_classpath}:${compile_classpath}"/>
                           <!-- Make sure libhadoop.so is on LD_LIBRARY_PATH. -->
-                          <!-- <env key="LD_LIBRARY_PATH" value="${env.LD_LIBRARY_PATH}:${project.build.directory}/native/target/usr/local/lib:${hadoop.common.build.dir}/native/target/usr/local/lib"/> -->
+                          <env key="LD_LIBRARY_PATH" value="${env.LD_LIBRARY_PATH}:${project.build.directory}/native/target/usr/local/lib:${hadoop.common.build.dir}/native/target/usr/local/lib"/>
                         </exec>
                         <echo message="Finished @{test}"/>
                       </sequential>

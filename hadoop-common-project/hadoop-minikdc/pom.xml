@@ -117,7 +117,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <!--
     <dependency>
       <groupId>org.apache.directory.server</groupId>
       <artifactId>apacheds-jdbm-partition</artifactId>
@@ -130,8 +129,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-    -->
-    <!--
     <dependency>
       <groupId>org.apache.directory.server</groupId>
       <artifactId>apacheds-protocol-ldap</artifactId>
@@ -144,7 +141,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-    -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>

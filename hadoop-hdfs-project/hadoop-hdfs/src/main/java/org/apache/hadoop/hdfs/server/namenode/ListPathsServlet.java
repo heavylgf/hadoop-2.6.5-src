@@ -131,6 +131,7 @@ public class ListPathsServlet extends DfsServlet {
    */
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response)
+  	// 在这里就可以看到，这个servlet的doGet()方法，就是在接收http请求，返回http响应
     throws ServletException, IOException {
     final PrintWriter out = response.getWriter();
     final XMLOutputter doc = new XMLOutputter(out, "UTF-8");

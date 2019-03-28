@@ -73,7 +73,7 @@ public class ImageServlet extends HttpServlet {
 
   public final static String CONTENT_DISPOSITION = "Content-Disposition";
   public final static String HADOOP_IMAGE_EDITS_HEADER = "X-Image-Edits-Name";
-
+  
   private static final String TXID_PARAM = "txid";
   private static final String START_TXID_PARAM = "startTxId";
   private static final String END_TXID_PARAM = "endTxId";
@@ -82,21 +82,21 @@ public class ImageServlet extends HttpServlet {
   private static final String IMAGE_FILE_TYPE = "imageFile";
 
   private static final Set<Long> currentlyDownloadingCheckpoints =
-          Collections.synchronizedSet(new HashSet<Long>());
-
+    Collections.synchronizedSet(new HashSet<Long>());
+  
   @Override
   public void doGet(final HttpServletRequest request,
-                    final HttpServletResponse response) throws ServletException, IOException {
+      final HttpServletResponse response) throws ServletException, IOException {
     try {
       final ServletContext context = getServletContext();
       final FSImage nnImage = NameNodeHttpServer.getFsImageFromContext(context);
       final GetImageParams parsedParams = new GetImageParams(request, response);
       final Configuration conf = (Configuration) context
-              .getAttribute(JspHelper.CURRENT_CONF);
+          .getAttribute(JspHelper.CURRENT_CONF);
       final NameNodeMetrics metrics = NameNode.getNameNodeMetrics();
 
       validateRequest(context, conf, request, response, nnImage,
-              parsedParams.getStorageInfoString());
+          parsedParams.getStorageInfoString());
 
       UserGroupInformation.getCurrentUser().doAs(new PrivilegedExceptionAction<Void>() {
         @Override
@@ -110,7 +110,7 @@ public class ImageServlet extends HttpServlet {
             } else {
               errorMessage += " with txid " + txid;
               imageFile = nnImage.getStorage().getFsImage(txid,
-                      EnumSet.of(NameNodeFile.IMAGE, NameNodeFile.IMAGE_ROLLBACK));
+                  EnumSet.of(NameNodeFile.IMAGE, NameNodeFile.IMAGE_ROLLBACK));
             }
             if (imageFile == null) {
               throw new IOException(errorMessage);
@@ -126,9 +126,9 @@ public class ImageServlet extends HttpServlet {
           } else if (parsedParams.isGetEdit()) {
             long startTxId = parsedParams.getStartTxId();
             long endTxId = parsedParams.getEndTxId();
-
+            
             File editFile = nnImage.getStorage()
-                    .findFinalizedEditsFile(startTxId, endTxId);
+                .findFinalizedEditsFile(startTxId, endTxId);
             long start = monotonicNow();
             serveFile(editFile);
 
@@ -156,13 +156,13 @@ public class ImageServlet extends HttpServlet {
             }
             // send file
             TransferFsImage.copyFileToStream(response.getOutputStream(),
-                    file, fis, getThrottler(conf));
+               file, fis, getThrottler(conf));
           } finally {
             IOUtils.closeStream(fis);
           }
         }
       });
-
+      
     } catch (Throwable t) {
       String errMsg = "GetImage failed. " + StringUtils.stringifyException(t);
       response.sendError(HttpServletResponse.SC_GONE, errMsg);
@@ -173,60 +173,60 @@ public class ImageServlet extends HttpServlet {
   }
 
   private void validateRequest(ServletContext context, Configuration conf,
-                               HttpServletRequest request, HttpServletResponse response,
-                               FSImage nnImage, String theirStorageInfoString) throws IOException {
+      HttpServletRequest request, HttpServletResponse response,
+      FSImage nnImage, String theirStorageInfoString) throws IOException {
 
     if (UserGroupInformation.isSecurityEnabled()
-            && !isValidRequestor(context, request.getUserPrincipal().getName(),
+        && !isValidRequestor(context, request.getUserPrincipal().getName(),
             conf)) {
       String errorMsg = "Only Namenode, Secondary Namenode, and administrators may access "
-              + "this servlet";
+          + "this servlet";
       response.sendError(HttpServletResponse.SC_FORBIDDEN, errorMsg);
       LOG.warn("Received non-NN/SNN/administrator request for image or edits from "
-              + request.getUserPrincipal().getName()
-              + " at "
-              + request.getRemoteHost());
+          + request.getUserPrincipal().getName()
+          + " at "
+          + request.getRemoteHost());
       throw new IOException(errorMsg);
     }
 
     String myStorageInfoString = nnImage.getStorage().toColonSeparatedString();
     if (theirStorageInfoString != null
-            && !myStorageInfoString.equals(theirStorageInfoString)) {
+        && !myStorageInfoString.equals(theirStorageInfoString)) {
       String errorMsg = "This namenode has storage info " + myStorageInfoString
-              + " but the secondary expected " + theirStorageInfoString;
+          + " but the secondary expected " + theirStorageInfoString;
       response.sendError(HttpServletResponse.SC_FORBIDDEN, errorMsg);
       LOG.warn("Received an invalid request file transfer request "
-              + "from a secondary with storage info " + theirStorageInfoString);
+          + "from a secondary with storage info " + theirStorageInfoString);
       throw new IOException(errorMsg);
     }
   }
 
   public static void setFileNameHeaders(HttpServletResponse response,
-                                        File file) {
+      File file) {
     response.setHeader(CONTENT_DISPOSITION, "attachment; filename=" +
-            file.getName());
+        file.getName());
     response.setHeader(HADOOP_IMAGE_EDITS_HEADER, file.getName());
   }
-
+  
   /**
    * Construct a throttler from conf
    * @param conf configuration
    * @return a data transfer throttler
    */
   public final static DataTransferThrottler getThrottler(Configuration conf) {
-    long transferBandwidth =
-            conf.getLong(DFSConfigKeys.DFS_IMAGE_TRANSFER_RATE_KEY,
-                    DFSConfigKeys.DFS_IMAGE_TRANSFER_RATE_DEFAULT);
+    long transferBandwidth = 
+      conf.getLong(DFSConfigKeys.DFS_IMAGE_TRANSFER_RATE_KEY,
+                   DFSConfigKeys.DFS_IMAGE_TRANSFER_RATE_DEFAULT);
     DataTransferThrottler throttler = null;
     if (transferBandwidth > 0) {
       throttler = new DataTransferThrottler(transferBandwidth);
     }
     return throttler;
   }
-
+  
   @VisibleForTesting
   static boolean isValidRequestor(ServletContext context, String remoteUser,
-                                  Configuration conf) throws IOException {
+      Configuration conf) throws IOException {
     if (remoteUser == null) { // This really shouldn't happen...
       LOG.warn("Received null remoteUser while authorizing access to getImage servlet");
       return false;
@@ -235,31 +235,31 @@ public class ImageServlet extends HttpServlet {
     Set<String> validRequestors = new HashSet<String>();
 
     validRequestors.add(SecurityUtil.getServerPrincipal(conf
-                    .get(DFSConfigKeys.DFS_NAMENODE_KERBEROS_PRINCIPAL_KEY),
-            NameNode.getAddress(conf).getHostName()));
+        .get(DFSConfigKeys.DFS_NAMENODE_KERBEROS_PRINCIPAL_KEY),
+        NameNode.getAddress(conf).getHostName()));
     try {
       validRequestors.add(
-              SecurityUtil.getServerPrincipal(conf
-                              .get(DFSConfigKeys.DFS_SECONDARY_NAMENODE_KERBEROS_PRINCIPAL_KEY),
-                      SecondaryNameNode.getHttpAddress(conf).getHostName()));
+          SecurityUtil.getServerPrincipal(conf
+              .get(DFSConfigKeys.DFS_SECONDARY_NAMENODE_KERBEROS_PRINCIPAL_KEY),
+              SecondaryNameNode.getHttpAddress(conf).getHostName()));
     } catch (Exception e) {
       // Don't halt if SecondaryNameNode principal could not be added.
       LOG.debug("SecondaryNameNode principal could not be added", e);
       String msg = String.format(
-              "SecondaryNameNode principal not considered, %s = %s, %s = %s",
-              DFSConfigKeys.DFS_SECONDARY_NAMENODE_KERBEROS_PRINCIPAL_KEY,
-              conf.get(DFSConfigKeys.DFS_SECONDARY_NAMENODE_KERBEROS_PRINCIPAL_KEY),
-              DFSConfigKeys.DFS_NAMENODE_SECONDARY_HTTP_ADDRESS_KEY,
-              conf.get(DFSConfigKeys.DFS_NAMENODE_SECONDARY_HTTP_ADDRESS_KEY,
-                      DFSConfigKeys.DFS_NAMENODE_SECONDARY_HTTP_ADDRESS_DEFAULT));
+        "SecondaryNameNode principal not considered, %s = %s, %s = %s",
+        DFSConfigKeys.DFS_SECONDARY_NAMENODE_KERBEROS_PRINCIPAL_KEY,
+        conf.get(DFSConfigKeys.DFS_SECONDARY_NAMENODE_KERBEROS_PRINCIPAL_KEY),
+        DFSConfigKeys.DFS_NAMENODE_SECONDARY_HTTP_ADDRESS_KEY,
+        conf.get(DFSConfigKeys.DFS_NAMENODE_SECONDARY_HTTP_ADDRESS_KEY,
+          DFSConfigKeys.DFS_NAMENODE_SECONDARY_HTTP_ADDRESS_DEFAULT));
       LOG.warn(msg);
     }
 
     if (HAUtil.isHAEnabled(conf, DFSUtil.getNamenodeNameServiceId(conf))) {
       Configuration otherNnConf = HAUtil.getConfForOtherNode(conf);
       validRequestors.add(SecurityUtil.getServerPrincipal(otherNnConf
-                      .get(DFSConfigKeys.DFS_NAMENODE_KERBEROS_PRINCIPAL_KEY),
-              NameNode.getAddress(otherNnConf).getHostName()));
+          .get(DFSConfigKeys.DFS_NAMENODE_KERBEROS_PRINCIPAL_KEY),
+          NameNode.getAddress(otherNnConf).getHostName()));
     }
 
     for (String v : validRequestors) {
@@ -277,41 +277,41 @@ public class ImageServlet extends HttpServlet {
     LOG.info("ImageServlet rejecting: " + remoteUser);
     return false;
   }
-
+  
   /**
    * Set headers for content length, and, if available, md5.
-   * @throws IOException
+   * @throws IOException 
    */
   public static void setVerificationHeadersForGet(HttpServletResponse response,
-                                                  File file) throws IOException {
+      File file) throws IOException {
     response.setHeader(TransferFsImage.CONTENT_LENGTH,
-            String.valueOf(file.length()));
+        String.valueOf(file.length()));
     MD5Hash hash = MD5FileUtils.readStoredMd5ForFile(file);
     if (hash != null) {
       response.setHeader(TransferFsImage.MD5_HEADER, hash.toString());
     }
   }
-
+  
   static String getParamStringForMostRecentImage() {
     return "getimage=1&" + TXID_PARAM + "=" + LATEST_FSIMAGE_VALUE;
   }
 
   static String getParamStringForImage(NameNodeFile nnf, long txid,
-                                       StorageInfo remoteStorageInfo) {
+      StorageInfo remoteStorageInfo) {
     final String imageType = nnf == null ? "" : "&" + IMAGE_FILE_TYPE + "="
-            + nnf.name();
+        + nnf.name();
     return "getimage=1&" + TXID_PARAM + "=" + txid
-            + imageType
-            + "&" + STORAGEINFO_PARAM + "=" +
-            remoteStorageInfo.toColonSeparatedString();
+      + imageType
+      + "&" + STORAGEINFO_PARAM + "=" +
+      remoteStorageInfo.toColonSeparatedString();
   }
 
   static String getParamStringForLog(RemoteEditLog log,
-                                     StorageInfo remoteStorageInfo) {
+      StorageInfo remoteStorageInfo) {
     return "getedit=1&" + START_TXID_PARAM + "=" + log.getStartTxId()
-            + "&" + END_TXID_PARAM + "=" + log.getEndTxId()
-            + "&" + STORAGEINFO_PARAM + "=" +
-            remoteStorageInfo.toColonSeparatedString();
+        + "&" + END_TXID_PARAM + "=" + log.getEndTxId()
+        + "&" + STORAGEINFO_PARAM + "=" +
+          remoteStorageInfo.toColonSeparatedString();
   }
 
   static class GetImageParams {
@@ -329,7 +329,7 @@ public class ImageServlet extends HttpServlet {
      */
     public GetImageParams(HttpServletRequest request,
                           HttpServletResponse response
-    ) throws IOException {
+                           ) throws IOException {
       @SuppressWarnings("unchecked")
       Map<String, String[]> pmap = request.getParameterMap();
       isGetImage = isGetEdit = fetchLatest = false;
@@ -337,13 +337,13 @@ public class ImageServlet extends HttpServlet {
       for (Map.Entry<String, String[]> entry : pmap.entrySet()) {
         String key = entry.getKey();
         String[] val = entry.getValue();
-        if (key.equals("getimage")) {
+        if (key.equals("getimage")) { 
           isGetImage = true;
           try {
             txId = ServletUtil.parseLongParam(request, TXID_PARAM);
             String imageType = ServletUtil.getParameter(request, IMAGE_FILE_TYPE);
             nnf = imageType == null ? NameNodeFile.IMAGE : NameNodeFile
-                    .valueOf(imageType);
+                .valueOf(imageType);
           } catch (NumberFormatException nfe) {
             if (request.getParameter(TXID_PARAM).equals(LATEST_FSIMAGE_VALUE)) {
               fetchLatest = true;
@@ -351,7 +351,7 @@ public class ImageServlet extends HttpServlet {
               throw nfe;
             }
           }
-        } else if (key.equals("getedit")) {
+        } else if (key.equals("getedit")) { 
           isGetEdit = true;
           startTxId = ServletUtil.parseLongParam(request, START_TXID_PARAM);
           endTxId = ServletUtil.parseLongParam(request, END_TXID_PARAM);
@@ -384,7 +384,7 @@ public class ImageServlet extends HttpServlet {
       Preconditions.checkState(isGetEdit);
       return startTxId;
     }
-
+    
     public long getEndTxId() {
       Preconditions.checkState(isGetEdit);
       return endTxId;
@@ -401,28 +401,29 @@ public class ImageServlet extends HttpServlet {
     boolean shouldFetchLatest() {
       return fetchLatest;
     }
-
+    
   }
 
   /**
    * Set headers for image length and if available, md5.
-   *
+   * 
    * @throws IOException
    */
   static void setVerificationHeadersForPut(HttpURLConnection connection,
-                                           File file) throws IOException {
+      File file) throws IOException {
     connection.setRequestProperty(TransferFsImage.CONTENT_LENGTH,
-            String.valueOf(file.length()));
+        String.valueOf(file.length()));
     MD5Hash hash = MD5FileUtils.readStoredMd5ForFile(file);
     if (hash != null) {
       connection
-              .setRequestProperty(TransferFsImage.MD5_HEADER, hash.toString());
+          .setRequestProperty(TransferFsImage.MD5_HEADER, hash.toString());
     }
   }
 
   /**
    * Set the required parameters for uploading image
-   *
+   * 
+   * @param httpMethod instance of method to set the parameters
    * @param storage colon separated storageInfo string
    * @param txid txid of the image
    * @param imageFileSize size of the imagefile to be uploaded
@@ -430,7 +431,7 @@ public class ImageServlet extends HttpServlet {
    * @return Returns map of parameters to be used with PUT request.
    */
   static Map<String, String> getParamsForPutImage(Storage storage, long txid,
-                                                  long imageFileSize, NameNodeFile nnf) {
+      long imageFileSize, NameNodeFile nnf) {
     Map<String, String> params = new HashMap<String, String>();
     params.put(TXID_PARAM, Long.toString(txid));
     params.put(STORAGEINFO_PARAM, storage.toColonSeparatedString());
@@ -447,74 +448,74 @@ public class ImageServlet extends HttpServlet {
    */
   @Override
   protected void doPut(final HttpServletRequest request,
-                       final HttpServletResponse response) throws ServletException, IOException {
+      final HttpServletResponse response) throws ServletException, IOException {
     try {
       ServletContext context = getServletContext();
       final FSImage nnImage = NameNodeHttpServer.getFsImageFromContext(context);
       final Configuration conf = (Configuration) getServletContext()
-              .getAttribute(JspHelper.CURRENT_CONF);
+          .getAttribute(JspHelper.CURRENT_CONF);
       final PutImageParams parsedParams = new PutImageParams(request, response,
-              conf);
+          conf);
       final NameNodeMetrics metrics = NameNode.getNameNodeMetrics();
 
       validateRequest(context, conf, request, response, nnImage,
-              parsedParams.getStorageInfoString());
+          parsedParams.getStorageInfoString());
 
       UserGroupInformation.getCurrentUser().doAs(
-              new PrivilegedExceptionAction<Void>() {
+          new PrivilegedExceptionAction<Void>() {
 
-                @Override
-                public Void run() throws Exception {
+            @Override
+            public Void run() throws Exception {
 
-                  final long txid = parsedParams.getTxId();
+              final long txid = parsedParams.getTxId();
 
-                  final NameNodeFile nnf = parsedParams.getNameNodeFile();
+              final NameNodeFile nnf = parsedParams.getNameNodeFile();
 
-                  if (!currentlyDownloadingCheckpoints.add(txid)) {
-                    response.sendError(HttpServletResponse.SC_CONFLICT,
-                            "Another checkpointer is already in the process of uploading a"
-                                    + " checkpoint made at transaction ID " + txid);
-                    return null;
-                  }
-                  try {
-                    if (nnImage.getStorage().findImageFile(nnf, txid) != null) {
-                      response.sendError(HttpServletResponse.SC_CONFLICT,
-                              "Another checkpointer already uploaded an checkpoint "
-                                      + "for txid " + txid);
-                      return null;
-                    }
-
-                    // 通过这个输入流就可以从standby namenode上不断的读取fsimage文件的内容
-                    InputStream stream = request.getInputStream();
-                    try {
-                      long start = monotonicNow();
-                      MD5Hash downloadImageDigest = TransferFsImage
-                              .handleUploadImageRequest(request, txid,
-                                      nnImage.getStorage(), stream,
-                                      parsedParams.getFileSize(), getThrottler(conf));
-                      // 人家接收完文件，同时更高一下自己本地磁盘的fsimage的名称
-                      // 同时写一个md5校验文件
-                      nnImage.saveDigestAndRenameCheckpointImage(nnf, txid,
-                              downloadImageDigest);
-                      // Metrics non-null only when used inside name node
-                      if (metrics != null) {
-                        long elapsed = monotonicNow() - start;
-                        metrics.addPutImage(elapsed);
-                      }
-                      // Now that we have a new checkpoint, we might be able to
-                      // remove some old ones.
-                      // 可以清理掉一些旧的edits log文件或者是旧的fsimage的文件
-                      nnImage.purgeOldStorage(nnf);
-                    } finally {
-                      stream.close();
-                    }
-                  } finally {
-                    currentlyDownloadingCheckpoints.remove(txid);
-                  }
+              if (!currentlyDownloadingCheckpoints.add(txid)) {
+                response.sendError(HttpServletResponse.SC_CONFLICT,
+                    "Another checkpointer is already in the process of uploading a"
+                        + " checkpoint made at transaction ID " + txid);
+                return null;
+              }
+              try {
+                if (nnImage.getStorage().findImageFile(nnf, txid) != null) {
+                  response.sendError(HttpServletResponse.SC_CONFLICT,
+                      "Another checkpointer already uploaded an checkpoint "
+                          + "for txid " + txid);
                   return null;
                 }
 
-              });
+                // 通过这个输入流就可以从standby namenode上不断的读取fsimage文件的内容
+                InputStream stream = request.getInputStream();
+                try {
+                  long start = monotonicNow();
+                  MD5Hash downloadImageDigest = TransferFsImage
+                      .handleUploadImageRequest(request, txid,
+                          nnImage.getStorage(), stream,
+                          parsedParams.getFileSize(), getThrottler(conf));
+                  // 人家接收完文件，同时更高一下自己本地磁盘的fsimage的名称
+                  // 同时写一个md5校验文件
+                  nnImage.saveDigestAndRenameCheckpointImage(nnf, txid,
+                      downloadImageDigest);
+                  // Metrics non-null only when used inside name node
+                  if (metrics != null) {
+                    long elapsed = monotonicNow() - start;
+                    metrics.addPutImage(elapsed);
+                  }
+                  // Now that we have a new checkpoint, we might be able to
+                  // remove some old ones.
+                  // 可以清理掉一些旧的edits log文件或者是旧的fsimage的文件
+                  nnImage.purgeOldStorage(nnf);
+                } finally {
+                  stream.close();
+                }
+              } finally {
+                currentlyDownloadingCheckpoints.remove(txid);
+              }
+              return null;
+            }
+
+          });
     } catch (Throwable t) {
       String errMsg = "PutImage failed. " + StringUtils.stringifyException(t);
       response.sendError(HttpServletResponse.SC_GONE, errMsg);
@@ -532,16 +533,16 @@ public class ImageServlet extends HttpServlet {
     private NameNodeFile nnf;
 
     public PutImageParams(HttpServletRequest request,
-                          HttpServletResponse response, Configuration conf) throws IOException {
+        HttpServletResponse response, Configuration conf) throws IOException {
       txId = ServletUtil.parseLongParam(request, TXID_PARAM);
       storageInfoString = ServletUtil.getParameter(request, STORAGEINFO_PARAM);
       fileSize = ServletUtil.parseLongParam(request,
-              TransferFsImage.FILE_LENGTH);
+          TransferFsImage.FILE_LENGTH);
       String imageType = ServletUtil.getParameter(request, IMAGE_FILE_TYPE);
       nnf = imageType == null ? NameNodeFile.IMAGE : NameNodeFile
-              .valueOf(imageType);
+          .valueOf(imageType);
       if (fileSize == 0 || txId == -1 || storageInfoString == null
-              || storageInfoString.isEmpty()) {
+          || storageInfoString.isEmpty()) {
         throw new IOException("Illegal parameters to TransferFsImage");
       }
     }

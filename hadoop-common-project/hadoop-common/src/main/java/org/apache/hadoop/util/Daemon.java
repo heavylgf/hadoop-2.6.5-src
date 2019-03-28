@@ -29,6 +29,9 @@ import org.apache.hadoop.classification.InterfaceStability;
 public class Daemon extends Thread {
 
   {
+	// 默认会设置成Daemon状态
+	// 大家自行去看看，我的JDK并发编程系列的课程
+	// 在那个里面就解释了什么是daemon线程
     setDaemon(true);                              // always a daemon
   }
 

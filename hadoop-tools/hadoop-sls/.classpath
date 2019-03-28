@@ -72,7 +72,7 @@
   <classpathentry kind="var" path="M2_REPO/com/google/inject/guice/3.0/guice-3.0.jar" sourcepath="M2_REPO/com/google/inject/guice/3.0/guice-3.0-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/aopalliance/aopalliance/1.0/aopalliance-1.0.jar" sourcepath="M2_REPO/aopalliance/aopalliance/1.0/aopalliance-1.0-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/sun/jersey/jersey-server/1.9/jersey-server-1.9.jar" sourcepath="M2_REPO/com/sun/jersey/jersey-server/1.9/jersey-server-1.9-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/asm/asm/3.2/asm-3.2.jar"/>
+  <classpathentry kind="var" path="M2_REPO/asm/asm/3.2/asm-3.2.jar" sourcepath="M2_REPO/asm/asm/3.2/asm-3.2-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/sun/jersey/jersey-json/1.9/jersey-json-1.9.jar" sourcepath="M2_REPO/com/sun/jersey/jersey-json/1.9/jersey-json-1.9-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/codehaus/jettison/jettison/1.1/jettison-1.1.jar" sourcepath="M2_REPO/org/codehaus/jettison/jettison/1.1/jettison-1.1-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/sun/xml/bind/jaxb-impl/2.2.3-1/jaxb-impl-2.2.3-1.jar" sourcepath="M2_REPO/com/sun/xml/bind/jaxb-impl/2.2.3-1/jaxb-impl-2.2.3-1-sources.jar"/>
@@ -100,5 +100,5 @@
   <classpathentry kind="src" path="/hadoop-yarn-server-web-proxy"/>
   <classpathentry kind="src" path="/hadoop-mapreduce-client-hs"/>
   <classpathentry kind="src" path="/hadoop-rumen"/>
-  <classpathentry kind="var" path="M2_REPO/com/codahale/metrics/metrics-core/3.0.1/metrics-core-3.0.1.jar" sourcepath="M2_REPO/com/codahale/metrics/metrics-core/3.0.1/metrics-core-3.0.1-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/codahale/metrics/metrics-core/3.0.1/metrics-core-3.0.1.jar"/>
 </classpath>

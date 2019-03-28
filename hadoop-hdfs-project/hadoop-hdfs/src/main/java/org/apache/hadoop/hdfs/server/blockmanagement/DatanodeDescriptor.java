@@ -400,6 +400,7 @@ public class DatanodeDescriptor extends DatanodeInfo {
       long cacheUsed, int xceiverCount, int volFailures) {
     updateHeartbeatState(reports, cacheCapacity, cacheUsed, xceiverCount,
         volFailures);
+    // 设置一下，自从注册以来是否发送过心跳
     heartbeatedSinceRegistration = true;
   }
 
@@ -441,10 +442,15 @@ public class DatanodeDescriptor extends DatanodeInfo {
           storageMap.values());
     }
 
+    // 他其实是在更新DatanodeDescriptor中的一些信息，这些信息是人家datanode给你心跳汇报过来的
     setCacheCapacity(cacheCapacity);
     setCacheUsed(cacheUsed);
     setXceiverCount(xceiverCount);
+    
+    // 非常核心的以及重要的，如果DatanodeDescriptor他接收了一次心跳，更新了一次心跳
+    // 最主要的就是设置一下最近进行心跳的时间
     setLastUpdate(Time.now());    
+    
     this.volumeFailures = volFailures;
     for (StorageReport report : reports) {
       DatanodeStorageInfo storage = updateStorage(report.getStorage());

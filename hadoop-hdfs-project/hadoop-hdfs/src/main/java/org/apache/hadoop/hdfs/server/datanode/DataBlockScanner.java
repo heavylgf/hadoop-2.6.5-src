@@ -41,12 +41,6 @@ import com.google.common.annotations.VisibleForTesting;
  * block pool a {@link BlockPoolSliceScanner} is created which runs in a separate
  * thread to scan the blocks for that block pool. When a {@link BPOfferService}
  * becomes alive or dies, blockPoolScannerMap in this class is updated.
- *
- * DataBlockScanner管理所有块池的块扫描。为每一个
- * 块池创建一个{@link BlockPoolSliceScanner}，它在一个单独的运行
- * 线程扫描该块池的块。当一个{@link BPOfferService}
- * 变为活动或死亡，blockPoolScannerMap在这个类更新。
- *
  */
 @InterfaceAudience.Private
 public class DataBlockScanner implements Runnable {

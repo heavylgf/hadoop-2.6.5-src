@@ -179,10 +179,17 @@ public class FSEditLogLoader {
     long lastInodeId = fsNamesys.getLastInodeId();
     
     try {
+      // 核心的读取edits log的逻辑在这里
+      // 他其实是搞了一个while true死循环，不断的调用EditLogFileInputStream的readOp()
+      // 按理说readOp()这个方法应该是每次都会读取到一条edits log
+      // 如果读取到一条edits log，就会将这条edits log应用到自己standby本地的元数据里去
+      // 如果没有读到edits log，就跳出循环
       while (true) {
         try {
           FSEditLogOp op;
           try {
+        	// 可以认为，这里不断的通过底层的基于http的InputStream
+        	// 不断的从journalnode上读取一个接一个的edits log，可以应用到自己本地
             op = in.readOp();
             if (op == null) {
               break;
@@ -227,6 +234,7 @@ public class FSEditLogLoader {
               LOG.trace("op=" + op + ", startOpt=" + startOpt
                   + ", numEdits=" + numEdits + ", totalEdits=" + totalEdits);
             }
+            // 将edits log应用到自己standby namenode本地的元数据里去
             long inodeId = applyEditLogOp(op, fsDir, startOpt,
                 in.getVersion(true), lastInodeId);
             if (lastInodeId < inodeId) {
@@ -522,10 +530,13 @@ public class FSEditLogLoader {
       }
       break;
     }
+    // 包含了所有的操作，不同的操作，如何应用到自己本地的元数据里去
+    // 我们以创建目录来举例
     case OP_MKDIR: {
       MkdirOp mkdirOp = (MkdirOp)op;
       inodeId = getAndUpdateLastInodeId(mkdirOp.inodeId, logVersion,
           lastInodeId);
+      // 很简单，人家就是直接将元数据应用到了自己本地的FSDirectory里面去，更新了一下内存里的文件目录树
       fsDir.unprotectedMkdir(inodeId,
           renameReservedPathsOnUpgrade(mkdirOp.path, logVersion),
           mkdirOp.permissions, mkdirOp.aclEntries, mkdirOp.timestamp);

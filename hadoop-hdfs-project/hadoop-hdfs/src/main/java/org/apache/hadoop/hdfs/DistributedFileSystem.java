@@ -97,7 +97,7 @@ import com.google.common.base.Preconditions;
 /****************************************************************
  * Implementation of the abstract FileSystem for the DFS system.
  * This object is the way end-user code interacts with a Hadoop
- * DistributedFileSystem.
+ * DistributedFileSystem.  
  *
  *****************************************************************/
 @InterfaceAudience.LimitedPrivate({ "MapReduce", "HBase" })
@@ -299,6 +299,8 @@ public class DistributedFileSystem extends FileSystem {
       @Override
       public FSDataInputStream doCall(final Path p)
           throws IOException, UnresolvedLinkException {
+    	// 这里走的是这个方法，DFSClent.open()方法，创建了一个DFSInputStream的输入流
+    	// 然后又用这个DFSClent包装成一个HDFSDataInputStream
         final DFSInputStream dfsis =
           dfs.open(getPathName(p), bufferSize, verifyChecksum);
         return dfs.createWrappedInputStream(dfsis);
@@ -311,7 +313,6 @@ public class DistributedFileSystem extends FileSystem {
     }.resolve(this, absF);
   }
 
-  // 閽堝hdfs鐨勮緭鍑烘祦
   @Override
   public FSDataOutputStream append(Path f, final int bufferSize,
       final Progressable progress) throws IOException {
@@ -395,10 +396,13 @@ public class DistributedFileSystem extends FileSystem {
       @Override
       public FSDataOutputStream doCall(final Path p)
           throws IOException, UnresolvedLinkException {
-        // 杩欎釜涓滆タ鐨勫簳灞傦紝涓昏杩樻槸璋冪敤DFSClient鐨刢reate()鏂规硶锛屾潵鍒涘缓涓�涓拡瀵筯dfs鐨勮緭鍑烘祦
+    	// 这个东西的底层，主要还是在调用DFSClient的create()方法，来创建一个针对hdfs的输出流
         final DFSOutputStream dfsos = dfs.create(getPathName(p), permission,
                 cflags, replication, blockSize, progress, bufferSize,
                 checksumOpt);
+        // 实际上返回的给我们的应用系统的不是底层的DFSOutputStream输出流
+        // 人家会包裹一下的，把这个底层的输出流包裹成一个FSDataOutputStream输出流
+        // 这个实际的输出流的类型，是HDFSDataOutputStream
         return dfs.createWrappedOutputStream(dfsos, statistics);
       }
       @Override

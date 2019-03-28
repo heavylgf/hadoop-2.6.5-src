@@ -240,7 +240,7 @@ public abstract class ZKFailoverController {
       rpcServer.stopAndJoin();
       
       elector.quitElection(true);
-      // 这里开始
+      // 有一个线程，这个线程是有一个HealthMonitor
       healthMonitor.shutdown();
       healthMonitor.join();
     }

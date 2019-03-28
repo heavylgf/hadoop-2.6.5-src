@@ -88,6 +88,8 @@ public class ReplaceDatanodeOnFailure {
         if (replication < 3) {
           return false;
         } else {
+          // 如果datanode数量 <= 要求的副本数量  / 2
+          // 只剩下了2个datanode <= 3 / 2
           if (n <= (replication/2)) {
             return true;
           } else {

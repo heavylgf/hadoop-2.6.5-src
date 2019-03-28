@@ -103,6 +103,5 @@
     <orderEntry type="module" module-name="hadoop-yarn-server-resourcemanager" scope="TEST" />
     <orderEntry type="module" module-name="hadoop-yarn-server-applicationhistoryservice" scope="TEST" />
     <orderEntry type="module" module-name="hadoop-yarn-server-web-proxy" scope="TEST" />
-    <orderEntry type="library" name="Maven: com.cenqua.clover:clover:3.0.2" level="project" />
   </component>
 </module>

@@ -4,5 +4,5 @@
   <classpathentry kind="output" path="target/classes"/>
   <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
   <classpathentry kind="var" path="M2_REPO/jdiff/jdiff/1.0.9/jdiff-1.0.9.jar"/>
-  <classpathentry kind="lib" path="C:/Program Files/Java/jdk1.8.0_171/lib/tools.jar"/>
+  <classpathentry kind="lib" path="F:/development/Java/jdk1.8.0_151/lib/tools.jar"/>
 </classpath>

@@ -164,6 +164,7 @@ public class RemoteBlockReader2  implements BlockReader {
 
   @Override
   public int read(ByteBuffer buf) throws IOException {
+    // 人家其实就是一个packet一个packet的读取数据
     if (curDataSlice == null || curDataSlice.remaining() == 0 && bytesNeededToFinish > 0) {
       readNextPacket();
     }
@@ -230,10 +231,12 @@ public class RemoteBlockReader2  implements BlockReader {
     // If we've now satisfied the whole client read, read one last packet
     // header, which should be empty
     if (bytesNeededToFinish <= 0) {
+      // 应该是读到最后，发现这个block读取完毕了，此时会读到一个空packet
       readTrailingEmptyPacket();
       if (verifyChecksum) {
         sendReadResult(Status.CHECKSUM_OK);
       } else {
+        // 如果读取完毕了一个block之后，就会发送一个结果，SUCCESS
         sendReadResult(Status.SUCCESS);
       }
     }
@@ -395,8 +398,12 @@ public class RemoteBlockReader2  implements BlockReader {
                                      PeerCache peerCache,
                                      CachingStrategy cachingStrategy) throws IOException {
     // in and out will be closed when sock is closed (by the caller)
+	// 在构造BlockReader的时候，就会跟datanode完成socket连接
+	// 以及获取对应的socket输入输出流
+	// 就可以通过socket跟对应的datanode进行通信
     final DataOutputStream out = new DataOutputStream(new BufferedOutputStream(
           peer.getOutputStream()));
+    // 这边的意思就是通知一下datanode说，兄弟，我打算要从你那儿read读取一个block数据了
     new Sender(out).readBlock(block, blockToken, clientName, startOffset, len,
         verifyChecksum, cachingStrategy);
 

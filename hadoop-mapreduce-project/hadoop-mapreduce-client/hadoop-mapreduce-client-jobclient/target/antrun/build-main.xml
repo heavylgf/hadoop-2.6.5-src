@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <project name="maven-antrun-" default="main"  >
 <target name="main">
-  <mkdir dir="F:\development\eclipse\eclipse-workspace\hadoop-2.6.5-src\hadoop-mapreduce-project\hadoop-mapreduce-client\hadoop-mapreduce-client-jobclient\target/test-dir"/>
-  <mkdir dir="F:\development\eclipse\eclipse-workspace\hadoop-2.6.5-src\hadoop-mapreduce-project\hadoop-mapreduce-client\hadoop-mapreduce-client-jobclient\target/test-dir"/>
+  <mkdir dir="F:\development\hadoop-source-code\hadoop-2.6.5-src\hadoop-mapreduce-project\hadoop-mapreduce-client\hadoop-mapreduce-client-jobclient\target/test-dir"/>
+  <mkdir dir="F:\development\hadoop-source-code\hadoop-2.6.5-src\hadoop-mapreduce-project\hadoop-mapreduce-client\hadoop-mapreduce-client-jobclient\target/test-dir"/>
 </target>
 </project>

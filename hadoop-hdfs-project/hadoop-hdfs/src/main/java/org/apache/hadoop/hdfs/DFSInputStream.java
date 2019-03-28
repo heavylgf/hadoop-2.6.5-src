@@ -237,8 +237,12 @@ implements ByteBufferReadable, CanSetDropBehind, CanSetReadahead,
 
   /**
    * Grab the open-file info from namenode
+   * 看起来这个方法是在说，他会从namenode去获取某些要打开的文件的数据
    */
   synchronized void openInfo() throws IOException, UnresolvedLinkException {
+	// 看这个方法，看起来好像就是在跟namenode发送请求，获取文件对应的block的数据
+	// 同时获取到文件里最后一个block的长度
+	// 
     lastBlockBeingWrittenLength = fetchLocatedBlocksAndGetLastBlockLength();
     int retriesForLastBlockLength = dfsClient.getConf().retryTimesForGetLastBlockLength;
     while (retriesForLastBlockLength > 0) {
@@ -272,6 +276,8 @@ implements ByteBufferReadable, CanSetDropBehind, CanSetReadahead,
   }
 
   private long fetchLocatedBlocksAndGetLastBlockLength() throws IOException {
+	// 这行代码是比较关键的一行，从namenode获取到文件对应的block列表
+	// 在这里获取到了一个文件对应的所有的block，以及每个block在哪些datanode上
     final LocatedBlocks newInfo = dfsClient.getLocatedBlocks(src, 0);
     if (DFSClient.LOG.isDebugEnabled()) {
       DFSClient.LOG.debug("newInfo = " + newInfo);
@@ -577,6 +583,11 @@ implements ByteBufferReadable, CanSetDropBehind, CanSetReadahead,
   /**
    * Open a DataInputStream to a DataNode so that it can be read from.
    * We get block ID and the IDs of the destinations at startup, from the namenode.
+   * 
+   * 我们刚开始在DFSInputStream初始化的时候，就跟namenode通信获取到了block的ID以及对应副本所在的datanode机器
+   * 在这里就会对指定位置的block（刚开始肯定是第一个block），就会打开一个输入流，连接到那个block的某个副本
+   * 所在的datanode上去，以便于可以开始从那个datanode读取数据
+   * 
    */
   private synchronized DatanodeInfo blockSeekTo(long target) throws IOException {
     if (target >= getFileLength()) {
@@ -598,22 +609,30 @@ implements ByteBufferReadable, CanSetDropBehind, CanSetReadahead,
     
     boolean connectFailedOnce = false;
 
+    // 大概认为往下面的代码，肯定就是开始去连接datanode以及获取输入流了
+    
     while (true) {
       //
       // Compute desired block
       //
+      // 获取第一个block对一个的LocatedBlock对象
       LocatedBlock targetBlock = getBlockAt(target, true);
       assert (target==pos) : "Wrong postion " + pos + " expect " + target;
       long offsetIntoBlock = target - targetBlock.getStartOffset();
 
+      // 很明显就是对第一个block从它对应的3个副本所在的datanode上
+      // 获取一个对应的datanode
       DNAddrPair retval = chooseDataNode(targetBlock, null);
       chosenNode = retval.info;
       InetSocketAddress targetAddr = retval.addr;
       StorageType storageType = retval.storageType;
 
       try {
+    	// 获取到这个block对应的一个对象
         ExtendedBlock blk = targetBlock.getBlock();
         Token<BlockTokenIdentifier> accessToken = targetBlock.getBlockToken();
+        // 构造出来一个BlockReader组件
+        // 很明显，这个BlockReader组件就是专门负责跟datanode通信读取block数据的
         blockReader = new BlockReaderFactory(dfsClient.getConf()).
             setInetSocketAddress(targetAddr).
             setRemotePeerFactory(dfsClient).
@@ -784,6 +803,7 @@ implements ByteBufferReadable, CanSetDropBehind, CanSetReadahead,
      */
     boolean retryCurrentNode = true;
 
+    // 不断的用这个BlockReader在while循环里读取数据
     while (true) {
       // retry as many times as seekToNewSource allows.
       try {
@@ -828,8 +848,13 @@ implements ByteBufferReadable, CanSetDropBehind, CanSetReadahead,
     if (closed) {
       throw new IOException("Stream closed");
     }
+    // 推测一下
+    // 如果有一个block在读取的过程中发现有破损
+    // 可能就会放在这里，而且会标识出来是这个block在哪个datanode上的副本破损了
+    // 下次就不会从这个datanode去下载副本了
     Map<ExtendedBlock,Set<DatanodeInfo>> corruptedBlockMap 
       = new HashMap<ExtendedBlock, Set<DatanodeInfo>>();
+    
     failures = 0;
     if (pos < getFileLength()) {
       int retries = 2;
@@ -837,6 +862,14 @@ implements ByteBufferReadable, CanSetDropBehind, CanSetReadahead,
         try {
           // currentNode can be left as null if previous read had a checksum
           // error on the same block. See HDFS-3067
+          // pos：这个变量的作用，就是标识一下，当前在读第几个block
+          // currentNode代表的就是当前正在从哪个datanode上读取block
+        	
+          // 如果说是在读一个block的话，主要这个block的packet还没读完
+          // 这里一定是currentNode不是null
+          // 如果说你的pos的位置超过了一个block应该有的大小的位置之后，此时就会
+          // 重新定位到下一个block，开始连接那个datanode去读取
+        	
           if (pos > blockEnd || currentNode == null) {
             currentNode = blockSeekTo(pos);
           }
@@ -845,9 +878,13 @@ implements ByteBufferReadable, CanSetDropBehind, CanSetReadahead,
             realLen = (int) Math.min(realLen,
                 locatedBlocks.getFileLength() - pos);
           }
+          
+          // 这个方法在读取数据
+          // 就是从指定的位置读取数据放到
           int result = readBuffer(strategy, off, realLen, corruptedBlockMap);
           
           if (result >= 0) {
+        	// 每次你读取完一块数据，pos就会不断的增加
             pos += result;
           } else {
             // got a EOS from reader though we expect more data on it.
@@ -978,7 +1015,10 @@ implements ByteBufferReadable, CanSetDropBehind, CanSetReadahead,
     DatanodeInfo chosenNode = null;
     StorageType storageType = null;
     if (nodes != null) {
+      // 遍历block对应的datanode的列表
       for (int i = 0; i < nodes.length; i++) {
+    	// 只要是遍历到的datanode不在deadNodes这个列表中
+    	// deadNodes大概就是标记了死掉的datanode，或者是无法联通的datanode
         if (!deadNodes.containsKey(nodes[i])
             && (ignoredNodes == null || !ignoredNodes.contains(nodes[i]))) {
           chosenNode = nodes[i];

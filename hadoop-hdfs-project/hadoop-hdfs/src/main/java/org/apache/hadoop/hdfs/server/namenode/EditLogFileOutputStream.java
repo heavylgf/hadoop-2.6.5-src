@@ -63,7 +63,7 @@ public class EditLogFileOutputStream extends EditLogOutputStream {
 
   /**
    * Creates output buffers and file object.
-   *
+   * 
    * @param conf
    *          Configuration object
    * @param name
@@ -73,7 +73,7 @@ public class EditLogFileOutputStream extends EditLogOutputStream {
    * @throws IOException
    */
   public EditLogFileOutputStream(Configuration conf, File name, int size)
-          throws IOException {
+      throws IOException {
     super();
     shouldSyncWritesAndSkipFsync = conf.getBoolean(
             DFSConfigKeys.DFS_NAMENODE_EDITS_NOEDITLOGCHANNELFLUSH,
@@ -83,8 +83,8 @@ public class EditLogFileOutputStream extends EditLogOutputStream {
     doubleBuf = new EditsDoubleBuffer(size);
     RandomAccessFile rp;
     if (shouldSyncWritesAndSkipFsync) {
-      rp = new RandomAccessFile(name, "rws"); // åº•å±‚éƒ½æ˜¯Java IOçš„ä¸€äº›ä¸œè¥¿ï¼ŒRandomAccessFile
-      // æ¯æ¬¡éƒ½ä¼šæ ¹æ®transactionIdç”Ÿæˆä¸€ä¸ªæ–‡ä»¶å
+      rp = new RandomAccessFile(name, "rws"); // µ×²ã¶¼ÊÇJava IOµÄÒ»Ğ©¶«Î÷£¬RandomAccessFile
+      // Ã¿´Î¶¼»á¸ù¾İtransactionIdÉú³ÉÒ»¸öÎÄ¼şÃû
     } else {
       rp = new RandomAccessFile(name, "rw");
     }
@@ -95,8 +95,8 @@ public class EditLogFileOutputStream extends EditLogOutputStream {
 
   @Override
   public void write(FSEditLogOp op) throws IOException {
-    // ä»€ä¹ˆå«åšå†…å­˜åŒç¼“å†²æœºåˆ¶çš„è¾“å‡º
-    // å…¶å®å°±æ˜¯åœ¨å°†æ•°æ®å†™å…¥åŒç¼“å†²çš„å…¶ä¸­ä¸€å—ç¼“å†²åŒºé‡Œé¢
+	// Ê²Ã´½Ğ×öÄÚ´æË«»º³å»úÖÆµÄÊä³ö
+	// ÆäÊµ¾ÍÊÇÔÚ½«Êı¾İĞ´ÈëË«»º³åµÄÆäÖĞÒ»¿é»º³åÇøÀïÃæ
     doubleBuf.writeOp(op);
   }
 
@@ -110,8 +110,8 @@ public class EditLogFileOutputStream extends EditLogOutputStream {
    * */
   @Override
   public void writeRaw(byte[] bytes, int offset, int length) throws IOException {
-    // äººå®¶ä¹Ÿæ˜¯èµ°çš„åŒç¼“å†²çš„æœºåˆ¶
-    // å…ˆå†™å…¥å†…å­˜é‡Œå»ï¼Œç„¶åå†æ˜¯å»flush
+	// ÈË¼ÒÒ²ÊÇ×ßµÄË«»º³åµÄ»úÖÆ
+	// ÏÈĞ´ÈëÄÚ´æÀïÈ¥£¬È»ºóÔÙÊÇÈ¥flush
     doubleBuf.writeRaw(bytes, offset, length);
   }
 
@@ -130,14 +130,14 @@ public class EditLogFileOutputStream extends EditLogOutputStream {
   /**
    * Write header information for this EditLogFileOutputStream to the provided
    * DataOutputSream.
-   *
+   * 
    * @param layoutVersion the LayoutVersion of the EditLog
    * @param out the output stream to write the header to.
    * @throws IOException in the event of error writing to the stream.
    */
   @VisibleForTesting
   public static void writeHeader(int layoutVersion, DataOutputStream out)
-          throws IOException {
+      throws IOException {
     out.writeInt(layoutVersion);
     LayoutFlags.write(out);
   }
@@ -156,7 +156,7 @@ public class EditLogFileOutputStream extends EditLogOutputStream {
         doubleBuf.close();
         doubleBuf = null;
       }
-
+      
       // remove any preallocated padding bytes from the transaction log.
       if (fc != null && fc.isOpen()) {
         fc.truncate(fc.position());
@@ -173,7 +173,7 @@ public class EditLogFileOutputStream extends EditLogOutputStream {
     }
     fp = null;
   }
-
+  
   @Override
   public void abort() throws IOException {
     if (fp == null) {
@@ -206,7 +206,7 @@ public class EditLogFileOutputStream extends EditLogOutputStream {
       return;
     }
     preallocate(); // preallocate file if necessary
-    // äººå®¶å°±æ˜¯è°ƒç”¨äº†
+    // ÈË¼Ò¾ÍÊÇµ÷ÓÃÁË
     doubleBuf.flushTo(fp);
     if (durable && !shouldSkipFsyncForTests && !shouldSyncWritesAndSkipFsync) {
       fc.force(false); // metadata updates not needed
@@ -241,7 +241,7 @@ public class EditLogFileOutputStream extends EditLogOutputStream {
     }
     if(FSNamesystem.LOG.isDebugEnabled()) {
       FSNamesystem.LOG.debug("Preallocated " + total + " bytes at the end of " +
-              "the edit log (offset " + oldSize + ")");
+      		"the edit log (offset " + oldSize + ")");
     }
   }
 
@@ -251,7 +251,7 @@ public class EditLogFileOutputStream extends EditLogOutputStream {
   File getFile() {
     return file;
   }
-
+  
   @Override
   public String toString() {
     return "EditLogFileOutputStream(" + file + ")";
@@ -263,17 +263,17 @@ public class EditLogFileOutputStream extends EditLogOutputStream {
   public boolean isOpen() {
     return fp != null;
   }
-
+  
   @VisibleForTesting
   public void setFileChannelForTesting(FileChannel fc) {
     this.fc = fc;
   }
-
+  
   @VisibleForTesting
   public FileChannel getFileChannelForTesting() {
     return fc;
   }
-
+  
   /**
    * For the purposes of unit tests, we don't need to actually
    * write durably to disk. So, we can skip the fsync() calls

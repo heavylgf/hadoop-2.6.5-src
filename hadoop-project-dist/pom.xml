@@ -127,8 +127,10 @@
           <maxmemory>512m</maxmemory>
           <quiet>true</quiet>
           <verbose>false</verbose>
+          <!--
           <source>${maven.compile.source}</source>
           <charset>${maven.compile.encoding}</charset>
+          -->
           <reportOutputDirectory>${project.build.directory}/site</reportOutputDirectory>
           <destDir>api</destDir>
           <groups>
@@ -307,10 +309,11 @@
                         <path refid="maven.compile.classpath"/>
                       </classpath>
                     </javadoc>
-
+<!--
                     <xslt style="${env.FINDBUGS_HOME}/src/xsl/default.xsl"
                           in="${project.build.directory}/findbugsXml.xml"
                           out="${project.build.directory}/site/findbugs.html"/>
+                          -->
 
                   </target>
                 </configuration>
@@ -341,6 +344,7 @@
                 <configuration>
                   <target>
                     <!-- Using Unix script to preserve symlinks -->
+                    <!--
                     <echo file="${project.build.directory}/dist-copynativelibs.sh">
                       BUILD_DIR="${project.build.directory}"
                       TAR='tar cf -'
@@ -380,6 +384,7 @@
                         fi
                       fi
                     </echo>
+                    -->
                     <exec executable="sh" dir="${project.build.directory}" failonerror="true">
                       <arg line="./dist-copynativelibs.sh"/>
                     </exec>

@@ -351,6 +351,7 @@ public class BlockReaderFactory implements ShortCircuitReplicaCreator {
     Preconditions.checkState(!DFSInputStream.tcpReadsDisabledForTesting,
         "TCP reads were disabled for testing, but we failed to " +
         "do a non-TCP read.");
+    // 默认情况是这个
     return getRemoteBlockReaderFromTcp();
   }
 
@@ -775,6 +776,8 @@ public class BlockReaderFactory implements ShortCircuitReplicaCreator {
       }
     }
     try {
+      // 应该是在这里创建Peer的过程中
+      // 就跟对应的datanode建立了对应的socket连接以及获取到了输入输出流
       Peer peer = remotePeerFactory.newConnectedPeer(inetSocketAddress, token,
         datanode);
       if (LOG.isTraceEnabled()) {

@@ -57,16 +57,16 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
  * periodically waking up to take a checkpoint of the namespace.
  * When it takes a checkpoint, it saves it to its local
  * storage and then uploads it to the remote NameNode.
- *
+ * 
  * 这是一个后台线程，在standby namenode里运行的
  * 周期性的运行对namespace（元数据）的一次checkpoint操作
  * 当他执行checkpoint操作的时候，他会把自己的namespace（内存里的元数据）写一份到磁盘文件上去，fsimage文件
  * 然后将这个fsimage文件，上传一份给active namenode
- *
+ * 
  * active namenode就可以时不时的获取到一份最新的fsimage，然后清空之前的一些edits log文件
  * 他这样就可以保证每次namenode启动的时候，其实都是只要将最新的一份fsimage和少量的edits log进行合并即可
  * fsimage和edits log进行合并
- *
+ * 
  */
 @InterfaceAudience.Private
 public class StandbyCheckpointer {
@@ -83,19 +83,19 @@ public class StandbyCheckpointer {
 
   private final Object cancelLock = new Object();
   private Canceler canceler;
-
+  
   // Keep track of how many checkpoints were canceled.
   // This is for use in tests.
   private static int canceledCount = 0;
-
+  
   public StandbyCheckpointer(Configuration conf, FSNamesystem ns)
-          throws IOException {
+      throws IOException {
     this.namesystem = ns;
     this.conf = conf;
-    this.checkpointConf = new CheckpointConf(conf);
+    this.checkpointConf = new CheckpointConf(conf); 
     this.thread = new CheckpointerThread();
     this.uploadThreadFactory = new ThreadFactoryBuilder().setDaemon(true)
-            .setNameFormat("TransferFsImageUpload-%d").build();
+        .setNameFormat("TransferFsImageUpload-%d").build();
 
     setNameNodeAddresses(conf);
   }
@@ -103,7 +103,7 @@ public class StandbyCheckpointer {
   /**
    * Determine the address of the NN we are checkpointing
    * as well as our own HTTP address from the configuration.
-   * @throws IOException
+   * @throws IOException 
    */
   private void setNameNodeAddresses(Configuration conf) throws IOException {
     // Look up our own address.
@@ -112,21 +112,21 @@ public class StandbyCheckpointer {
     // Look up the active node's address
     Configuration confForActive = HAUtil.getConfForOtherNode(conf);
     activeNNAddress = getHttpAddress(confForActive);
-
+    
     // Sanity-check.
     Preconditions.checkArgument(checkAddress(activeNNAddress),
-            "Bad address for active NN: %s", activeNNAddress);
+        "Bad address for active NN: %s", activeNNAddress);
     Preconditions.checkArgument(checkAddress(myNNAddress),
-            "Bad address for standby NN: %s", myNNAddress);
+        "Bad address for standby NN: %s", myNNAddress);
   }
-
+  
   private URL getHttpAddress(Configuration conf) throws IOException {
     final String scheme = DFSUtil.getHttpClientScheme(conf);
     String defaultHost = NameNode.getServiceAddress(conf, true).getHostName();
     URI addr = DFSUtil.getInfoServerWithDefaultHost(defaultHost, conf, scheme);
     return addr.toURL();
   }
-
+  
   /**
    * Ensure that the given address is valid and has a port
    * specified.
@@ -137,11 +137,11 @@ public class StandbyCheckpointer {
 
   public void start() {
     LOG.info("Starting standby checkpoint thread...\n" +
-            "Checkpointing active NN at " + activeNNAddress + "\n" +
-            "Serving checkpoints at " + myNNAddress);
+        "Checkpointing active NN at " + activeNNAddress + "\n" +
+        "Serving checkpoints at " + myNNAddress);
     thread.start();
   }
-
+  
   public void stop() throws IOException {
     cancelAndPreventCheckpoints("Stopping checkpointer");
     thread.setShouldRun(false);
@@ -162,27 +162,27 @@ public class StandbyCheckpointer {
     assert canceler != null;
     final long txid;
     final NameNodeFile imageType;
-
+    
     namesystem.longReadLockInterruptibly();
     try {
       assert namesystem.getEditLog().isOpenForRead() :
-              "Standby Checkpointer should only attempt a checkpoint when " +
-                      "NN is in standby mode, but the edit logs are in an unexpected state";
-
+        "Standby Checkpointer should only attempt a checkpoint when " +
+        "NN is in standby mode, but the edit logs are in an unexpected state";
+      
       FSImage img = namesystem.getFSImage();
-
+      
       long prevCheckpointTxId = img.getStorage().getMostRecentCheckpointTxId();
       long thisCheckpointTxId = img.getLastAppliedOrWrittenTxId();
       assert thisCheckpointTxId >= prevCheckpointTxId;
       if (thisCheckpointTxId == prevCheckpointTxId) {
         LOG.info("A checkpoint was triggered but the Standby Node has not " +
-                "received any transactions since the last checkpoint at txid " +
-                thisCheckpointTxId + ". Skipping...");
+            "received any transactions since the last checkpoint at txid " +
+            thisCheckpointTxId + ". Skipping...");
         return;
       }
 
       if (namesystem.isRollingUpgrade()
-              && !namesystem.getFSImage().hasRollbackFSImage()) {
+          && !namesystem.getFSImage().hasRollbackFSImage()) {
         // if we will do rolling upgrade but have not created the rollback image
         // yet, name this checkpoint as fsimage_rollback
         imageType = NameNodeFile.IMAGE_ROLLBACK;
@@ -196,7 +196,7 @@ public class StandbyCheckpointer {
       img.saveNamespace(namesystem, imageType, canceler);
       txid = img.getStorage().getMostRecentCheckpointTxId();
       assert txid == thisCheckpointTxId : "expected to save checkpoint at txid=" +
-              thisCheckpointTxId + " but instead saved at txid=" + txid;
+        thisCheckpointTxId + " but instead saved at txid=" + txid;
 
       // Save the legacy OIV image, if the output dir is defined.
       String outputDir = checkpointConf.getLegacyOivImageDir();
@@ -206,19 +206,19 @@ public class StandbyCheckpointer {
     } finally {
       namesystem.longReadUnlock();
     }
-
+    
     // Upload the saved checkpoint back to the active
     // Do this in a separate thread to avoid blocking transition to active
     // See HDFS-4816
     // 就是说用另外一个线程异步的将这个刚刚写好的fsimage文件给传输到active namenode上去
     // 开一个单线程线程池，另外一个线程异步上传新的fsimage文件到active namenode上去
     ExecutorService executor =
-            Executors.newSingleThreadExecutor(uploadThreadFactory);
+        Executors.newSingleThreadExecutor(uploadThreadFactory);
     Future<Void> upload = executor.submit(new Callable<Void>() {
       @Override
       public Void call() throws IOException {
         TransferFsImage.uploadImageFromStorage(activeNNAddress, conf,
-                namesystem.getFSImage().getStorage(), imageType, txid, canceler);
+            namesystem.getFSImage().getStorage(), imageType, txid, canceler);
         return null;
       }
     });
@@ -232,10 +232,10 @@ public class StandbyCheckpointer {
       throw e;
     } catch (ExecutionException e) {
       throw new IOException("Exception during image upload: " + e.getMessage(),
-              e.getCause());
+          e.getCause());
     }
   }
-
+  
   /**
    * Cancel any checkpoint that's currently being made,
    * and prevent any new checkpoints from starting for the next
@@ -255,7 +255,7 @@ public class StandbyCheckpointer {
       }
     }
   }
-
+  
   @VisibleForTesting
   static int getCanceledCount() {
     return canceledCount;
@@ -264,7 +264,7 @@ public class StandbyCheckpointer {
   private long countUncheckpointedTxns() {
     FSImage img = namesystem.getFSImage();
     return img.getLastAppliedOrWrittenTxId() -
-            img.getStorage().getMostRecentCheckpointTxId();
+      img.getStorage().getMostRecentCheckpointTxId();
   }
 
   private class CheckpointerThread extends Thread {
@@ -274,7 +274,7 @@ public class StandbyCheckpointer {
     private CheckpointerThread() {
       super("Standby State Checkpointer");
     }
-
+    
     private void setShouldRun(boolean shouldRun) {
       this.shouldRun = shouldRun;
     }
@@ -284,13 +284,13 @@ public class StandbyCheckpointer {
       // We have to make sure we're logged in as far as JAAS
       // is concerned, in order to use kerberized SSL properly.
       SecurityUtil.doAsLoginUserOrFatal(
-              new PrivilegedAction<Object>() {
-                @Override
-                public Object run() {
-                  doWork();
-                  return null;
-                }
-              });
+          new PrivilegedAction<Object>() {
+          @Override
+          public Object run() {
+            doWork();
+            return null;
+          }
+        });
     }
 
     /**
@@ -299,7 +299,7 @@ public class StandbyCheckpointer {
      * mode. We need to not only cancel any concurrent checkpoint,
      * but also prevent any checkpoints from racing to start just
      * after the cancel call.
-     *
+     * 
      * @param delayMs the number of MS for which checkpoints will be
      * prevented
      */
@@ -330,39 +330,39 @@ public class StandbyCheckpointer {
           if (UserGroupInformation.isSecurityEnabled()) {
             UserGroupInformation.getCurrentUser().checkTGTAndReloginFromKeytab();
           }
-
+          
           final long now = monotonicNow();
           final long uncheckpointed = countUncheckpointedTxns();
           final long secsSinceLast = (now - lastCheckpointTime) / 1000;
-
+          
           boolean needCheckpoint = needRollbackCheckpoint;
           if (needCheckpoint) {
             LOG.info("Triggering a rollback fsimage for rolling upgrade.");
-          }
-
+          } 
+          
           // 如果满足第一个条件，那么就可以执行checkpoint操作
           // uncheckpointed（还没合并到fsimage的edtis log的数量） >= 100万
           // 也就是说，fsimage文件如果落后于edits log已经100万条数据了，那么此时必须得执行一次checkpoint操作
           else if (uncheckpointed >= checkpointConf.getTxnCount()) {
-            LOG.info("Triggering checkpoint because there have been " +
-                    uncheckpointed + " txns since the last checkpoint, which " +
-                    "exceeds the configured threshold " +
-                    checkpointConf.getTxnCount());
+            LOG.info("Triggering checkpoint because there have been " + 
+                uncheckpointed + " txns since the last checkpoint, which " +
+                "exceeds the configured threshold " +
+                checkpointConf.getTxnCount());
             needCheckpoint = true;
-          }
+          } 
           // secsSinceLast（当前时间到上一次checkpoint的间隔） >= 1小时（3600秒）
           // 如果距离上一次checkpoint操作都间隔了超过1个小时了，那么此时就会执行一次checkpoint操作
           else if (secsSinceLast >= checkpointConf.getPeriod()) {
             LOG.info("Triggering checkpoint because it has been " +
-                    secsSinceLast + " seconds since the last checkpoint, which " +
-                    "exceeds the configured interval " + checkpointConf.getPeriod());
+                secsSinceLast + " seconds since the last checkpoint, which " +
+                "exceeds the configured interval " + checkpointConf.getPeriod());
             needCheckpoint = true;
           }
-
+          
           // 人家执行checkpoint操作，就两个条件
           // 第一个条件，就是说如果有超过100万个edtis log没合并到fsimage里去，那么就执行
           // 第二个条件，如果超过1小时，那么就执行一次
-
+          
           synchronized (cancelLock) {
             if (now < preventCheckpointsUntil) {
               LOG.info("But skipping this checkpoint since we are about to failover!");
@@ -372,13 +372,13 @@ public class StandbyCheckpointer {
             assert canceler == null;
             canceler = new Canceler();
           }
-
+          
           if (needCheckpoint) {
             doCheckpoint();
             // reset needRollbackCheckpoint to false only when we finish a ckpt
             // for rollback image
             if (needRollbackCheckpoint
-                    && namesystem.getFSImage().hasRollbackFSImage()) {
+                && namesystem.getFSImage().hasRollbackFSImage()) {
               namesystem.setCreatedRollbackImages(true);
               namesystem.setNeedRollbackFsImage(false);
             }

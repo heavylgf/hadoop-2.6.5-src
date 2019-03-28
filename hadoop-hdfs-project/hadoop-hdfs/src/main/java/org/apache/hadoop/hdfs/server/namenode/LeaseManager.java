@@ -79,17 +79,47 @@ public class LeaseManager {
   // Used for handling lock-leases
   // Mapping: leaseHolder -> Lease
   //
+  // TreeMap
+  // Èç¹û´ó¼ÒÈ¥¹Ø×¢Ò»ÏÂÎÒÖ®Ç°½²½âµÄÄÇ¸öJDKÔ´ÂëÆÊÎöÏµÁĞµÄ¿Î³Ì
+  // ÀïÃæ¾ÍÓĞ¼¯ºÏ°üµÄÔ´ÂëÆÊÎö
+  // ÀïÃæÊÇÌáµ½ÁËÕâ¸öTreeMapµÄ£¬ºìºÚÊ÷±£´æµÄ¼¯ºÏÊı¾İ½á¹¹£¬ÌØµã¾ÍÊÇËµ·ÅÈëÀïÃæµÄÊı¾İ
+  // ¿ÉÒÔÄ¬ÈÏ×Ô¶¯¸ù¾İkeyµÄ×ÔÈ»´óĞ¡À´ÅÅĞò
+  // ÅÅĞòºÃÁËÒÔºó£¬ÏÂ´ÎÄãÈç¹û±éÀúTreeMapµÄÊ±ºò£¬¾ÍÊÇ¸ù¾İkey×ÔÈ»´óĞ¡ÅÅĞòºóµÄË³ĞòÀ´±éÀúµÄ
+  
+  // HashMap±éÀúµÄÊ±ºòÊÇÎŞĞòµÄ
+  // LinkedHashMapÊÇÓÃÒ»¸öË«ÏòÁ´±í±£´æÁË²åÈëmapµÄkey-value¶ÔµÄË³Ğò
+  // ±éÀúLinkedHashMapµÄÊ±ºòÊÇ¸ù¾İ²åÈëµÄË³ĞòÀ´±éÀúµÄ
+  // TreeMapÊÇÄ¬ÈÏ¸ù¾İkeyµÄ×ÔÈ»´óĞ¡À´ÅÅĞòµÄ£¬±éÀúµÄÊ±ºòÒ²ÊÇ°´ÕÕÕâ¸öË³ĞòÀ´±éÀúµÄ
+  
+  // ÓÃTreeMap±£´æÁËÒ»¸öleaseÊı¾İ¼¯ºÏ
+  // ÓÃÆ¨¹ÉÏëÏë¶¼ÖªµÀ£¬LeaseÒ»¿´¾ÍÊÇÆõÔ¼£¬ÊÇLeaseManager¹ÜÀíµÄºËĞÄÊı¾İ
+  // Ò»¸öLease¾ÍÊÇ´ú±íÁËÄ³¸ö¿Í»§¶Ë¶ÔÒ»¸öÎÄ¼şÓµÓĞµÄÆõÔ¼
+  // leasesÊı¾İ½á¹¹Àï£¬keyÊÇ¿Í»§¶ËÃû³Æ£¬value¾ÍÊÇÄÇ¸ö¿Í»§¶ËµÄleaseÆõÔ¼
+  // TreeMapµÄ»°£¬Ä¬ÈÏ»á¸ù¾İ¿Í»§¶ËµÄÃû³ÆÀ´½øĞĞÅÅĞò
   private final SortedMap<String, Lease> leases = new TreeMap<String, Lease>();
   // Set of: Lease
+  // TreeSet£¬Èç¹û¿´¹ıÎÒµÄÄÇ¸öJDK¼¯ºÏÔ´ÂëÆÊÎöµÄ¿Î³Ì
+  // SetÏµÁĞµÄ¶«Î÷ÊÇÃ»ÓĞÔ´ÂëµÄ£¬ËûÈ«²¿¶¼ÊÇ»ùÓÚMapÏµÁĞµÄÀàÀ´ÊµÏÖµÄ
+  // TreeSetµ×²ã¾ÍÊÇ»ùÓÚTreeMapÀ´ÊµÏÖµÄ£¬Ä¬ÈÏÀïÃæµÄÔªËØÊÇ°´ÕÕ×ÔÈ»´óĞ¡ÅÅĞòµÄ
+  // ÆÕÍ¨µÄHashSetÊÇÎŞĞòµÄ
+  // Ïàµ±ÓÚÄ¬ÈÏ¾ÍÊÇ¸ù¾İLeaseÀ´×ÔÈ»ÅÅĞòÁË
+  // Ä¬ÈÏÊÇ¸ù¾İleaseµÄlastUpdateĞøÔ¼Ê±¼äÀ´ÅÅĞò£¬Èç¹ûÒ»Ñù£¬¾Í¸ù¾İ¿Í»§¶ËÃû³ÆÀ´ÅÅĞò
   private final NavigableSet<Lease> sortedLeases = new TreeSet<Lease>();
 
   // 
   // Map path names to leases. It is protected by the sortedLeases lock.
   // The map stores pathnames in lexicographical order.
   //
+  // TreeMap£¬¸ù¾İpathÀ´ÅÅĞòµÄÆõÔ¼Êı¾İ
+  // keyÊÇÎÄ¼şÂ·¾¶Ãû£¬Ä¬ÈÏÊÇ¸ù¾İÎÄ¼şÂ·¾¶ÃûÀ´½øĞĞÅÅĞòµÄ
   private final SortedMap<String, Lease> sortedLeasesByPath = new TreeMap<String, Lease>();
 
+  // ºËĞÄ£ºDaemon£¬±¾Éí¾ÍÊÇ»ùÓÚËû´´½¨µÄÏß³Ì£¬¶¼ÊÇdaemonºóÌ¨Ïß³Ì
   private Daemon lmthread;
+  
+  // ÓĞÒ»¸ö¶«Î÷£¬ÊÇ½Ğ×öshouldRunMonitor£¬±êÖ¾Î»
+  // volatileĞŞÊÎµÄ±êÖ¾Î»£¬volatilieÊÇÊ²Ã´¶«Î÷£¿Çë²Î¼ÓÎÒµÄjava²¢·¢±à³Ì¿Î³Ì
+  // ÎÒ»áÏêÏ¸µÄÆÊÎövolatileºÍjavaÄÚ´æÄ£ĞÍµÄÔ­Àí
   private volatile boolean shouldRunMonitor;
 
   LeaseManager(FSNamesystem fsnamesystem) {this.fsnamesystem = fsnamesystem;}
@@ -105,17 +135,26 @@ public class LeaseManager {
    * This method iterates through all the leases and counts the number of blocks
    * which are not COMPLETE. The FSNamesystem read lock MUST be held before
    * calling this method.
+   * 
+   * ÔÚnamenodeÆô¶¯µÄÊ±ºò£¬»á½øĞĞÒ»¸ösafe modeµÄ¼ì²é
+   * »áµ÷ÓÃÕâ¸ö·½·¨
+   * 
    * @return
    */
   synchronized long getNumUnderConstructionBlocks() {
     assert this.fsnamesystem.hasReadLock() : "The FSNamesystem read lock wasn't"
       + "acquired before counting under construction blocks";
     long numUCBlocks = 0;
+    // ÕâÀïµÄ»°ÄØ¾ÍÊÇÔÚ±éÀúËùÓĞµÄlease£¬LeaseÆõÔ¼µÄ¶«Î÷£¬Õâ¸ö¶«Î÷µÃÔÚºóÃæÀ´½²½â
+    // Ã¿¸öleaseÀïÃæÓĞ¶à¸öpath£¬Äã¿ÉÒÔÈÏÎªÒ»¸öpath¾ÍÊÇ´ú±íÁËÒ»¸öÎÄ¼şµÄÂ·¾¶£¬/usr/warehosue/hive/access.log
     for (Lease lease : sortedLeases) {
       for (String path : lease.getPaths()) {
         final INodeFile cons;
         try {
+          // »áÍ¨¹ıFSNamesystemÀïÃæÓĞÒ»¸ö¹Ø¼üµÄ¶«¶«£¬FSDirectory£¬getINode(path).asFile()
+          // ¾Í¿ÉÒÔ»ñÈ¡µ½´ú±íÁË/usr/warehosue/hive/access.logÕâ¸ö¶«Î÷µÄÒ»¸öÎÄ¼ş¶ÔÏó£¬INodeFile
           cons = this.fsnamesystem.getFSDirectory().getINode(path).asFile();
+          // ÔÚÕâÀïËû»áÅĞ¶ÏÒ»ÏÂ£¬Õâ¸öÎÄ¼şµ±Ç°ÊÇ·ñ´¦ÓÚunder construction×´Ì¬£¬Èç¹û²»ÊÇ´¦ÓÚÕâ¸ö×´Ì¬£¬ÄÇÃ´¾ÍÖ±½Ó¿´ÏÂÒ»¸öpath
           if (!cons.isUnderConstruction()) {
             LOG.warn("The file " + cons.getFullPathName()
                 + " is not under construction but has lease.");
@@ -124,10 +163,16 @@ public class LeaseManager {
         } catch (UnresolvedLinkException e) {
           throw new AssertionError("Lease files should reside on this FS");
         }
+        
+        // Õâ±ßÊÇÍ¨¹ıINodeFile.getBlocks()·½·¨
+        // »ñÈ¡/usr/warehosue/hive/access.logÎÄ¼şµÄblocks
+        // Ã¿¸öÎÄ¼ş¶¼¿ÉÒÔ¶ÔÓ¦¶à¸öblock£¬¿ÉÒÔ²ğ·ÖÎª128mÒ»¸öµÄblock£¬ËùÒÔÕâÀïÒ»¸öÎÄ¼ş¿ÉÄÜÓĞ¶à¸öblock
         BlockInfo[] blocks = cons.getBlocks();
         if(blocks == null)
           continue;
+        // ±éÀúÕâ¸öÎÄ¼şµÄblock
         for(BlockInfo b : blocks) {
+          // Èç¹ûÕâ¸öblockµÄ×´Ì¬²»ÊÇcomplete£¬ÄÇÃ´Õâ¸öblock¾ÍÊôÓÚÒ»¸öunder constructionµÄblock
           if(!b.isComplete())
             numUCBlocks++;
         }
@@ -154,16 +199,26 @@ public class LeaseManager {
   
   /**
    * Adds (or re-adds) the lease for the specified file.
+   * 
+   * ÎªÄ³¸ö¿Í»§¶Ë¼ÓÈëÒ»¸öÕë¶ÔÄ³¸öÎÄ¼şµÄÆõÔ¼
+   * 
    */
   synchronized Lease addLease(String holder, String src) {
+	// holderÒ»¿´¾ÍÊÇ´ú±í¿Í»§¶ËµÄÃû×Ö
+	// ¸Õ¿ªÊ¼¿Ï¶¨ÊÇÕÒ²»µ½µÄ
     Lease lease = getLease(holder);
     if (lease == null) {
+      // Ö±½Ó¹¹ÔìÒ»¸öÄÚ²¿Àà£¬Lease¶ÔÏó£¬´«Èë½øÈ¥¿Í»§¶ËµÄÃû³Æ
+      // Ö±½ÓÒÔ<¿Í»§¶ËÃû³Æ, LeaseÆõÔ¼>µÄkey-value¶Ô¸ñÊ½£¬½«Ëû·ÅÈëleasedÊı¾İ½á¹¹ÖĞ
+      // Í¬Ê±½«LeaseÊı¾İ¼ÓÈëÁËÒ»¸ösortedLeasesÊı¾İ½á¹¹
       lease = new Lease(holder);
       leases.put(holder, lease);
       sortedLeases.add(lease);
     } else {
       renewLease(lease);
     }
+    // ÍùsortedLeasesByPathµÄÊı¾İ½á¹¹ÖĞ¼ÓÈëÆõÔ¼
+    // Õâ¸öÊı¾İ½á¹¹µÄkey£¬²»ÊÇ¿Í»§¶ËÃû³Æ£¬¶øÊÇÎÄ¼şÂ·¾¶Ãû£¬ËùÒÔËûÄ¬ÈÏÊÇ¸ù¾İÎÄ¼şÂ·¾¶ÃûÀ´ÅÅĞòµÄ
     sortedLeasesByPath.put(src, lease);
     lease.paths.add(src);
     return lease;
@@ -171,6 +226,10 @@ public class LeaseManager {
 
   /**
    * Remove the specified lease and src.
+   * 
+   * É¾³ıÄ³¸ö¿Í»§¶ËÕë¶ÔÄ³¸öÎÄ¼şµÄÆõÔ¼
+   * ´ÓËûËùÓĞµÄÊı¾İ½á¹¹ÖĞ£¬½«Õâ¸öÎÄ¼şÆõÔ¼¸øÉ¾³ıµô
+   * 
    */
   synchronized void removeLease(Lease lease, String src) {
     sortedLeasesByPath.remove(src);
@@ -220,12 +279,21 @@ public class LeaseManager {
 
   /**
    * Renew the lease(s) held by the given client
+   * 
+   * renew£¬Èç¹û´ó¼Ò¿´¹ıÎÒÖ®Ç°·ÖÎö¹ıµÄspring cloudÔ´ÂëµÄ¿ÎµÄ»°£¬¾ÍÖªµÀÔÚÀïÃæ
+   * Î¢·şÎñ×¢²áÖĞĞÄ£¬eurekaÀïÃæÓĞleaseºÍrenewµÄ¸ÅÄî
+   * ¸÷¸öÎ¢·şÎñ¶¼»á²»¶ÏµÄ·¢ËÍĞÄÌø¸øeureka server£¬ÀïÃæ»áÎ¬»¤Ã¿¸ö·şÎñ¸úeureka serverÖ®¼äµÄlease
+   * Ã¿´Î·¢ËÍÒ»´ÎĞÄÌø£¬¾Í»árenew lease£¬ĞøÔ¼
+   * 
    */
   synchronized void renewLease(String holder) {
     renewLease(getLease(holder));
   }
   synchronized void renewLease(Lease lease) {
     if (lease != null) {
+      // ÏÈ´ÓsortedLeasesÀïÃæÉ¾³ıµô£¬ÒòÎªËûÒªÖØĞÂĞøÔ¼
+      // ¸üĞÂ×î½üÒ»´ÎĞøÔ¼µÄÊ±¼ä
+      // ÖØĞÂ¼ÓÈësortedLeasesÀïÃæÈ¥£¬¸ù¾İ×îĞÂµÄĞøÔ¼Ê±¼äÖØĞÂÅÅĞò
       sortedLeases.remove(lease);
       lease.renew();
       sortedLeases.add(lease);
@@ -249,8 +317,13 @@ public class LeaseManager {
    * expire, all the corresponding locks can be released.
    *************************************************************/
   class Lease implements Comparable<Lease> {
+	// holder£¬ÄÄ¸ö¿Í»§¶Ë³ÖÓĞµÄÕâ·İÆõÔ¼
     private final String holder;
+    // ¿Í»§¶Ë£¬Ò»¿´¾ÍÊÇËµ£¬¿Ï¶¨ÊÇÓĞÁËÒ»·İÆõÔ¼Ö®ºó£¬±ØĞëµÃÓÃÒ»¸öºóÌ¨Ïß³Ì²»¶Ï·¢ËÍÇëÇó
+    // À´½øĞĞrenew lease£¬ĞøÔ¼
+    // Õâ¸ölastUpdateÒ»°ã´æ´¢µÄÊÇ×î½üÒ»´ÎËû½øĞĞĞøÔ¼µÄÊ±¼ä
     private long lastUpdate;
+    // Õâ¸ö¿Í»§¶ËÔÚÕâ·İÆõÔ¼ÀïÕë¶ÔÄÄĞ©ÎÄ¼şÉùÃ÷ÁË×Ô¼ºµÄËùÓĞÈ¨
     private final Collection<String> paths = new TreeSet<String>();
   
     /** Only LeaseManager object can create a lease */
@@ -265,7 +338,7 @@ public class LeaseManager {
 
     /** @return true if the Hard Limit Timer has expired */
     public boolean expiredHardLimit() {
-      // å½“å‰æ—¶é—´ - ä¸Šæ¬¡ç»­çº¦æ—¶é—´ > 1å°æ—¶
+      // µ±Ç°Ê±¼ä - ÉÏ´ÎĞøÔ¼Ê±¼ä > 1Ğ¡Ê±
       return now() - lastUpdate > hardLimit;
     }
 
@@ -291,13 +364,16 @@ public class LeaseManager {
     public int compareTo(Lease o) {
       Lease l1 = this;
       Lease l2 = o;
+      // ÑĞ¾¿Ò»ÏÂ£¬¸÷¸öLeaseÊÇ¸ù¾İÊ²Ã´À´ÅÅĞòµÄ£¿
       long lu1 = l1.lastUpdate;
       long lu2 = l2.lastUpdate;
+      // ÊÇ¸ù¾İlastUpdateÒ²¾ÍÊÇ×î½üÒ»´ÎĞøÔ¼µÄÊ±¼äÀ´½øĞĞÅÅĞòµÄ
       if (lu1 < lu2) {
         return -1;
       } else if (lu1 > lu2) {
         return 1;
       } else {
+    	// Èç¹ûÁ½¸ö¿Í»§¶ËµÄĞøÔ¼µÄÊ±¼äÊÇÒ»ÑùµÄ £¬ÄÇÃ´¾Í¸ù¾İ¿Í»§¶ËµÄÃû³ÆÀ´ÅÅĞò
         return l1.holder.compareTo(l2.holder);
       }
     }
@@ -407,6 +483,13 @@ public class LeaseManager {
    * Monitor checks for leases that have expired,
    * and disposes of them.
    ******************************************************/
+  // ÕâÊÇÒ»¸öºóÌ¨Ïß³Ì
+  // Õâ¸ö¶«Î÷Ä¬ÈÏÒ»¶¨»áÔËĞĞÆğÀ´£¬ÔÚºóÌ¨²»¶ÏµÄ¼à¿Ø¸÷¸öleaseÆõÔ¼
+  // Èç¹ûÄ³¸ö¿Í»§¶ËÉêÇë³ÖÓĞÁËÒ»¸öÎÄ¼şµÄÆõÔ¼
+  // ½á¹û£¬²»ĞÒµÄÊÂÇé·¢ÉúÁË£¬Ò²¾ÍÊÇÄÇ¸ö¿Í»§¶ËÄªÃûÆäÃîµÄËÀÍöÁË£¬¹ÒÁË£¬È»ºóÃ»ÓĞÉ¾³ıÕâ¸öÆõÔ¼
+  // ÄÇÃ´´ËÊ±¾ÍĞèÒªnamenodeÀï£¬LeaseManagerµÄMonitorºóÌ¨Ïß³Ì
+  // ²»¶ÏµÄ¼à¿Ø¸÷¸ölease£¬ÅĞ¶ÏÈç¹ûËµÄ³¸ö¿Í»§¶ËÉêÇëÁËÆõÔ¼Ö®ºó£¬³¤Ê±¼ä·¶Î§ÄÚ¶¼Ã»ÓĞÀ´ĞøÔ¼£¬ÈÏÎªËûËÀÁË
+  // ´ËÊ±¾ÍÒª×Ô¶¯ÊÍ·ÅÕâ¸ölease£¬²»ÈÃÒ»¸ö¿Í»§¶Ë³¤Ê±¼äÕ¼ÓĞÕâ¸öÎÄ¼şµÄËùÓĞÈ¨
   class Monitor implements Runnable {
     final String name = getClass().getSimpleName();
 
@@ -419,6 +502,9 @@ public class LeaseManager {
           fsnamesystem.writeLockInterruptibly();
           try {
             if (!fsnamesystem.isInSafeMode()) {
+              // ¼ì²éÆõÔ¼µÄºËĞÄÂß¼­£¬ÊÇÔÚcheckLeases()·½·¨Àï
+              // ÔÚÕâ¸ö¼ì²éÆõÔ¼µÄÂß¼­ÖĞ£¬¿ÉÄÜ»á´¥·¢Ò»Ğ©Ğ´edits logÔªÊı¾İµÄ²Ù×÷
+              // Èç¹û´¥·¢ÁËµÄ»°£¬»¹ÈÃedits log syncÒ»ÏÂ
               needSync = checkLeases();
             }
           } finally {
@@ -429,6 +515,7 @@ public class LeaseManager {
             }
           }
   
+          // Ä¬ÈÏÊÇÃ¿¸ô2Ãë£¬¶ÔËùÓĞµÄÆõÔ¼×öÒ»´Î¼ì²é
           Thread.sleep(HdfsServerConstants.NAMENODE_LEASE_RECHECK_INTERVAL);
         } catch(InterruptedException ie) {
           if (LOG.isDebugEnabled()) {
@@ -463,6 +550,11 @@ public class LeaseManager {
   }
   
   /** Check the leases beginning from the oldest.
+   *  
+   *  sortedLeasesÄ¬ÈÏÊÇ¸ù¾İleaseĞøÔ¼Ê±¼äÀ´½øĞĞÅÅĞòµÄ£¬Ä¬ÈÏÊÇĞøÔ¼Ê±¼äÔ½¾É£¬Ô½ÀÏµÄ£¬Ô½¿¿Ç°µÄ
+   *  ÊÇ·ÅÔÚµÚÒ»¸ö
+   *  ËùÒÔÔÚÕâÀïÖ±½Ó¿ÉÒÔfirst()·½·¨»ñÈ¡µÚÒ»¸öÆõÔ¼
+   * 
    *  @return true is sync is needed.
    */
   @VisibleForTesting
@@ -475,14 +567,19 @@ public class LeaseManager {
     } catch(NoSuchElementException e) {}
 
     while(leaseToCheck != null) {
-      // å¦‚æœæœ€è€çš„ä¸€ä¸ªå¥‘çº¦
-      // æ‰€æœ‰çš„å¥‘çº¦éƒ½æœ‰ä¸€ä¸ªç»­çº¦çš„æ—¶é—´
-      // æ¯”å¦‚è¯´ï¼Œå¥‘çº¦1:10:00:00 å¥‘çº¦2:10:05:00, å¥‘çº¦3:10:20:00
-      //
+      // Èç¹û×îÀÏµÄÒ»¸öÆõÔ¼
+      // ËùÓĞµÄÆõÔ¼¶¼ÓĞÒ»¸öĞøÔ¼µÄÊ±¼ä
+      // ±ÈÈçËµ£¬ÆõÔ¼1£º10:00:00£¬ÆõÔ¼2£º10:05:00£¬ÆõÔ¼3£º10:20:00
+      // ÈË¼ÒÔÚÕâÀï×ö¼ì²é£¬¼ì²éÆõÔ¼¹ıÆÚµÄÊ±ºò£¬²»ÊÇºÜ½©Ó²µÄ±éÀúËùÓĞµÄÆõÔ¼À´¼ì²éËûµÄÊ±¼äµÄ£¬ÄÇÑùµÄ»°ĞÔÄÜ²»ÊÇÌ«ºÃ
+      // Ëû¾Í¸ù¾İÒ»¸ösortedLeasesÅÅĞòµÄÊı¾İ½á¹¹£¬È¡³öÀ´ĞøÔ¼Ê±¼ä×îÀÏµÄÄÇ¸ö
+      // ±ÈÈçËµ10:00:00
+      // Èç¹ûËµÄÇ¸ö×îÀÏµÄÆõÔ¼£¬¶¼Ã»ÓĞ³¬¹ı1Ğ¡Ê±»¹Ã»ĞøÔ¼£¬ÄÇÃ´¾Í²»ÓÃ¼ì²éÁË£¬ÒòÎª¾ÍÒâÎ¶×ÅºóÃæµÄÆõÔ¼¿Ï¶¨ĞøÔ¼Ê±¼ä¶¼Ã»³¬¹ı1Ğ¡Ê±
       if (!leaseToCheck.expiredHardLimit()) {
         break;
       }
 
+      // Èç¹û½øÈëµ½ÕâÀï£¬·¢ÏÖÓĞÄ³¸öÆõÔ¼£¬ÒÑ¾­³¬¹ıÁË1Ğ¡Ê±»¹Ã»ĞøÔ¼ÁË
+      
       LOG.info(leaseToCheck + " has expired hard limit");
 
       final List<String> removing = new ArrayList<String>();
@@ -492,9 +589,11 @@ public class LeaseManager {
       // causing ConcurrentModificationException
       String[] leasePaths = new String[leaseToCheck.getPaths().size()];
       leaseToCheck.getPaths().toArray(leasePaths);
-
+      // ±äÁ¿Õâ¸öÆõÔ¼ÖĞÓĞÈ¨ÏŞµÄÎÄ¼şµÄÂ·¾¶
       for(String p : leasePaths) {
         try {
+          // ´ËÊ±¾Í»á×Ô¶¯ÊÍ·ÅµôÄÇĞ©ÆõÔ¼
+          // ÊÍ·ÅµôÒ»¸öÆõÔ¼Õë¶ÔÄ³¸öÎÄ¼şÂ·¾¶µÄËùÓĞÈ¨
           boolean completed = fsnamesystem.internalReleaseLease(leaseToCheck, p,
               HdfsServerConstants.NAMENODE_LEASE_HOLDER);
           if (LOG.isDebugEnabled()) {
@@ -516,8 +615,10 @@ public class LeaseManager {
       }
 
       for(String p : removing) {
+    	// É¾³ıÕâ¸öÆõÔ¼
         removeLease(leaseToCheck, p);
       }
+      // »ñÈ¡µ½sortedLeasesÖĞµÄµÚ¶ş¸öÆõÔ¼£¬·¢ÏÖµÚÒ»¸öÆõÔ¼ÊÇ¹ıÆÚµÄ
       leaseToCheck = sortedLeases.higher(leaseToCheck);
     }
 
@@ -539,6 +640,11 @@ public class LeaseManager {
         + "\n}";
   }
 
+  /**
+   * Õâ¸ö·½·¨£¬Ò»¿´¾ÍÊÇÔÚÕâÀï¹¹ÔìÁËÕâ¸öºóÌ¨Ïß³Ì
+   * È»ºóÍ¬Ê±Æô¶¯ÁËÕâ¸öºóÌ¨Ïß³Ì
+   * Õâ¸ö·½·¨Ò»¶¨ÊÇÔÚFSNamesystem³õÊ¼»¯µÄÊ±ºòÀ´µ÷ÓÃLeaseManagerµÄ·½·¨£¬Æô¶¯ËûµÄºóÌ¨Ïß³Ì
+   */
   void startMonitor() {
     Preconditions.checkState(lmthread == null,
         "Lease Monitor already running");

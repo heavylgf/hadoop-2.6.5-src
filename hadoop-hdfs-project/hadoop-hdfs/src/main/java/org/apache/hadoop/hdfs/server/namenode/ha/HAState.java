@@ -33,7 +33,6 @@ abstract public class HAState {
 
   /**
    * Constructor
-   * @param name Name of the state.
    */
   public HAState(HAServiceState state) {
     this.state = state;
@@ -48,7 +47,6 @@ abstract public class HAState {
 
   /**
    * Internal method to transition the state of a given namenode to a new state.
-   * @param nn Namenode
    * @param s new state
    * @throws ServiceFailedException on failure to transition to new state.
    */

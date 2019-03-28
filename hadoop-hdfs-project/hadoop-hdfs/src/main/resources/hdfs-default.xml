@@ -569,7 +569,8 @@
 </property>
 
 <property>
-  <name>dfs.blockreport.initialDelay</name>  <value>0</value>
+  <name>dfs.blockreport.initialDelay</name>  
+  <value>0</value>
   <description>Delay for first block report in seconds.</description>
 </property>
 

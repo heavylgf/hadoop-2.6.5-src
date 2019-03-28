@@ -200,9 +200,12 @@ public class GetJournalEditServlet extends HttpServlet {
         return;
       }
       
+      // 读取了一个参数，segmentTxId
+      // 一看人家就是提供了一个http接口让你来读取某个txid的edits log
       long segmentTxId = ServletUtil.parseLongParam(request,
           SEGMENT_TXID_PARAM);
 
+      // FileJournalManager是专门用来处理读写磁盘文件上的edits log的
       FileJournalManager fjm = storage.getJournalManager();
       File editFile;
 
@@ -210,6 +213,7 @@ public class GetJournalEditServlet extends HttpServlet {
         // Synchronize on the FJM so that the file doesn't get finalized
         // out from underneath us while we're in the process of opening
         // it up.
+    	// 通过FileJournalManager就可以获取到txid对应的一个EditLogFile那个文件里的内容
         EditLogFile elf = fjm.getLogFile(
             segmentTxId);
         if (elf == null) {
@@ -220,12 +224,17 @@ public class GetJournalEditServlet extends HttpServlet {
         editFile = elf.getFile();
         ImageServlet.setVerificationHeadersForGet(response, editFile);
         ImageServlet.setFileNameHeaders(response, editFile);
+        // 对那个底层的文件提供了一个FileInputStream
+        // 你的java基础比较好的话，你会发现其实这种东西底层，没什么特别的
+        // JDK的集合、并发、IO、网络，就这点东西，rpc，或者http
         editFileIn = new FileInputStream(editFile);
       }
       
       DataTransferThrottler throttler = ImageServlet.getThrottler(conf);
 
       // send edits
+      // 流对拷，将文件的输入流输出到http的response的输出流里去
+      // 这样的话呢，你的standby namenode就可以通过流的方式不断的读取这个文件里的edits log
       TransferFsImage.copyFileToStream(response.getOutputStream(), editFile,
           editFileIn, throttler);
 

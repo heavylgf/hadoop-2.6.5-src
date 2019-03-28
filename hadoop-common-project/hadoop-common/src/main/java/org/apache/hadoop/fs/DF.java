@@ -92,6 +92,7 @@ public class DF extends Shell {
 
   /** @return the usable space remaining on the filesystem in bytes. */
   public long getAvailable() {
+	// 往底层了说，无非就是调用JDK的API，File.getUsableSpace()获取当前目录下可用的磁盘空间
     return dirFile.getUsableSpace();
   }
 

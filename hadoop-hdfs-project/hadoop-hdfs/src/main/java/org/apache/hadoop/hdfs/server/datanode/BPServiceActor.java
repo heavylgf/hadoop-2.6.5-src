@@ -75,15 +75,15 @@ import com.google.common.collect.Maps;
  */
 @InterfaceAudience.Private
 class BPServiceActor implements Runnable {
-
+  
   static final Log LOG = DataNode.LOG;
   final InetSocketAddress nnAddr;
   HAServiceState state;
 
   final BPOfferService bpos;
-
+  
   // lastBlockReport, lastDeletedReport and lastHeartbeat may be assigned/read
-  // by testing threads (through BPServiceActor#triggerXXX), while also
+  // by testing threads (through BPServiceActor#triggerXXX), while also 
   // assigned/read by the actor thread. Thus they should be declared as volatile
   // to make sure the "happens-before" consistency.
   volatile long lastBlockReport = 0;
@@ -110,7 +110,7 @@ class BPServiceActor implements Runnable {
    * reported to the NN. Access should be synchronized on this object.
    */
   private final Map<DatanodeStorage, PerStoragePendingIncrementalBR>
-          pendingIncrementalBRperStorage = Maps.newHashMap();
+      pendingIncrementalBRperStorage = Maps.newHashMap();
 
   // IBR = Incremental Block Report. If this flag is set then an IBR will be
   // sent immediately by the actor thread without waiting for the IBR timer
@@ -134,14 +134,14 @@ class BPServiceActor implements Runnable {
       return false;
     }
     return runningState == BPServiceActor.RunningState.RUNNING
-            || runningState == BPServiceActor.RunningState.CONNECTING;
+        || runningState == BPServiceActor.RunningState.CONNECTING;
   }
 
   @Override
   public String toString() {
     return bpos.toString() + " service to " + nnAddr;
   }
-
+  
   InetSocketAddress getNNSocketAddress() {
     return nnAddr;
   }
@@ -164,7 +164,7 @@ class BPServiceActor implements Runnable {
    * This calls <code>versionRequest</code> to determine the NN's
    * namespace and version info. It automatically retries until
    * the NN responds or the DN is shutting down.
-   *
+   * 
    * @return the NamespaceInfo
    */
   @VisibleForTesting
@@ -172,13 +172,13 @@ class BPServiceActor implements Runnable {
     NamespaceInfo nsInfo = null;
     while (shouldRun()) {
       try {
-        // ç›¸å½“äºå°±æ˜¯åœ¨åº•å±‚bpNamenodeä½œä¸ºä¸€ä¸ªRPCä»£ç†
-        // bpNamenodeåº•å±‚ä¼šæ„é€ ä¸€ä¸ªç½‘ç»œè¯·æ±‚ï¼Œå»è¿æ¥åˆ°namenodeçš„rpc serverç«¯å£ä¸Šå»
-        // å‘é€ä¸€ä¸ªè¯·æ±‚ï¼Œè¿™ä¸ªè¯·æ±‚é‡Œè¯´æ˜äº†æ˜¯è¦è°ƒç”¨è¿™ä¸ªversionRequest()æ–¹æ³•
-        // rpc serverä¼šç»Ÿä¸€å¤„ç†æ‰€æœ‰çš„rpcè°ƒç”¨çš„ç½‘ç»œè¿æ¥å’Œè¯·æ±‚
-        // rpc serverä¼šå°†å¯¹åº”çš„æ¥å£æ–¹æ³•çš„è¯·æ±‚ï¼Œè½¬å‘ç»™ä¹‹å‰æˆ‘ä»¬çœ‹åˆ°çš„é‚£äº›å°serviceå…·ä½“æ¥å¤„ç†æŸä¸ªæ¥å£çš„è¯·æ±‚
-        // rpc serveræœ€åä¼šå°†è¿™ä¸ªå“åº”ç»“æœè¿”å›ç»™datanode
-        nsInfo = bpNamenode.versionRequest();
+    	// Ïàµ±ÓÚ¾ÍÊÇÔÚµ×²ãbpNamenode×÷ÎªÒ»¸öRPC´úÀí
+    	// bpNamenodeµ×²ã»á¹¹ÔìÒ»¸öÍøÂçÇëÇó£¬È¥Á¬½Óµ½namenodeµÄrpc server¶Ë¿ÚÉÏÈ¥
+    	// ·¢ËÍÒ»¸öÇëÇó£¬Õâ¸öÇëÇóÀïËµÃ÷ÁËÊÇÒªµ÷ÓÃÕâ¸översionRequest()·½·¨
+    	// rpc server»áÍ³Ò»´¦ÀíËùÓĞµÄrpcµ÷ÓÃµÄÍøÂçÁ¬½ÓºÍÇëÇó
+    	// rpc server»á½«¶ÔÓ¦µÄ½Ó¿Ú·½·¨µÄÇëÇó£¬×ª·¢¸øÖ®Ç°ÎÒÃÇ¿´µ½µÄÄÇĞ©Ğ¡service¾ßÌåÀ´´¦ÀíÄ³¸ö½Ó¿ÚµÄÇëÇó
+    	// rpc server×îºó»á½«Õâ¸öÏìÓ¦½á¹û·µ»Ø¸ødatanode
+        nsInfo = bpNamenode.versionRequest(); 
         LOG.debug(this + " received versionRequest response: " + nsInfo);
         break;
       } catch(SocketTimeoutException e) {  // namenode is busy
@@ -186,11 +186,11 @@ class BPServiceActor implements Runnable {
       } catch(IOException e ) {  // namenode is not available
         LOG.warn("Problem connecting to server: " + nnAddr);
       }
-
+      
       // try again in a second
       sleepAndLogInterrupts(5000, "requesting version info from NN");
     }
-
+    
     if (nsInfo != null) {
       checkNNVersion(nsInfo);
     } else {
@@ -200,55 +200,55 @@ class BPServiceActor implements Runnable {
   }
 
   private void checkNNVersion(NamespaceInfo nsInfo)
-          throws IncorrectVersionException {
+      throws IncorrectVersionException {
     // build and layout versions should match
     String nnVersion = nsInfo.getSoftwareVersion();
     String minimumNameNodeVersion = dnConf.getMinimumNameNodeVersion();
     if (VersionUtil.compareVersions(nnVersion, minimumNameNodeVersion) < 0) {
       IncorrectVersionException ive = new IncorrectVersionException(
-              minimumNameNodeVersion, nnVersion, "NameNode", "DataNode");
+          minimumNameNodeVersion, nnVersion, "NameNode", "DataNode");
       LOG.warn(ive.getMessage());
       throw ive;
     }
     String dnVersion = VersionInfo.getVersion();
     if (!nnVersion.equals(dnVersion)) {
       LOG.info("Reported NameNode version '" + nnVersion + "' does not match " +
-              "DataNode version '" + dnVersion + "' but is within acceptable " +
-              "limits. Note: This is normal during a rolling upgrade.");
+          "DataNode version '" + dnVersion + "' but is within acceptable " +
+          "limits. Note: This is normal during a rolling upgrade.");
     }
   }
 
   private void connectToNNAndHandshake() throws IOException {
     // get NN proxy
-    // è¿™è¾¹çš„æ„æ€å…¶å®å°±æ˜¯è¿æ¥åˆ°namenodeä¸Šå»åšï¼Œè·å–ä¸€ä¸ªbpNamenode
-    // bpNamenodeå…¶å®å°±æ˜¯ä¸€ä¸ªè´Ÿè´£è¿›è¡Œrpcæ¥å£è°ƒç”¨çš„ä¸€ä¸ªä¸œè¥¿ï¼Œé€šè¿‡è¿™ä¸ªä¸œè¥¿å°±å¯ä»¥è®©BPServiceActor
-    // ä»¥rpcæ¥å£è°ƒç”¨çš„æ–¹å¼ï¼Œå»è¯·æ±‚namenode
-    // bpNamenodeå°±æ˜¯ä¸€ä¸ªrpcæ¥å£è°ƒç”¨çš„ä»£ç†ï¼Œåœ¨datanodeè·å–ä¸€ä¸ªrpcä»£ç†ä¹‹å
-    // åé¢å°±å¯ä»¥é€šè¿‡è¿™ä¸ªä»£ç†è·Ÿnamenodeè¿›è¡Œé€šä¿¡
+	// Õâ±ßµÄÒâË¼ÆäÊµ¾ÍÊÇÁ¬½Óµ½namenodeÉÏÈ¥×ö£¬»ñÈ¡Ò»¸öbpNamenode
+	// bpNamenodeÆäÊµ¾ÍÊÇÒ»¸ö¸ºÔğ½øĞĞrpc½Ó¿Úµ÷ÓÃµÄÒ»¸ö¶«Î÷£¬Í¨¹ıÕâ¸ö¶«Î÷¾Í¿ÉÒÔÈÃBPServiceActor
+	// ÒÔrpc½Ó¿Úµ÷ÓÃµÄ·½Ê½£¬È¥ÇëÇónamenode
+	// bpNamenode¾ÍÊÇÒ»¸örpc½Ó¿Úµ÷ÓÃµÄ´úÀí£¬ÔÚdatanode»ñÈ¡Ò»¸örpc´úÀíÖ®ºó
+	// ºóÃæ¾Í¿ÉÒÔÍ¨¹ıÕâ¸ö´úÀí¸únamenode½øĞĞÍ¨ĞÅ
     bpNamenode = dn.connectToNN(nnAddr);
 
     // First phase of the handshake with NN - get the namespace info.
-    // åœ¨è¿™é‡Œå°±æ˜¯é€šè¿‡ä¸Šé¢çš„é‚£ä¸ªbpNamenodeä½œä¸ºä¸€ä¸ªrpcä»£ç†ï¼Œè°ƒç”¨äº†namenodeçš„ä¸€ä¸ªrpcæ¥å£
-    // è·å–åˆ°äº†ä¸€ä¸ªnamenodeçš„NamespaceInfo
-    // NamespaceInfoå¤§æ¦‚æ¥è¯´å°±æ˜¯åŒ…å«äº†ä¸€äº›idï¼Œæ¯”å¦‚è¯´clusterIdï¼ŒnsIdï¼ŒblockPoolId
-    // åŒ…å«äº†ä¸€äº›namenodeçš„id
+    // ÔÚÕâÀï¾ÍÊÇÍ¨¹ıÉÏÃæµÄÄÇ¸öbpNamenode×÷ÎªÒ»¸örpc´úÀí£¬µ÷ÓÃÁËnamenodeµÄÒ»¸örpc½Ó¿Ú
+    // »ñÈ¡µ½ÁËÒ»¸önamenodeµÄNamespaceInfo
+    // NamespaceInfo´ó¸ÅÀ´Ëµ¾ÍÊÇ°üº¬ÁËÒ»Ğ©id£¬±ÈÈçËµclusterId£¬nsId£¬blockPoolId
+    // °üº¬ÁËÒ»Ğ©namenodeµÄid
     NamespaceInfo nsInfo = retrieveNamespaceInfo();
-
+    
     // Verify that this matches the other NN in this HA pair.
     // This also initializes our block pool in the DN if we are
     // the first NN connection for this BP.
-
-    // ç¬¬ä¸€ä»¶äº‹æƒ…
-    // ä¸¤ä¸ªnamenodeéƒ½ä¼šè¿”å›ä¸€ä¸ªNamespaceInfoï¼Œæ­¤å¤„å°±ä¼šåœ¨ç¬¬äºŒä¸ªnamenodeè¿”å›NamespaceInfoçš„æ—¶å€™
-    // è¿›è¡Œä¸¤ä¸ªNamespaceInfoçš„æ ¡éªŒï¼Œæ£€æŸ¥ä¸€ä¸‹ä»–ä»¬ä¿©å…¶å®æ˜¯ä¸€æ ·çš„
-
-    // ç¬¬äºŒä»¶äº‹æƒ…
-    // å¦‚æœæ˜¯ç¬¬ä¸€ä¸ªnamenodeè¿”å›äº†ä¸€ä¸ªNamespaceInfoä¹‹å
-    // ä¸€å®šä¼šåœ¨datanodeè¿™é‡Œåˆå§‹åŒ–DataStorageï¼Œé‡Œé¢ä¼šåˆå§‹åŒ–å¯¹åº”çš„blockå­˜å‚¨ç©ºé—´
-    // å¯åŠ¨ä¸€äº›blockç›¸å…³çš„åå°çº¿ç¨‹
-
+    
+    // µÚÒ»¼şÊÂÇé
+    // Á½¸önamenode¶¼»á·µ»ØÒ»¸öNamespaceInfo£¬´Ë´¦¾Í»áÔÚµÚ¶ş¸önamenode·µ»ØNamespaceInfoµÄÊ±ºò
+    // ½øĞĞÁ½¸öNamespaceInfoµÄĞ£Ñé£¬¼ì²éÒ»ÏÂËûÃÇÁ©ÆäÊµÊÇÒ»ÑùµÄ
+    
+    // µÚ¶ş¼şÊÂÇé
+    // Èç¹ûÊÇµÚÒ»¸önamenode·µ»ØÁËÒ»¸öNamespaceInfoÖ®ºó
+    // Ò»¶¨»áÔÚdatanodeÕâÀï³õÊ¼»¯DataStorage£¬ÀïÃæ»á³õÊ¼»¯¶ÔÓ¦µÄblock´æ´¢¿Õ¼ä
+    // Æô¶¯Ò»Ğ©blockÏà¹ØµÄºóÌ¨Ïß³Ì
+    
     bpos.verifyAndSetNamespaceInfo(nsInfo);
-
+    
     // Second phase of the handshake with the NN.
     register();
   }
@@ -266,13 +266,13 @@ class BPServiceActor implements Runnable {
   }
 
   /**
-   * This methods  arranges for the data node to send the block report at
+   * This methods  arranges for the data node to send the block report at 
    * the next heartbeat.
    */
   void scheduleBlockReport(long delay) {
     if (delay > 0) { // send BR after random delay
       lastBlockReport = Time.now()
-              - ( dnConf.blockReportInterval - DFSUtil.getRandom().nextInt((int)(delay)));
+      - ( dnConf.blockReportInterval - DFSUtil.getRandom().nextInt((int)(delay)));
     } else { // send at next heartbeat
       lastBlockReport = lastHeartbeat - dnConf.blockReportInterval;
     }
@@ -280,7 +280,7 @@ class BPServiceActor implements Runnable {
   }
 
   void reportBadBlocks(ExtendedBlock block,
-                       String storageUuid, StorageType storageType) {
+      String storageUuid, StorageType storageType) {
     if (bpRegistration == null) {
       return;
     }
@@ -288,18 +288,18 @@ class BPServiceActor implements Runnable {
     String[] uuids = { storageUuid };
     StorageType[] types = { storageType };
     LocatedBlock[] blocks = { new LocatedBlock(block, dnArr, uuids, types) };
-
+    
     try {
-      bpNamenode.reportBadBlocks(blocks);
+      bpNamenode.reportBadBlocks(blocks);  
     } catch (IOException e){
       /* One common reason is that NameNode could be in safe mode.
        * Should we keep on retrying in that case?
        */
       LOG.warn("Failed to report bad block " + block + " to namenode : "
-              + " Exception", e);
+          + " Exception", e);
     }
   }
-
+  
   /**
    * Report received blocks and delete hints to the Namenode for each
    * storage.
@@ -310,10 +310,10 @@ class BPServiceActor implements Runnable {
 
     // Generate a list of the pending reports for each storage under the lock
     ArrayList<StorageReceivedDeletedBlocks> reports =
-            new ArrayList<StorageReceivedDeletedBlocks>(pendingIncrementalBRperStorage.size());
+        new ArrayList<StorageReceivedDeletedBlocks>(pendingIncrementalBRperStorage.size());
     synchronized (pendingIncrementalBRperStorage) {
       for (Map.Entry<DatanodeStorage, PerStoragePendingIncrementalBR> entry :
-              pendingIncrementalBRperStorage.entrySet()) {
+           pendingIncrementalBRperStorage.entrySet()) {
         final DatanodeStorage storage = entry.getKey();
         final PerStoragePendingIncrementalBR perStorageMap = entry.getValue();
 
@@ -335,8 +335,8 @@ class BPServiceActor implements Runnable {
     boolean success = false;
     try {
       bpNamenode.blockReceivedAndDeleted(bpRegistration,
-              bpos.getBlockPoolId(),
-              reports.toArray(new StorageReceivedDeletedBlocks[reports.size()]));
+          bpos.getBlockPoolId(),
+          reports.toArray(new StorageReceivedDeletedBlocks[reports.size()]));
       success = true;
     } finally {
       if (!success) {
@@ -346,7 +346,7 @@ class BPServiceActor implements Runnable {
             // blocks back onto our queue, but only in the case where we
             // didn't put something newer in the meantime.
             PerStoragePendingIncrementalBR perStorageMap =
-                    pendingIncrementalBRperStorage.get(report.getStorage());
+                pendingIncrementalBRperStorage.get(report.getStorage());
             perStorageMap.putMissingBlockInfos(report.getBlocks());
             sendImmediateIBR = true;
           }
@@ -359,9 +359,9 @@ class BPServiceActor implements Runnable {
    * @return pending incremental block report for given {@code storage}
    */
   private PerStoragePendingIncrementalBR getIncrementalBRMapForStorage(
-          DatanodeStorage storage) {
+      DatanodeStorage storage) {
     PerStoragePendingIncrementalBR mapForStorage =
-            pendingIncrementalBRperStorage.get(storage);
+        pendingIncrementalBRperStorage.get(storage);
 
     if (mapForStorage == null) {
       // This is the first time we are adding incremental BR state for
@@ -381,11 +381,11 @@ class BPServiceActor implements Runnable {
    * Caller must synchronize access using pendingIncrementalBRperStorage.
    */
   void addPendingReplicationBlockInfo(ReceivedDeletedBlockInfo bInfo,
-                                      DatanodeStorage storage) {
+      DatanodeStorage storage) {
     // Make sure another entry for the same block is first removed.
     // There may only be one such entry.
     for (Map.Entry<DatanodeStorage, PerStoragePendingIncrementalBR> entry :
-            pendingIncrementalBRperStorage.entrySet()) {
+          pendingIncrementalBRperStorage.entrySet()) {
       if (entry.getValue().removeBlockInfo(bInfo)) {
         break;
       }
@@ -399,10 +399,10 @@ class BPServiceActor implements Runnable {
    * client? For now we don't.
    */
   void notifyNamenodeBlock(ReceivedDeletedBlockInfo bInfo,
-                           String storageUuid, boolean now) {
+      String storageUuid, boolean now) {
     synchronized (pendingIncrementalBRperStorage) {
       addPendingReplicationBlockInfo(
-              bInfo, dn.getFSDataset().getStorage(storageUuid));
+          bInfo, dn.getFSDataset().getStorage(storageUuid));
       sendImmediateIBR = true;
       // If now is true, the report is sent right away.
       // Otherwise, it will be sent out in the next heartbeat.
@@ -413,10 +413,10 @@ class BPServiceActor implements Runnable {
   }
 
   void notifyNamenodeDeletedBlock(
-          ReceivedDeletedBlockInfo bInfo, String storageUuid) {
+      ReceivedDeletedBlockInfo bInfo, String storageUuid) {
     synchronized (pendingIncrementalBRperStorage) {
       addPendingReplicationBlockInfo(
-              bInfo, dn.getFSDataset().getStorage(storageUuid));
+          bInfo, dn.getFSDataset().getStorage(storageUuid));
     }
   }
 
@@ -438,7 +438,7 @@ class BPServiceActor implements Runnable {
       }
     }
   }
-
+  
   @VisibleForTesting
   void triggerHeartbeatForTests() {
     synchronized (pendingIncrementalBRperStorage) {
@@ -494,8 +494,8 @@ class BPServiceActor implements Runnable {
   List<DatanodeCommand> blockReport() throws IOException {
     // send block report if timer has expired.
     final long startTime = now();
-    // è¿™è¾¹æ˜¯åœ¨æ±‡æŠ¥blockï¼Œå½“å‰æ—¶é—´ - ä¸Šä¸€æ¬¡block reportçš„æ—¶é—´ > block reporté—´éš”
-    // å°±å¯ä»¥å‘èµ·ä¸€æ¬¡block reportï¼Œé»˜è®¤çš„è¿™ä¸ªé—´éš”æ˜¯6ä¸ªå°æ—¶
+    // Õâ±ßÊÇÔÚ»ã±¨block£¬µ±Ç°Ê±¼ä - ÉÏÒ»´Îblock reportµÄÊ±¼ä > block report¼ä¸ô
+    // ¾Í¿ÉÒÔ·¢ÆğÒ»´Îblock report£¬Ä¬ÈÏµÄÕâ¸ö¼ä¸ôÊÇ6¸öĞ¡Ê±
     if (startTime - lastBlockReport <= dnConf.blockReportInterval) {
       return null;
     }
@@ -510,20 +510,20 @@ class BPServiceActor implements Runnable {
     lastDeletedReport = startTime;
 
     long brCreateStartTime = now();
-    // ä»–å°±ä¼šè°ƒç”¨åº•å±‚çš„ç®¡ç†blockæ–‡ä»¶çš„ç»„ä»¶å»è·å–å„ä¸ªblockçš„ä¿¡æ¯
+    // Ëû¾Í»áµ÷ÓÃµ×²ãµÄ¹ÜÀíblockÎÄ¼şµÄ×é¼şÈ¥»ñÈ¡¸÷¸öblockµÄĞÅÏ¢
     Map<DatanodeStorage, BlockListAsLongs> perVolumeBlockLists =
-            dn.getFSDataset().getBlockReports(bpos.getBlockPoolId());
-
+        dn.getFSDataset().getBlockReports(bpos.getBlockPoolId());
+    
     // Convert the reports to the format expected by the NN.
     int i = 0;
     int totalBlockCount = 0;
     StorageBlockReport reports[] =
-            new StorageBlockReport[perVolumeBlockLists.size()];
+        new StorageBlockReport[perVolumeBlockLists.size()];
 
     for(Map.Entry<DatanodeStorage, BlockListAsLongs> kvPair : perVolumeBlockLists.entrySet()) {
       BlockListAsLongs blockList = kvPair.getValue();
       reports[i++] = new StorageBlockReport(
-              kvPair.getKey(), blockList.getBlockListAsLongs());
+          kvPair.getKey(), blockList.getBlockListAsLongs());
       totalBlockCount += blockList.getNumberOfBlocks();
     }
 
@@ -537,8 +537,8 @@ class BPServiceActor implements Runnable {
       if (totalBlockCount < dnConf.blockReportSplitThreshold) {
         // Below split threshold, send all reports in a single message.
         DatanodeCommand cmd = bpNamenode.blockReport(
-                bpRegistration, bpos.getBlockPoolId(), reports,
-                new BlockReportContext(1, 0, reportId));
+            bpRegistration, bpos.getBlockPoolId(), reports,
+              new BlockReportContext(1, 0, reportId));
         numRPCs = 1;
         numReportsSent = reports.length;
         if (cmd != null) {
@@ -549,8 +549,8 @@ class BPServiceActor implements Runnable {
         for (int r = 0; r < reports.length; r++) {
           StorageBlockReport singleReport[] = { reports[r] };
           DatanodeCommand cmd = bpNamenode.blockReport(
-                  bpRegistration, bpos.getBlockPoolId(), singleReport,
-                  new BlockReportContext(reports.length, r, reportId));
+              bpRegistration, bpos.getBlockPoolId(), singleReport,
+              new BlockReportContext(reports.length, r, reportId));
           numReportsSent++;
           numRPCs++;
           if (cmd != null) {
@@ -566,19 +566,19 @@ class BPServiceActor implements Runnable {
       dn.getMetrics().addBlockReport(brSendCost);
       final int nCmds = cmds.size();
       LOG.info((success ? "S" : "Uns") +
-              "uccessfully sent block report 0x" +
-              Long.toHexString(reportId) + ",  containing " + reports.length +
-              " storage report(s), of which we sent " + numReportsSent + "." +
-              " The reports had " + totalBlockCount +
-              " total blocks and used " + numRPCs +
-              " RPC(s). This took " + brCreateCost +
-              " msec to generate and " + brSendCost +
-              " msecs for RPC and NN processing." +
-              " Got back " +
-              ((nCmds == 0) ? "no commands" :
-                      ((nCmds == 1) ? "one command: " + cmds.get(0) :
-                              (nCmds + " commands: " + Joiner.on("; ").join(cmds)))) +
-              ".");
+          "uccessfully sent block report 0x" +
+          Long.toHexString(reportId) + ",  containing " + reports.length +
+          " storage report(s), of which we sent " + numReportsSent + "." +
+          " The reports had " + totalBlockCount +
+          " total blocks and used " + numRPCs +
+          " RPC(s). This took " + brCreateCost +
+          " msec to generate and " + brSendCost +
+          " msecs for RPC and NN processing." +
+          " Got back " +
+          ((nCmds == 0) ? "no commands" :
+              ((nCmds == 1) ? "one command: " + cmds.get(0) :
+                  (nCmds + " commands: " + Joiner.on("; ").join(cmds)))) +
+          ".");
     }
     scheduleNextBlockReport(startTime);
     return cmds.size() == 0 ? null : cmds;
@@ -589,7 +589,7 @@ class BPServiceActor implements Runnable {
     // time before we start the periodic block reports.
     if (resetBlockReportTime) {
       lastBlockReport = previousReportStartTime -
-              DFSUtil.getRandom().nextInt((int)(dnConf.blockReportInterval));
+          DFSUtil.getRandom().nextInt((int)(dnConf.blockReportInterval));
       resetBlockReportTime = false;
     } else {
       /* say the last block report was at 8:20:14. The current report
@@ -599,7 +599,7 @@ class BPServiceActor implements Runnable {
        *   2) unexpected like 11:35:43, next report should be at 12:20:14
        */
       lastBlockReport += (now() - lastBlockReport) /
-              dnConf.blockReportInterval * dnConf.blockReportInterval;
+          dnConf.blockReportInterval * dnConf.blockReportInterval;
     }
   }
 
@@ -627,40 +627,40 @@ class BPServiceActor implements Runnable {
       long sendCost = sendTime - createTime;
       dn.getMetrics().addCacheReport(sendCost);
       LOG.debug("CacheReport of " + blockIds.size()
-              + " block(s) took " + createCost + " msec to generate and "
-              + sendCost + " msecs for RPC and NN processing");
+          + " block(s) took " + createCost + " msec to generate and "
+          + sendCost + " msecs for RPC and NN processing");
     }
     return cmd;
   }
-
+  
   HeartbeatResponse sendHeartBeat() throws IOException {
-    // å‘é€å¿ƒè·³çš„æ—¶å€™ï¼Œä¸€å—å°±æ˜¯å¸¦ä¸Šè‡ªå·±å½“å‰çš„å­˜å‚¨çš„ä¿¡æ¯
+	// ·¢ËÍĞÄÌøµÄÊ±ºò£¬Ò»¿é¾ÍÊÇ´øÉÏ×Ô¼ºµ±Ç°µÄ´æ´¢µÄĞÅÏ¢
     StorageReport[] reports =
-            dn.getFSDataset().getStorageReports(bpos.getBlockPoolId());
+        dn.getFSDataset().getStorageReports(bpos.getBlockPoolId());
     if (LOG.isDebugEnabled()) {
       LOG.debug("Sending heartbeat with " + reports.length +
-              " storage reports from service actor: " + this);
+                " storage reports from service actor: " + this);
     }
 
     return bpNamenode.sendHeartbeat(bpRegistration,
-            reports,
-            // ç¼“å­˜å¯ä»¥ç”¨çš„å®¹é‡
-            dn.getFSDataset().getCacheCapacity(),
-            // å·²ç»ä½¿ç”¨çš„ç¼“å­˜çš„ç©ºé—´
-            dn.getFSDataset().getCacheUsed(),
-            dn.getXmitsInProgress(),
-            dn.getXceiverCount(),
-            dn.getFSDataset().getNumFailedVolumes());
-}
-
+        reports,
+        // »º´æ¿ÉÒÔÓÃµÄÈİÁ¿
+        dn.getFSDataset().getCacheCapacity(),
+        // ÒÑ¾­Ê¹ÓÃµÄ»º´æµÄ¿Õ¼ä
+        dn.getFSDataset().getCacheUsed(),
+        dn.getXmitsInProgress(),
+        dn.getXceiverCount(),
+        dn.getFSDataset().getNumFailedVolumes());
+  }
+  
   //This must be called only by BPOfferService
   void start() {
-    // ä¹‹å‰åœ¨BlockPoolManageråˆå§‹åŒ–çš„æ—¶å€™ï¼ŒstartAll()æ–¹æ³•å·²ç»è¢«è°ƒç”¨è¿‡äº†
-    // åœ¨è¿™é‡ŒDataNodeåœ¨startDatanodeDaemon()æ–¹æ³•å†æ¬¡è°ƒç”¨äº†BlockPoolManager.startAll()æ–¹æ³•
-    // å±äºæ˜¯é‡å¤è°ƒç”¨
-    // ä¹Ÿä¸ä¼šæœ‰ä»€ä¹ˆé—®é¢˜ï¼Œåœ¨è¿™é‡Œä»–ä¼šåˆ¤æ–­ä¸€ä¸‹ï¼Œå¦‚æœè¿™ä¸ªBPServiceActorçº¿ç¨‹å·²ç»å¯åŠ¨è¿‡äº†
-    // æ­¤æ—¶ä¼šç›´æ¥è¿”å›ï¼Œä¸ä¼šé‡å¤å¯åŠ¨ä¸€ä¸ªçº¿ç¨‹
-
+	// Ö®Ç°ÔÚBlockPoolManager³õÊ¼»¯µÄÊ±ºò£¬startAll()·½·¨ÒÑ¾­±»µ÷ÓÃ¹ıÁË  
+	// ÔÚÕâÀïDataNodeÔÚstartDatanodeDaemon()·½·¨ÔÙ´Îµ÷ÓÃÁËBlockPoolManager.startAll()·½·¨
+	// ÊôÓÚÊÇÖØ¸´µ÷ÓÃ
+	// Ò²²»»áÓĞÊ²Ã´ÎÊÌâ£¬ÔÚÕâÀïËû»áÅĞ¶ÏÒ»ÏÂ£¬Èç¹ûÕâ¸öBPServiceActorÏß³ÌÒÑ¾­Æô¶¯¹ıÁË
+	// ´ËÊ±»áÖ±½Ó·µ»Ø£¬²»»áÖØ¸´Æô¶¯Ò»¸öÏß³Ì
+	  
     if ((bpThread != null) && (bpThread.isAlive())) {
       //Thread is started already
       return;
@@ -669,22 +669,22 @@ class BPServiceActor implements Runnable {
     bpThread.setDaemon(true); // needed for JUnit testing
     bpThread.start();
   }
-
+  
   private String formatThreadName() {
     Collection<StorageLocation> dataDirs =
-            DataNode.getStorageLocations(dn.getConf());
+        DataNode.getStorageLocations(dn.getConf());
     return "DataNode: [" + dataDirs.toString() + "] " +
-            " heartbeating to " + nnAddr;
+      " heartbeating to " + nnAddr;
   }
-
+  
   //This must be called only by blockPoolManager.
   void stop() {
     shouldServiceRun = false;
     if (bpThread != null) {
-      bpThread.interrupt();
+        bpThread.interrupt();
     }
   }
-
+  
   //This must be called only by blockPoolManager
   void join() {
     try {
@@ -693,10 +693,10 @@ class BPServiceActor implements Runnable {
       }
     } catch (InterruptedException ie) { }
   }
-
+  
   //Cleanup method to be called by current thread before exiting.
   private synchronized void cleanUp() {
-
+    
     shouldServiceRun = false;
     IOUtils.cleanup(LOG, bpNamenode);
     bpos.shutdownActor(this);
@@ -705,12 +705,12 @@ class BPServiceActor implements Runnable {
   private void handleRollingUpgradeStatus(HeartbeatResponse resp) throws IOException {
     RollingUpgradeStatus rollingUpgradeStatus = resp.getRollingUpdateStatus();
     if (rollingUpgradeStatus != null &&
-            rollingUpgradeStatus.getBlockPoolId().compareTo(bpos.getBlockPoolId()) != 0) {
+        rollingUpgradeStatus.getBlockPoolId().compareTo(bpos.getBlockPoolId()) != 0) {
       // Can this ever occur?
       LOG.error("Invalid BlockPoolId " +
-              rollingUpgradeStatus.getBlockPoolId() +
-              " in HeartbeatResponse. Expected " +
-              bpos.getBlockPoolId());
+          rollingUpgradeStatus.getBlockPoolId() +
+          " in HeartbeatResponse. Expected " +
+          bpos.getBlockPoolId());
     } else {
       bpos.signalRollingUpgrade(rollingUpgradeStatus != null);
     }
@@ -722,11 +722,11 @@ class BPServiceActor implements Runnable {
    */
   private void offerService() throws Exception {
     LOG.info("For namenode " + nnAddr + " using"
-            + " DELETEREPORT_INTERVAL of " + dnConf.deleteReportInterval + " msec "
-            + " BLOCKREPORT_INTERVAL of " + dnConf.blockReportInterval + "msec"
-            + " CACHEREPORT_INTERVAL of " + dnConf.cacheReportInterval + "msec"
-            + " Initial delay: " + dnConf.initialBlockReportDelay + "msec"
-            + "; heartBeatInterval=" + dnConf.heartBeatInterval);
+        + " DELETEREPORT_INTERVAL of " + dnConf.deleteReportInterval + " msec "
+        + " BLOCKREPORT_INTERVAL of " + dnConf.blockReportInterval + "msec"
+        + " CACHEREPORT_INTERVAL of " + dnConf.cacheReportInterval + "msec"
+        + " Initial delay: " + dnConf.initialBlockReportDelay + "msec"
+        + "; heartBeatInterval=" + dnConf.heartBeatInterval);
 
     //
     // Now loop for a long time....
@@ -738,9 +738,9 @@ class BPServiceActor implements Runnable {
         //
         // Every so often, send heartbeat or block-report
         //
-        // å½“å‰æ—¶é—´å‡å»ä¸Šæ¬¡å‘é€å¿ƒè·³çš„æ—¶é—´ >= å¿ƒè·³çš„é—´éš”æ—¶é—´ï¼Œå°±å¯ä»¥å»å‘é€ä¸€æ¬¡å¿ƒè·³äº†
-        // ä½ é…ç½®äº†5ç§’é’Ÿå‘é€ä¸€æ¬¡å¿ƒè·³ï¼Œåœ¨è¿™é‡Œå°±ä¼šæ¯éš”5ç§’æ‰§è¡Œä¸€ä¸‹è¿™ä¸ªä»£ç 
-        // é»˜è®¤æƒ…å†µä¸‹æ˜¯3ç§’é’Ÿï¼Œå‘é€ä¸€æ¬¡å¿ƒè·³
+        // µ±Ç°Ê±¼ä¼õÈ¥ÉÏ´Î·¢ËÍĞÄÌøµÄÊ±¼ä >= ĞÄÌøµÄ¼ä¸ôÊ±¼ä£¬¾Í¿ÉÒÔÈ¥·¢ËÍÒ»´ÎĞÄÌøÁË
+        // ÄãÅäÖÃÁË5ÃëÖÓ·¢ËÍÒ»´ÎĞÄÌø£¬ÔÚÕâÀï¾Í»áÃ¿¸ô5ÃëÖ´ĞĞÒ»ÏÂÕâ¸ö´úÂë
+        // Ä¬ÈÏÇé¿öÏÂÊÇ3ÃëÖÓ£¬·¢ËÍÒ»´ÎĞÄÌø
         if (startTime - lastHeartbeat >= dnConf.heartBeatInterval) {
           //
           // All heartbeat messages include following info:
@@ -751,7 +751,7 @@ class BPServiceActor implements Runnable {
           //
           lastHeartbeat = startTime;
           if (!dn.areHeartbeatsDisabledForTests()) {
-            // å‘é€å¿ƒè·³è¿‡åï¼Œä¼šæ‹¿åˆ°ä¸€ä¸ªHeartBeatResponse
+        	// ·¢ËÍĞÄÌø¹ıºó£¬»áÄÃµ½Ò»¸öHeartBeatResponse
             HeartbeatResponse resp = sendHeartBeat();
             assert resp != null;
             dn.getMetrics().addHeartbeat(now() - startTime);
@@ -762,14 +762,14 @@ class BPServiceActor implements Runnable {
             // Important that this happens before processCommand below,
             // since the first heartbeat to a new active might have commands
             // that we should actually process.
-
-            // è¿™è¾¹çš„è¯å°±æ˜¯è¦æ ¹æ®namenodeè¿”å›çš„çŠ¶æ€ï¼ˆactive or standbyï¼‰
-            // æ›´æ–°å½“å‰BPServiceActorçš„çŠ¶æ€ï¼Œä¸€ç»„namenodeæ˜¯ä¸¤ä¸ªnamenodeï¼Œä¸€ä¸ªactiveï¼Œå¦ä¸€ä¸ªstandby
-            // æ¯ä¸ªnamenodeéƒ½å¯¹åº”ä¸€ä¸ªBPServiceActorï¼Œä¿å­˜è‡ªå·±å¯¹åº”çš„namenodeçš„çŠ¶æ€
-            // å‘é€å¿ƒè·³çš„æ—¶å€™ï¼Œå¦‚æœè¯´æ„ŸçŸ¥åˆ°namenodeçš„çŠ¶æ€å‘ç”Ÿäº†åˆ‡æ¢ï¼Œactive -> standby
-            // BPServiceActorä¹Ÿæ˜¯è¦æ›´æ–°è‡ªå·±çš„çŠ¶æ€
+            
+            // Õâ±ßµÄ»°¾ÍÊÇÒª¸ù¾İnamenode·µ»ØµÄ×´Ì¬£¨active or standby£©
+            // ¸üĞÂµ±Ç°BPServiceActorµÄ×´Ì¬£¬Ò»×énamenodeÊÇÁ½¸önamenode£¬Ò»¸öactive£¬ÁíÒ»¸östandby
+            // Ã¿¸önamenode¶¼¶ÔÓ¦Ò»¸öBPServiceActor£¬±£´æ×Ô¼º¶ÔÓ¦µÄnamenodeµÄ×´Ì¬
+            // ·¢ËÍĞÄÌøµÄÊ±ºò£¬Èç¹ûËµ¸ĞÖªµ½namenodeµÄ×´Ì¬·¢ÉúÁËÇĞ»»£¬active -> standby
+            // BPServiceActorÒ²ÊÇÒª¸üĞÂ×Ô¼ºµÄ×´Ì¬
             bpos.updateActorStatesFromHeartbeat(
-                    this, resp.getNameNodeHaState());
+                this, resp.getNameNodeHaState());
             state = resp.getNameNodeHaState().getState();
 
             if (state == HAServiceState.ACTIVE) {
@@ -782,35 +782,35 @@ class BPServiceActor implements Runnable {
             long endProcessCommands = now();
             if (endProcessCommands - startProcessCommands > 2000) {
               LOG.info("Took " + (endProcessCommands - startProcessCommands)
-                      + "ms to process " + resp.getCommands().length
-                      + " commands from NN");
+                  + "ms to process " + resp.getCommands().length
+                  + " commands from NN");
             }
           }
         }
-
-        // ä¸‹é¢è¿™ä¸€å¤§å¨å…¶å®æ˜¯åœ¨ä¸æ–­çš„ç»™namenodeæ±‡æŠ¥è‡ªå·±çš„block
-        // ç°åœ¨æˆ‘ä»¬åªæ˜¯æ¥åˆæ¢ä¸€ä¸‹è¿™å—block reportçš„æºç ï¼Œå› ä¸ºå…·ä½“å¦‚æœä½ è¦æ·±å…¥çš„ç†è§£block reportçš„ä¸€äº›ä»£ç 
-        // ä½ å¿…é¡»æ˜¯åœ¨å®Œå…¨çœ‹æ‡‚äº†äººå®¶çš„æ–‡ä»¶ä¸Šä¼ ï¼Œdatanodeæ˜¯å¦‚ä½•åœ¨ä¸Šä¼ æ•°æ®çš„æ—¶å€™ç®¡ç†blockçš„
-        // ç„¶åæ‰èƒ½æ¥çœ‹æ‡‚datanodeæ˜¯å¦‚ä½•æ±‡æŠ¥blockçš„
-        // datanodeæ±‡æŠ¥blockçš„ä»£ç ï¼ŒåŸºæœ¬ä¸Šéƒ½æ˜¯åœ¨BPServiceActorçº¿ç¨‹çš„offerService()æ–¹æ³•å†…
-
-        // è¿™è¾¹ä¹Ÿæ˜¯åœ¨æ±‡æŠ¥deleted blocks
-        // è¿™ä¸ªé—´éš”æ˜¯5åˆ†é’Ÿ
-        // å°±æ˜¯å…¶å®åœ¨blockè¢«datanodeæ¥æ”¶åˆ°äº†ä»¥åï¼Œä¸æ˜¯åŒæ­¥è¿›è¡Œé€šçŸ¥namenode
-        // å…ˆä¼šåŠ å…¥ä¸€ä¸ªé˜Ÿåˆ—é‡Œé¢
-        // å…¶å®å°±æ˜¯åœ¨BPServiceActorçº¿ç¨‹ï¼Œä»–é»˜è®¤æ˜¯æ¯éš”5åˆ†é’Ÿå°†æœ€è¿‘æ¥æ”¶åˆ°ï¼Œæˆ–è€…æ˜¯åˆ é™¤æ‰çš„block
-        // ä¸€æ¬¡æ€§æ‰¹é‡çš„ä¸ŠæŠ¥ç»™namenode
+        
+        // ÏÂÃæÕâÒ»´óÛçÆäÊµÊÇÔÚ²»¶ÏµÄ¸ønamenode»ã±¨×Ô¼ºµÄblock
+        // ÏÖÔÚÎÒÃÇÖ»ÊÇÀ´³õÌ½Ò»ÏÂÕâ¿éblock reportµÄÔ´Âë£¬ÒòÎª¾ßÌåÈç¹ûÄãÒªÉîÈëµÄÀí½âblock reportµÄÒ»Ğ©´úÂë
+        // Äã±ØĞëÊÇÔÚÍêÈ«¿´¶®ÁËÈË¼ÒµÄÎÄ¼şÉÏ´«£¬datanodeÊÇÈçºÎÔÚÉÏ´«Êı¾İµÄÊ±ºò¹ÜÀíblockµÄ
+        // È»ºó²ÅÄÜÀ´¿´¶®datanodeÊÇÈçºÎ»ã±¨blockµÄ
+        // datanode»ã±¨blockµÄ´úÂë£¬»ù±¾ÉÏ¶¼ÊÇÔÚBPServiceActorÏß³ÌµÄofferService()·½·¨ÄÚ
+        
+        // Õâ±ßÒ²ÊÇÔÚ»ã±¨deleted blocks
+        // Õâ¸ö¼ä¸ôÊÇ5·ÖÖÓ
+        // ¾ÍÊÇÆäÊµÔÚblock±»datanode½ÓÊÕµ½ÁËÒÔºó£¬²»ÊÇÍ¬²½½øĞĞÍ¨Öªnamenode
+        // ÏÈ»á¼ÓÈëÒ»¸ö¶ÓÁĞÀïÃæ
+        // ÆäÊµ¾ÍÊÇÔÚBPServiceActorÏß³Ì£¬ËûÄ¬ÈÏÊÇÃ¿¸ô5·ÖÖÓ½«×î½ü½ÓÊÕµ½£¬»òÕßÊÇÉ¾³ıµôµÄblock
+        // Ò»´ÎĞÔÅúÁ¿µÄÉÏ±¨¸ønamenode
         if (sendImmediateIBR ||
-                (startTime - lastDeletedReport > dnConf.deleteReportInterval)) {
+            (startTime - lastDeletedReport > dnConf.deleteReportInterval)) {
           reportReceivedDeletedBlocks();
           lastDeletedReport = startTime;
         }
 
-        // block reportï¼Œé»˜è®¤çš„é—´éš”æ˜¯6ä¸ªå°æ—¶
+        // block report£¬Ä¬ÈÏµÄ¼ä¸ôÊÇ6¸öĞ¡Ê±
         List<DatanodeCommand> cmds = blockReport();
         processCommand(cmds == null ? null : cmds.toArray(new DatanodeCommand[cmds.size()]));
 
-        // cache block reportï¼Œé»˜è®¤çš„é—´éš”æ˜¯10ç§’
+        // cache block report£¬Ä¬ÈÏµÄ¼ä¸ôÊÇ10Ãë
         DatanodeCommand cmd = cacheReport();
         processCommand(new DatanodeCommand[]{ cmd });
 
@@ -821,11 +821,11 @@ class BPServiceActor implements Runnable {
         }
 
         //
-        // There is no work to do;  sleep until hearbeat timer elapses,
+        // There is no work to do;  sleep until hearbeat timer elapses, 
         // or work arrives, and then iterate again.
         //
-        long waitTime = dnConf.heartBeatInterval -
-                (Time.now() - lastHeartbeat);
+        long waitTime = dnConf.heartBeatInterval - 
+        (Time.now() - lastHeartbeat);
         synchronized(pendingIncrementalBRperStorage) {
           if (waitTime > 0 && !sendImmediateIBR) {
             try {
@@ -838,8 +838,8 @@ class BPServiceActor implements Runnable {
       } catch(RemoteException re) {
         String reClass = re.getClassName();
         if (UnregisteredNodeException.class.getName().equals(reClass) ||
-                DisallowedDatanodeException.class.getName().equals(reClass) ||
-                IncorrectVersionException.class.getName().equals(reClass)) {
+            DisallowedDatanodeException.class.getName().equals(reClass) ||
+            IncorrectVersionException.class.getName().equals(reClass)) {
           LOG.warn(this + " is shutting down", re);
           shouldServiceRun = false;
           return;
@@ -861,23 +861,23 @@ class BPServiceActor implements Runnable {
    * Register one bp with the corresponding NameNode
    * <p>
    * The bpDatanode needs to register with the namenode on startup in order
-   * 1) to report which storage it is serving now and
+   * 1) to report which storage it is serving now and 
    * 2) to receive a registrationID
-   *
+   *  
    * issued by the namenode to recognize registered datanodes.
-   *
+   * 
    * @see FSNamesystem#registerDatanode(DatanodeRegistration)
    * @throws IOException
    */
   void register() throws IOException {
     // The handshake() phase loaded the block pool storage
     // off disk - so update the bpRegistration object from that info
-
-    // è°ƒç”¨äº†BPOfferService.createRegistration()æ–¹æ³•
-    // åˆ›å»ºäº†ä¸€ä¸ªDatanodeRegistrationå¯¹è±¡ï¼Œå¤§ä½“ä¸Šæ¥è¯´ç›¸å½“äºæ˜¯ä¸€ä¸ªdatanodeæ³¨å†Œè¯·æ±‚
-    // è¿™ä¸ªé‡Œé¢åŒ…å«äº†DataNodeID
-    // è¿™æ ·çš„è¯ï¼Œå¦‚æœnamenodeæ”¶åˆ°è¿™ä¸ªæ³¨å†Œçš„è¯·æ±‚ï¼ŒbpRegistration
-    // é‚£ä¹ˆå°±å¯ä»¥è¯†åˆ«å‡ºæ¥æ˜¯å“ªä¸ªdatanodeå‘èµ·çš„æ³¨å†Œ
+	  
+	// µ÷ÓÃÁËBPOfferService.createRegistration()·½·¨
+	// ´´½¨ÁËÒ»¸öDatanodeRegistration¶ÔÏó£¬´óÌåÉÏÀ´ËµÏàµ±ÓÚÊÇÒ»¸ödatanode×¢²áÇëÇó
+	// Õâ¸öÀïÃæ°üº¬ÁËDataNodeI
+	// ÕâÑùµÄ»°£¬Èç¹ûnamenodeÊÕµ½Õâ¸ö×¢²áµÄÇëÇó£¬bpRegistration
+	// ÄÇÃ´¾Í¿ÉÒÔÊ¶±ğ³öÀ´ÊÇÄÄ¸ödatanode·¢ÆğµÄ×¢²á
     bpRegistration = bpos.createRegistration();
 
     LOG.info(this + " beginning handshake with NN");
@@ -885,33 +885,33 @@ class BPServiceActor implements Runnable {
     while (shouldRun()) {
       try {
         // Use returned registration from namenode with updated fields
-        // æ‹¿å›æ¥çš„bpRegistrationå¯¹è±¡é‡Œé¢è‚¯å®šæ˜¯åŒ…å«äº†ä¸€äº›namenodeæ³¨å†ŒæˆåŠŸä»¥åç»™datanodeè¿”å›çš„ä¸€äº›ä¸œè¥¿
+    	// ÄÃ»ØÀ´µÄbpRegistration¶ÔÏóÀïÃæ¿Ï¶¨ÊÇ°üº¬ÁËÒ»Ğ©namenode×¢²á³É¹¦ÒÔºó¸ødatanode·µ»ØµÄÒ»Ğ©¶«Î÷
         bpRegistration = bpNamenode.registerDatanode(bpRegistration);
         break;
       } catch(EOFException e) {  // namenode might have just restarted
         LOG.info("Problem connecting to server: " + nnAddr + " :"
-                + e.getLocalizedMessage());
+            + e.getLocalizedMessage());
         sleepAndLogInterrupts(1000, "connecting to server");
       } catch(SocketTimeoutException e) {  // namenode is busy
         LOG.info("Problem connecting to server: " + nnAddr);
         sleepAndLogInterrupts(1000, "connecting to server");
       }
     }
-
+    
     LOG.info("Block pool " + this + " successfully registered with NN");
     bpos.registrationSucceeded(this, bpRegistration);
 
     // random short delay - helps scatter the BR from all DNs
-    // å»¶è¿Ÿè°ƒåº¦ä¸€æ¬¡block reportï¼Œä»–å…¶å®åœ¨è¿™é‡Œå°±ä¼šæ‰§è¡Œä¸€æ¬¡block reportï¼Œå»æ±‡æŠ¥ä¸€æ¬¡å½“å‰datanodeèŠ‚ç‚¹ä¸Š
-    // å…¨é‡çš„blockæœ‰å“ªäº›
-    // è¿™è¾¹ä¼šåšä¸€äº›æ—¶é—´çš„è®¾å®šï¼Œç„¶ååœ¨åé¢ï¼Œå°±ä¼šåœ¨BPServiceActor.run()æ–¹æ³•ï¼Œçº¿ç¨‹çš„ä¸»æµç¨‹é‡Œé¢
-    // ä¼šå»å¼€å§‹è¿›è¡Œblock reportï¼Œç¬¬ä¸€æ¬¡æ˜¯å…¨é‡æ±‡æŠ¥è‡ªå·±çš„block
+    // ÑÓ³Ùµ÷¶ÈÒ»´Îblock report£¬ËûÆäÊµÔÚÕâÀï¾Í»áÖ´ĞĞÒ»´Îblock report£¬È¥»ã±¨Ò»´Îµ±Ç°datanode½ÚµãÉÏ
+    // È«Á¿µÄblockÓĞÄÄĞ©
+    // Õâ±ß»á×öÒ»Ğ©Ê±¼äµÄÉè¶¨£¬È»ºóÔÚºóÃæ£¬¾Í»áÔÚBPServiceActor.run()·½·¨£¬Ïß³ÌµÄÖ÷Á÷³ÌÀïÃæ
+    // »áÈ¥¿ªÊ¼½øĞĞblock report£¬µÚÒ»´ÎÊÇÈ«Á¿»ã±¨×Ô¼ºµÄblock
     scheduleBlockReport(dnConf.initialBlockReportDelay);
   }
 
 
   private void sleepAndLogInterrupts(int millis,
-                                     String stateString) {
+      String stateString) {
     try {
       Thread.sleep(millis);
     } catch (InterruptedException ie) {
@@ -926,32 +926,32 @@ class BPServiceActor implements Runnable {
    *
    * Only stop when "shouldRun" or "shouldServiceRun" is turned off, which can
    * happen either at shutdown or due to refreshNamenodes.
-   *
-   * è¿™ä¸ªrunå°±æ˜¯BPServiceActorçº¿ç¨‹çš„æ ¸å¿ƒå·¥ä½œæ–¹æ³•
-   * åé¢æˆ‘ä»¬è¦ç»™å¤§å®¶å»è®²è§£è¿™ä¸ªdatanodeå¾€namenodeå»æ³¨å†Œ
-   * datanodeå®šæ—¶çš„å»ç»™namenodeå‘é€å¿ƒè·³
-   *
-   * è¿™äº›é€»è¾‘ï¼Œéƒ½æ˜¯åœ¨è¿™ä¸ªBPServiceActorçš„run()æ–¹æ³•é‡Œï¼Œä»–ä¼šè´Ÿè´£å»è·Ÿnamenodeè¿›è¡Œé€šä¿¡
-   *
+   * 
+   * Õâ¸örun¾ÍÊÇBPServiceActorÏß³ÌµÄºËĞÄ¹¤×÷·½·¨
+   * ºóÃæÎÒÃÇÒª¸ø´ó¼ÒÈ¥½²½âÕâ¸ödatanodeÍùnamenodeÈ¥×¢²á
+   * datanode¶¨Ê±µÄÈ¥¸ønamenode·¢ËÍĞÄÌø
+   * 
+   * ÕâĞ©Âß¼­£¬¶¼ÊÇÔÚÕâ¸öBPServiceActorµÄrun()·½·¨Àï£¬Ëû»á¸ºÔğÈ¥¸únamenode½øĞĞÍ¨ĞÅ
+   * 
    */
   @Override
   public void run() {
     LOG.info(this + " starting to offer service");
 
-    // BPServiceActoræ˜¯ä¸€ä¸ªçº¿ç¨‹
-    // ä¸€æ—¦å¯¹BPServiceActorè¿™ä¸ªçº¿ç¨‹æ‰§è¡Œäº†start()æ–¹æ³•å¯åŠ¨äº†è¿™ä¸ªçº¿ç¨‹ä¹‹å
-    // å®é™…ä¸Šæ¥è¯´ï¼Œè¿™ä¸ªçº¿ç¨‹çš„å·¥ä½œé€»è¾‘å°±æ˜¯åœ¨run()æ–¹æ³•ä¸­
-
+    // BPServiceActorÊÇÒ»¸öÏß³Ì
+    // Ò»µ©¶ÔBPServiceActorÕâ¸öÏß³ÌÖ´ĞĞÁËstart()·½·¨Æô¶¯ÁËÕâ¸öÏß³ÌÖ®ºó
+    // Êµ¼ÊÉÏÀ´Ëµ£¬Õâ¸öÏß³ÌµÄ¹¤×÷Âß¼­¾ÍÊÇÔÚrun()·½·¨ÖĞ
+    
     try {
       while (true) {
         // init stuff
         try {
           // setup storage
-          // è¿æ¥åˆ°namenodeä»¥åŠè¿›è¡Œæ¡æ‰‹ï¼Œè¯´å®è¯è¿™ä¸ªæ–¹æ³•çš„åå­—æçš„æ˜¯çœŸçš„ä¸å¤ªç†æƒ³
-          // è¿™ä¸ªæºç çš„æ³¨é‡Šå†™çš„ç¡®å®ä¸å¤ªä¸¥è°¨
-          // å…¶å®å°±æ˜¯å°è£…äº†æ•´ä¸ªdatanodeç¬¬ä¸€æ¬¡å¯åŠ¨è¿›è¡Œæ³¨å†Œçš„å…¨è¿‡ç¨‹
-          // æˆ‘ä»¬ä¹‹å‰ç»™å¤§å®¶è®²è§£çš„é‚£å¥—æ³¨å†Œçš„æµç¨‹å¦‚æœéƒ½ç»“æŸäº†ä¹‹åï¼Œé‚£ä¹ˆè¿™ä¸ªæ–¹æ³•å°±ä¼šæ‰§è¡Œç»“æŸ
-          // è¿™ä¸ªæ–¹æ³•æ‰§è¡Œç»“æŸäº†ä¹‹åï¼Œè‡ªç„¶å°±ä¼šèµ°ä¸€ä¸ªbreakï¼Œç»ˆç»“æ‰è¿™ä¸ªwhile trueå¾ªç¯
+          // Á¬½Óµ½namenodeÒÔ¼°½øĞĞÎÕÊÖ£¬ËµÊµ»°Õâ¸ö·½·¨µÄÃû×Ö¸ãµÄÊÇÕæµÄ²»Ì«ÀíÏë
+          // Õâ¸öÔ´ÂëµÄ×¢ÊÍĞ´µÄÈ·Êµ²»Ì«ÑÏ½÷
+          // ÆäÊµ¾ÍÊÇ·â×°ÁËÕû¸ödatanodeµÚÒ»´ÎÆô¶¯½øĞĞ×¢²áµÄÈ«¹ı³Ì
+          // ÎÒÃÇÖ®Ç°¸ø´ó¼Ò½²½âµÄÄÇÌ××¢²áµÄÁ÷³ÌÈç¹û¶¼½áÊøÁËÖ®ºó£¬ÄÇÃ´Õâ¸ö·½·¨¾Í»áÖ´ĞĞ½áÊø
+          // Õâ¸ö·½·¨Ö´ĞĞ½áÊøÁËÖ®ºó£¬×ÔÈ»¾Í»á×ßÒ»¸öbreak£¬ÖÕ½áµôÕâ¸öwhile trueÑ­»·
           connectToNNAndHandshake();
           break;
         } catch (IOException ioe) {
@@ -960,7 +960,7 @@ class BPServiceActor implements Runnable {
           if (shouldRetryInit()) {
             // Retry until all namenode's of BPOS failed initialization
             LOG.error("Initialization failed for " + this + " "
-                    + ioe.getLocalizedMessage());
+                + ioe.getLocalizedMessage());
             sleepAndLogInterrupts(5000, "initializing");
           } else {
             runningState = RunningState.FAILED;
@@ -972,15 +972,15 @@ class BPServiceActor implements Runnable {
 
       runningState = RunningState.RUNNING;
 
-      // è¿™ä¸ªçº¿ç¨‹å…¶å®ä¼šåœ¨è¿™é‡Œè¿›å…¥ä¸€ä¸ªwhile trueçš„æ­»å¾ªç¯
-      // BlockPoolOffserServiceï¼ŒBlockPoolServiceActor
-      // è¿™ä¸¤ä¸ªçº¿ç¨‹å…¶å®éƒ½æ˜¯BlockPoolï¼Œå—ç®¡ç†ç›¸å…³çš„ä¸œè¥¿ï¼Œè¿˜è´Ÿè´£äº†è·Ÿnamenodeä¹‹é—´çš„é€šä¿¡
-      // ä»–çš„é¢å‘å¯¹è±¡çš„è®¾è®¡è¿˜æ˜¯æœ‰ä¸€äº›ç¼ºé™·çš„ï¼Œå› ä¸ºè·Ÿnamenodeé€šä¿¡çš„çº¿ç¨‹è®¾è®¡æˆBlockPoolç›¸å…³çš„æ¦‚å¿µï¼Œä¸å¤ªåˆé€‚
-      // ä¼šè®©äººè§‰å¾—å¾ˆè¿·æƒ‘
+      // Õâ¸öÏß³ÌÆäÊµ»áÔÚÕâÀï½øÈëÒ»¸öwhile trueµÄËÀÑ­»·
+      // BlockPoolOffserService£¬BlockPoolServiceActor
+      // ÕâÁ½¸öÏß³ÌÆäÊµ¶¼ÊÇBlockPool£¬¿é¹ÜÀíÏà¹ØµÄ¶«Î÷£¬»¹¸ºÔğÁË¸únamenodeÖ®¼äµÄÍ¨ĞÅ
+      // ËûµÄÃæÏò¶ÔÏóµÄÉè¼Æ»¹ÊÇÓĞÒ»Ğ©È±ÏİµÄ£¬ÒòÎª¸únamenodeÍ¨ĞÅµÄÏß³ÌÉè¼Æ³ÉBlockPoolÏà¹ØµÄ¸ÅÄî£¬²»Ì«ºÏÊÊ
+      // »áÈÃÈË¾õµÃºÜÃÔ»ó
       while (shouldRun()) {
         try {
-          // æ¯éš”å‡ ç§’é’Ÿå‘é€å¿ƒè·³ï¼Œä¹Ÿæ˜¯åœ¨è¿™é‡Œ
-          // æ¯éš”ä¸€æ®µæ—¶é—´ï¼Œæ±‡æŠ¥è‡ªå·±çš„block reportï¼Œä¹Ÿæ˜¯åœ¨è¿™é‡Œ
+          // Ã¿¸ô¼¸ÃëÖÓ·¢ËÍĞÄÌø£¬Ò²ÊÇÔÚÕâÀï
+          // Ã¿¸ôÒ»¶ÎÊ±¼ä£¬»ã±¨×Ô¼ºµÄblock report£¬Ò²ÊÇÔÚÕâÀï
           offerService();
         } catch (Exception ex) {
           LOG.error("Exception in BPOfferService for " + this, ex);
@@ -1007,9 +1007,9 @@ class BPServiceActor implements Runnable {
 
   /**
    * Process an array of datanode commands
-   *
+   * 
    * @param cmds an array of datanode commands
-   * @return true if further processing may be required or false otherwise.
+   * @return true if further processing may be required or false otherwise. 
    */
   boolean processCommand(DatanodeCommand[] cmds) {
     if (cmds != null) {
@@ -1031,7 +1031,7 @@ class BPServiceActor implements Runnable {
       bpNamenode.errorReport(bpRegistration, errCode, errMsg);
     } catch(IOException e) {
       LOG.warn("Error reporting an error to NameNode " + nnAddr,
-              e);
+          e);
     }
   }
 
@@ -1039,9 +1039,9 @@ class BPServiceActor implements Runnable {
    * Report a bad block from another DN in this cluster.
    */
   void reportRemoteBadBlock(DatanodeInfo dnInfo, ExtendedBlock block)
-          throws IOException {
-    LocatedBlock lb = new LocatedBlock(block,
-            new DatanodeInfo[] {dnInfo});
+      throws IOException {
+    LocatedBlock lb = new LocatedBlock(block, 
+                                    new DatanodeInfo[] {dnInfo});
     bpNamenode.reportBadBlocks(new LocatedBlock[] {lb});
   }
 
@@ -1058,7 +1058,7 @@ class BPServiceActor implements Runnable {
 
   private static class PerStoragePendingIncrementalBR {
     private final Map<Long, ReceivedDeletedBlockInfo> pendingIncrementalBR =
-            Maps.newHashMap();
+        Maps.newHashMap();
 
     /**
      * Return the number of blocks on this storage that have pending
@@ -1075,8 +1075,8 @@ class BPServiceActor implements Runnable {
      */
     ReceivedDeletedBlockInfo[] dequeueBlockInfos() {
       ReceivedDeletedBlockInfo[] blockInfos =
-              pendingIncrementalBR.values().toArray(
-                      new ReceivedDeletedBlockInfo[getBlockInfoCount()]);
+          pendingIncrementalBR.values().toArray(
+              new ReceivedDeletedBlockInfo[getBlockInfoCount()]);
 
       pendingIncrementalBR.clear();
       return blockInfos;

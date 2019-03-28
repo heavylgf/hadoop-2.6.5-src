@@ -456,6 +456,7 @@ public class EditLogFileInputStream extends EditLogInputStream {
           new PrivilegedExceptionAction<InputStream>() {
             @Override
             public InputStream run() throws IOException {
+              // 底层的输入流，其实是个什么输入流呢？
               HttpURLConnection connection;
               try {
                 connection = (HttpURLConnection)
@@ -484,6 +485,8 @@ public class EditLogFileInputStream extends EditLogInputStream {
                                       "by the server when trying to fetch " + url);
               }
         
+              // 最终返回的是人家的http接口的输入流
+              // 接着就可以从这里，依赖这个InputStream读取底层的数据了
               return connection.getInputStream();
             }
           });

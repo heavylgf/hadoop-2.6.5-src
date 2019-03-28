@@ -171,6 +171,7 @@ public class BlockManager {
   final BlocksMap blocksMap;
 
   /** Replication thread. */
+  // ReplicationMonitor£¬ºóÌ¨Ïß³Ì£¬×¨ÃÅ¼à¿ØÓĞÃ»ÓĞÒª¸´ÖÆµÄblock
   final Daemon replicationThread = new Daemon(new ReplicationMonitor());
   
   /** Store blocks -> datanodedescriptor(s) map of corrupt replicas */
@@ -198,6 +199,9 @@ public class BlockManager {
   /**
    * Store set of Blocks that need to be replicated 1 or more times.
    * We also store pending replication-orders.
+   * 
+   * Õâ¸öÀïÃæ´æ·ÅµÄ¶¼ÊÇÄÇĞ©blockµÄ¸±±¾ÊıÁ¿²»³ä×ãµÄblock
+   * 
    */
   public final UnderReplicatedBlocks neededReplications = new UnderReplicatedBlocks();
 
@@ -1040,7 +1044,7 @@ public class BlockManager {
   /** Remove the blocks associated to the given datanode. */
   void removeBlocksAssociatedTo(final DatanodeDescriptor node) {
     final Iterator<? extends Block> it = node.getBlockIterator();
-    // è¿™ä¸ªdatanode
+    // Õâ¸ödatanode±éÀúÏÂËûÀïÃæÓĞµÄblock£¬¶ÔÃ¿¸öblock¶¼Ö±½ÓÉ¾³ı
     while(it.hasNext()) {
       removeStoredBlock(it.next(), node);
     }
@@ -1311,6 +1315,7 @@ public class BlockManager {
     namesystem.writeLock();
     try {
       // Choose the blocks to be replicated
+      // ´ÓneededRepliationsÀïÃæ£¬´ı¸´ÖÆµÄÈÎÎñ¶ÓÁĞ£¬ÀïÃæ´æ·ÅÁËÒª¸´ÖÆµÄblock
       blocksToReplicate = neededReplications
           .chooseUnderReplicatedBlocks(blocksToProcess);
     } finally {
@@ -1355,9 +1360,12 @@ public class BlockManager {
             containingNodes = new ArrayList<DatanodeDescriptor>();
             List<DatanodeStorageInfo> liveReplicaNodes = new ArrayList<DatanodeStorageInfo>();
             NumberReplicas numReplicas = new NumberReplicas();
+            // Ñ¡ÔñÒ»¸ö¸´ÖÆÕâ¸öblockµÄsoure datanode
+            // ×÷Îªsource datanodeÀ´¸´ÖÆÒ»¸öblock¸±±¾¸ø±ğµÄ»¹ÍêºÃµÄdatanode
             srcNode = chooseSourceDatanode(
                 block, containingNodes, liveReplicaNodes, numReplicas,
                 priority);
+            
             if(srcNode == null) { // block can not be replicated from any node
               LOG.debug("Block " + block + " cannot be repl from any node");
               continue;
@@ -1388,6 +1396,8 @@ public class BlockManager {
             } else {
               additionalReplRequired = 1; // Needed on a new rack
             }
+            
+            // ·â×°ÁË¸´ÖÆÈÎÎñ
             work.add(new ReplicationWork(block, bc, srcNode,
                 containingNodes, liveReplicaNodes, additionalReplRequired,
                 priority));
@@ -1399,6 +1409,7 @@ public class BlockManager {
     }
 
     final Set<Node> excludedNodes = new HashSet<Node>();
+    // ±éÀúÁËËùÓĞµÄ¸´ÖÆÈÎÎñ
     for(ReplicationWork rw : work){
       // Exclude all of the containing nodes from being targets.
       // This list includes decommissioning or corrupt nodes.
@@ -1410,9 +1421,13 @@ public class BlockManager {
       // choose replication targets: NOT HOLDING THE GLOBAL LOCK
       // It is costly to extract the filename for which chooseTargets is called,
       // so for now we pass in the block collection itself.
+      // Ñ¡ÔñÒª¸´ÖÆblock¸±±¾¹ıÈ¥µÄÄ¿±êdatanodeÁĞ±í
       rw.chooseTargets(blockplacement, storagePolicySuite, excludedNodes);
     }
 
+    // µ½´ËÎªÖ¹£¬¶ÔÃ¿¸öÒª¸´ÖÆµÄblock£¬µÚÒ»ÊÇÑ¡ÔñÁËÒ»¸ösource datanode
+    // µÚ¶şÊÇÑ¡ÔñÁËÒª¸´ÖÆ¹ıÈ¥µÄÄ¿±êµÄdatanode
+    
     namesystem.writeLock();
     try {
       for(ReplicationWork rw : work){
@@ -1464,6 +1479,8 @@ public class BlockManager {
           }
 
           // Add block to the to be replicated list
+          // ºËĞÄ´úÂë£º¶ÔÃ¿¸öblockµÄ¸´ÖÆsource datanode£¬¶¼¼ÓÈëÒ»¸ö¸´ÖÆµÄÄ¿±êdatanodeÁĞ±í
+          // srcNode£¬Õâ¸ödatanode£¬ĞèÒª¸´ÖÆblock£¬µ½targetsÖ¸¶¨µÄÄ¿±êdatanodeÖĞÈ¥
           rw.srcNode.addBlockToBeReplicated(block, targets);
           scheduledWork++;
           DatanodeStorageInfo.incrementBlocksScheduled(targets);
@@ -1481,6 +1498,8 @@ public class BlockManager {
 
           // remove from neededReplications
           if(numEffectiveReplicas + targets.length >= requiredReplication) {
+        	// ¸ø¸ãÍêÁËÒÔºó£¬·ÖÅäºÃÁË¸´ÖÆÈÎÎñÁË£¬ÒÑ¾­¼ÓÈëÁËsource DatanodeµÄ¸´ÖÆÈÎÎñ¶ÓÁĞÀïÃæÈ¥
+        	// Ö±½Ó´ÓneededReplicationsÖĞÒÆ³ıµô¶ÔÓ¦µÄblock¾Í¿ÉÒÔÁË
             neededReplications.remove(block, priority); // remove from neededReplications
             neededReplications.decrementReplicationIndex(priority);
           }
@@ -1553,9 +1572,13 @@ public class BlockManager {
     List<DatanodeDescriptor> favoredDatanodeDescriptors = 
         getDatanodeDescriptors(favoredNodes);
     final BlockStoragePolicy storagePolicy = storagePolicySuite.getPolicy(storagePolicyID);
+    
+    // ºËĞÄÔÚÕâÀï
+    // BlockPlacementPolicy×é¼ş£¬ÊÇ×¨ÃÅ¸ºÔğ¾ö¶¨Ò»¸öblockÊÇ·ÅÔÚÄÄÀïµÄ
     final DatanodeStorageInfo[] targets = blockplacement.chooseTarget(src,
         numOfReplicas, client, excludedNodes, blocksize, 
         favoredDatanodeDescriptors, storagePolicy);
+    
     if (targets.length < minReplication) {
       throw new IOException("File " + src + " could only be replicated to "
           + targets.length + " nodes instead of minReplication (="
@@ -2558,6 +2581,8 @@ public class BlockManager {
     }
 
     // handle underReplication/overReplication
+    // Ã¿´ÎÄãÉÏ±¨ÍêblockÖ®ºó£¬¾Í»á´¦Àíunder replication / over replication
+    // under replication£¬¾ÍÊÇËµ¸±±¾ÊıÁ¿²»×ã3£»over replication£¬¾ÍÊÇËµ¸±±¾ÊıÁ¿³¬¹ı3
     short fileReplication = bc.getBlockReplication();
     if (!isNeededReplication(storedBlock, fileReplication, numCurrentReplica)) {
       neededReplications.remove(storedBlock, numCurrentReplica,
@@ -2955,8 +2980,8 @@ public class BlockManager {
     }
     assert (namesystem.hasWriteLock());
     {
-      // blocksMapå°±æ˜¯å­˜æ”¾blockçš„æ˜ å°„å…³ç³»çš„
-      // åˆ é™¤å…³è”å…³ç³»
+      // blocksMap¾ÍÊÇ´æ·ÅdatanodeºÍblockµÄÓ³Éä¹ØÏµµÄ
+      // É¾³ı¹ØÁª¹ØÏµ
       if (!blocksMap.removeNode(block, node)) {
         if(blockLog.isDebugEnabled()) {
           blockLog.debug("BLOCK* removeStoredBlock: "
@@ -2970,7 +2995,8 @@ public class BlockManager {
       // failure. If the block is still valid, check if replication is
       // necessary. In that case, put block on a possibly-will-
       // be-replicated list.
-      //
+      // ¾Í¿ÉÒÔ¿´µ½£¬Èç¹û·¢ÏÖËµÒ»¸ödatanodeå´»ú£¬µ¼ÖÂÒ»¸öblock¸±±¾ÊıÁ¿±äÉÙÁË
+      // ÔÚÕâÀï£¬¾Í»áÅĞ¶Ï½«block·ÅÈëÒ»¸öĞèÒª¸´ÖÆ¸±±¾µÄÁĞ±íÖĞ
       BlockCollection bc = blocksMap.getBlockCollection(block);
       if (bc != null) {
         namesystem.decrementSafeBlockCount(block);
@@ -3073,13 +3099,14 @@ public class BlockManager {
     assert toUC.size() + toAdd.size() + toInvalidate.size() + toCorrupt.size() <= 1
       : "The block should be only in one of the lists.";
 
-    for (StatefulBlockInfo b : toUC) {
-      // block under construction, å°±æ˜¯è¿˜åœç•™åœ¨ä¼ è¾“è¿‡ç¨‹ä¸­ï¼Œä¸€ä¸ªblockå¯¹åº”å¤šä¸ªpacket
+    for (StatefulBlockInfo b : toUC) { 
+      // block under construction£¬¾ÍÊÇ»¹Í£ÁôÔÚ´«Êä¹ı³ÌÖĞ£¬Ò»¸öblock¶ÔÓ¦ÁËN¶à¸öpacket
       addStoredBlockUnderConstruction(b, storageInfo);
     }
     long numBlocksLogged = 0;
-    // å¦‚æœfinalizedçŠ¶æ€ï¼Œæ­¤æ—¶ä¸€å®šä¼šå°†blockåŠ å…¥toAddåˆ—è¡¨ä¸­
+    // Èç¹ûÊÇfinalized×´Ì¬£¬´ËÊ±Ò»¶¨»á½«block¼ÓÈëtoAddÁĞ±íÖĞ
     for (BlockInfo b : toAdd) {
+      // ÉÏ´«Íê±ÏµÄblock¾Í»á×ßÕâ¸ö·½·¨³¹µ×±êÊ¶ÒÑ¾­¿ÉÒÔÊ¹ÓÃÁË
       addStoredBlock(b, storageInfo, delHintNode, numBlocksLogged < maxNumBlocksToLog);
       numBlocksLogged++;
     }
@@ -3087,7 +3114,6 @@ public class BlockManager {
       blockLog.info("BLOCK* addBlock: logged info for " + maxNumBlocksToLog
           + " of " + numBlocksLogged + " reported.");
     }
-
     for (Block b : toInvalidate) {
       blockLog.info("BLOCK* addBlock: block "
           + b + " on " + node + " size " + b.getNumBytes()
@@ -3403,13 +3429,15 @@ public class BlockManager {
       }
       NumberReplicas repl = countNodes(block);
       int curExpectedReplicas = getReplication(block);
-      // åˆ¤æ–­ä¸€ä¸‹ï¼Œå½“å‰è¿™ä¸ªblockè¿˜å­˜åœ¨çš„datanodeä¸Šçš„å‰¯æœ¬æ•°é‡ï¼ˆå¯èƒ½å°±åªæœ‰ä¸¤ä¸ªå‰¯æœ¬ï¼‰
-      // æœŸæœ›çš„å‰¯æœ¬å› å­çš„æ•°é‡ï¼ˆ3ä¸ªå‰¯æœ¬ï¼‰
+      // ÅĞ¶ÏÒ»ÏÂ£¬µ±Ç°Õâ¸öblock»¹´æÔÚµÄdatanodeÉÏµÄ¸±±¾ÊıÁ¿£¨¿ÉÄÜ¾ÍÖ»ÓĞ2¸ö¸±±¾£©
+      // »¹ÓĞÆÚÍûµÄ¸±±¾Òò×ÓÊıÁ¿£¨ÆÚÍû3¸ö¸±±¾£©
+      // ÅĞ¶ÏÒ»ÏÂµ±Ç°µÄÕâ¸öblock¸±±¾ÊıÁ¿ÊÇ·ñ²»³ä×ã£¬ÊÇ·ñĞèÒª¸´ÖÆ
       if (isNeededReplication(block, curExpectedReplicas, repl.liveReplicas())) {
         neededReplications.update(block, repl.liveReplicas(), repl
             .decommissionedReplicas(), curExpectedReplicas, curReplicasDelta,
             expectedReplicasDelta);
       } else {
+    	// Èç¹û²»ÊÇÉÏÃæÄÇÖÖÒª¸´ÖÆ¸±±¾µÄÇé¿ö£¬¾Í°ÑÕâ¸öblock´Ó´ı¸´ÖÆµÄ¶ÓÁĞÖĞÒÆ³ı
         int oldReplicas = repl.liveReplicas()-curReplicasDelta;
         int oldExpectedReplicas = curExpectedReplicas-expectedReplicasDelta;
         neededReplications.remove(block, oldReplicas, repl.decommissionedReplicas(),
@@ -3627,6 +3655,7 @@ public class BlockManager {
             computeDatanodeWork();
             processPendingReplications();
           }
+          // 3ÃëÖÓ
           Thread.sleep(replicationRecheckInterval);
         } catch (Throwable t) {
           if (!namesystem.isRunning()) {
@@ -3670,6 +3699,7 @@ public class BlockManager {
     final int nodesToProcess = (int) Math.ceil(numlive
         * this.blocksInvalidateWorkPct);
 
+    // ºËĞÄ·½·¨£º¸øÃ¿¸öÒª¸´ÖÆµÄblock¶¼´´½¨Ò»¸ö¸´ÖÆÈÎÎñ
     int workFound = this.computeReplicationWork(blocksToProcess);
 
     // Update counters

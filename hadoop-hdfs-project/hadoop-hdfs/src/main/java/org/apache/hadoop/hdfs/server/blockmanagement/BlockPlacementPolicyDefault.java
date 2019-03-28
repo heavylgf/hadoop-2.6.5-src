@@ -197,6 +197,14 @@ public class BlockPlacementPolicyDefault extends BlockPlacementPolicy {
       excludedNodes = new HashSet<Node>();
     }
      
+    // 把握住两点
+    // 第一点：他会尽量保证各个datanode放的数据是均衡的
+    // 第二点：机架感知的策略
+    
+    // 在走机架感知的特性
+    // 计算，每个机架最多可以放几个副本
+    // 如果你是3个副本的话，一个机架最对就是3个副本
+    // 比如说你是1个机架，最多就是放3个副本，如果是2个机架，一个机架最多就是2个副本
     int[] result = getMaxNodesPerRack(chosenStorage.size(), numOfReplicas);
     numOfReplicas = result[0];
     int maxNodesPerRack = result[1];

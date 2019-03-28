@@ -48,6 +48,9 @@ public class BlockInfo extends Block implements LightWeightGSet.LinkedElement {
    * references to the previous and the next blocks, respectively, in the list
    * of blocks belonging to this storage.
    * 
+   * 在这里，他其实每个block都有一个triplets数组
+   * [datanode01, block01的上一个block，block01的下一个block, datanode02, block02的上一个block，block02的下一个block]
+   * 
    * Using previous and next in Object triplets is done instead of a
    * {@link LinkedList} list to efficiently use memory. With LinkedList the cost
    * per replica is 42 bytes (LinkedList#Entry object per replica) versus 16

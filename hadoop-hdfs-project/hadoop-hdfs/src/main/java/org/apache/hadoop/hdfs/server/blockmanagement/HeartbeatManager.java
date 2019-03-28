@@ -56,30 +56,30 @@ class HeartbeatManager implements DatanodeStatistics {
   /** Heartbeat monitor thread */
   private final Daemon heartbeatThread = new Daemon(new Monitor());
 
-
+    
   final Namesystem namesystem;
   final BlockManager blockManager;
 
   HeartbeatManager(final Namesystem namesystem,
-                   final BlockManager blockManager, final Configuration conf) {
+      final BlockManager blockManager, final Configuration conf) {
     this.namesystem = namesystem;
     this.blockManager = blockManager;
     boolean avoidStaleDataNodesForWrite = conf.getBoolean(
-            DFSConfigKeys.DFS_NAMENODE_AVOID_STALE_DATANODE_FOR_WRITE_KEY,
-            DFSConfigKeys.DFS_NAMENODE_AVOID_STALE_DATANODE_FOR_WRITE_DEFAULT);
+        DFSConfigKeys.DFS_NAMENODE_AVOID_STALE_DATANODE_FOR_WRITE_KEY,
+        DFSConfigKeys.DFS_NAMENODE_AVOID_STALE_DATANODE_FOR_WRITE_DEFAULT);
     long recheckInterval = conf.getInt(
-            DFSConfigKeys.DFS_NAMENODE_HEARTBEAT_RECHECK_INTERVAL_KEY,
-            DFSConfigKeys.DFS_NAMENODE_HEARTBEAT_RECHECK_INTERVAL_DEFAULT); // 5 min
+        DFSConfigKeys.DFS_NAMENODE_HEARTBEAT_RECHECK_INTERVAL_KEY,
+        DFSConfigKeys.DFS_NAMENODE_HEARTBEAT_RECHECK_INTERVAL_DEFAULT); // 5 min
     long staleInterval = conf.getLong(
-            DFSConfigKeys.DFS_NAMENODE_STALE_DATANODE_INTERVAL_KEY,
-            DFSConfigKeys.DFS_NAMENODE_STALE_DATANODE_INTERVAL_DEFAULT);// 30s
+        DFSConfigKeys.DFS_NAMENODE_STALE_DATANODE_INTERVAL_KEY,
+        DFSConfigKeys.DFS_NAMENODE_STALE_DATANODE_INTERVAL_DEFAULT);// 30s
 
     if (avoidStaleDataNodesForWrite && staleInterval < recheckInterval) {
       this.heartbeatRecheckInterval = staleInterval;
       LOG.info("Setting heartbeat recheck interval to " + staleInterval
-              + " since " + DFSConfigKeys.DFS_NAMENODE_STALE_DATANODE_INTERVAL_KEY
-              + " is less than "
-              + DFSConfigKeys.DFS_NAMENODE_HEARTBEAT_RECHECK_INTERVAL_KEY);
+          + " since " + DFSConfigKeys.DFS_NAMENODE_STALE_DATANODE_INTERVAL_KEY
+          + " is less than "
+          + DFSConfigKeys.DFS_NAMENODE_HEARTBEAT_RECHECK_INTERVAL_KEY);
     } else {
       this.heartbeatRecheckInterval = recheckInterval;
     }
@@ -97,7 +97,7 @@ class HeartbeatManager implements DatanodeStatistics {
     } catch (InterruptedException e) {
     }
   }
-
+  
   synchronized int getLiveDatanodeCount() {
     return datanodes.size();
   }
@@ -125,7 +125,7 @@ class HeartbeatManager implements DatanodeStatistics {
   @Override
   public synchronized float getCapacityRemainingPercent() {
     return DFSUtil.getPercentRemaining(
-            stats.capacityRemaining, stats.capacityTotal);
+        stats.capacityRemaining, stats.capacityTotal);
   }
 
   @Override
@@ -141,7 +141,7 @@ class HeartbeatManager implements DatanodeStatistics {
   @Override
   public synchronized long getCapacityUsedNonDFS() {
     final long nonDFSUsed = stats.capacityTotal
-            - stats.capacityRemaining - stats.capacityUsed;
+        - stats.capacityRemaining - stats.capacityUsed;
     return nonDFSUsed < 0L? 0L : nonDFSUsed;
   }
 
@@ -149,17 +149,17 @@ class HeartbeatManager implements DatanodeStatistics {
   public synchronized int getXceiverCount() {
     return stats.xceiverCount;
   }
-
+  
   @Override
   public synchronized int getInServiceXceiverCount() {
     return stats.nodesInServiceXceiverCount;
   }
-
+  
   @Override
   public synchronized int getNumDatanodesInService() {
     return stats.nodesInService;
   }
-
+  
   @Override
   public synchronized long getCacheCapacity() {
     return stats.cacheCapacity;
@@ -169,17 +169,17 @@ class HeartbeatManager implements DatanodeStatistics {
   public synchronized long getCacheUsed() {
     return stats.cacheUsed;
   }
-
+  
 
   @Override
   public synchronized long[] getStats() {
     return new long[] {getCapacityTotal(),
-            getCapacityUsed(),
-            getCapacityRemaining(),
-            -1L,
-            -1L,
-            -1L,
-            getBlockPoolUsed()};
+                       getCapacityUsed(),
+                       getCapacityRemaining(),
+                       -1L,
+                       -1L,
+                       -1L,
+                       getBlockPoolUsed()};
   }
 
   @Override
@@ -216,12 +216,12 @@ class HeartbeatManager implements DatanodeStatistics {
   }
 
   synchronized void updateHeartbeat(final DatanodeDescriptor node,
-                                    StorageReport[] reports, long cacheCapacity, long cacheUsed,
-                                    int xceiverCount, int failedVolumes) {
+      StorageReport[] reports, long cacheCapacity, long cacheUsed,
+      int xceiverCount, int failedVolumes) {
     stats.subtract(node);
-    // è¿™ä¸ªé‡Œé¢æœ€ç»ˆè¿˜æ˜¯åœ¨è°ƒç”¨DatanodeDescripor.updateHeartbeat()æ›´æ–°å¿ƒè·³çš„æ–¹æ³•
+    // Õâ¸öÀïÃæ×îÖÕ»¹ÊÇÔÚµ÷ÓÃDatanodeDescripor.updateHeartbeat()¸üÐÂÐÄÌøµÄ·½·¨
     node.updateHeartbeat(reports, cacheCapacity, cacheUsed,
-            xceiverCount, failedVolumes);
+        xceiverCount, failedVolumes);
     stats.add(node);
   }
 
@@ -236,7 +236,7 @@ class HeartbeatManager implements DatanodeStatistics {
     node.stopDecommission();
     stats.add(node);
   }
-
+  
   /**
    * Check if there are any expired heartbeats, and if so,
    * whether any blocks have to be re-replicated.
@@ -282,11 +282,11 @@ class HeartbeatManager implements DatanodeStatistics {
       int numOfStaleNodes = 0;
       int numOfStaleStorages = 0;
       synchronized(this) {
-        // ä¹‹å‰åªè¦æ³¨å†Œè¿‡çš„datanodeï¼Œéƒ½ä¼šåœ¨è¿™ä¸ªdatanodesåˆ—è¡¨ä¸­
-        // è¿™é‡Œåªè¦éåŽ†è¿™ä¸ªdatanodesåˆ—è¡¨å°±å¯ä»¥äº†
+    	// Ö®Ç°Ö»Òª×¢²á¹ýµÄdatanode£¬¶¼»áÔÚÕâ¸ödatanodesÁÐ±íÖÐ
+    	// ÕâÀïÖ»Òª±éÀúÕâ¸ödatanodesÁÐ±í¾Í¿ÉÒÔÁË
         for (DatanodeDescriptor d : datanodes) {
-          // è¿™è¾¹ä¼šè°ƒç”¨ä¸€ä¸ªDatanodeDescriptor.isDatanodeDead()æ–¹æ³•
-          // ä¼šåŽ»åˆ¤æ–­ä¸€ä¸ªdatanodeæ˜¯å¦æ­»æŽ‰äº†ï¼Œå®•æœºäº†
+          // Õâ±ß»áµ÷ÓÃÒ»¸öDatanodeDescriptor.isDatanodeDead()·½·¨
+          // »áÈ¥ÅÐ¶ÏÒ»¸ödatanodeÊÇ·ñËÀµôÁË£¬å´»úÁË
           if (dead == null && dm.isDatanodeDead(d)) {
             stats.incrExpiredHeartbeats();
             dead = d;
@@ -301,14 +301,14 @@ class HeartbeatManager implements DatanodeStatistics {
             }
 
             if (failedStorage == null &&
-                    storageInfo.areBlocksOnFailedStorage() &&
-                    d != dead) {
+                storageInfo.areBlocksOnFailedStorage() &&
+                d != dead) {
               failedStorage = storageInfo;
             }
           }
 
         }
-
+        
         // Set the number of stale nodes in the DatanodeManager
         dm.setNumStaleNodes(numOfStaleNodes);
         dm.setNumStaleStorages(numOfStaleStorages);
@@ -323,8 +323,8 @@ class HeartbeatManager implements DatanodeStatistics {
             return;
           }
           synchronized(this) {
-            // å¯¹äºŽå·²ç»æ­»æŽ‰çš„datanodeä¼šé€šè¿‡DatanodeManager.removeDeadDatanode()æ–¹æ³•
-            // å°†è¿™ä¸ªdatanodeä»Žé›†ç¾¤ä¸­å‰”é™¤æŽ‰
+        	// ¶ÔÓÚÒÑ¾­ËÀµôµÄdatanode»áÍ¨¹ýDatanodeManager.removeDeadDatanode()·½·¨
+        	// ½«Õâ¸ödatanode´Ó¼¯ÈºÖÐÌÞ³ýµô
             dm.removeDeadDatanode(dead);
           }
         } finally {
@@ -351,11 +351,11 @@ class HeartbeatManager implements DatanodeStatistics {
 
   /** Periodically check heartbeat and update block key */
   /**
-   * åœ¨namenodeå¯åŠ¨çš„æ—¶å€™ï¼ŒHeartbeatManagerå°±ä¼šè‡ªåŠ¨å¯åŠ¨ä¸€ä¸ªåŽå°çº¿ç¨‹
-   * è¿™ä¸ªåŽå°çº¿ç¨‹å°±æ˜¯è´Ÿè´£ç›‘æŽ§æ‰€æœ‰æ³¨å†Œä¸Šæ¥çš„datanodeæ˜¯å¦æŒ‰æ—¶åœ¨å‘é€å¿ƒè·³ï¼Œå¦‚æžœæ²¡æœ‰æŒ‰æ—¶å‘é€å¿ƒè·³çš„è¯
-   * å°±ä¼šè®¤ä¸ºè¿™ä¸ªdatanodeå·²ç»å®•æœºäº†
-   * æ­¤æ—¶å°±ä¼šå°†è¿™ä¸ªdatanodeä»Žé›†ç¾¤é‡Œé¢ç»™ç§»é™¤æŽ‰
-   *
+   * ÔÚnamenodeÆô¶¯µÄÊ±ºò£¬HeartbeatManager¾Í»á×Ô¶¯Æô¶¯Ò»¸öºóÌ¨Ïß³Ì
+   * Õâ¸öºóÌ¨Ïß³Ì¾ÍÊÇ¸ºÔð¼à¿ØËùÓÐ×¢²áÉÏÀ´µÄdatanodeÊÇ·ñ°´Ê±ÔÚ·¢ËÍÐÄÌø£¬Èç¹ûÃ»ÓÐ°´Ê±·¢ËÍÐÄÌøµÄ»°
+   * ¾Í»áÈÏÎªÕâ¸ödatanodeÒÑ¾­å´»úÁË
+   * ´ËÊ±¾Í»á½«Õâ¸ödatanode´Ó¼¯ÈºÀïÃæ¸øÒÆ³ýµô
+   * 
    * @author zhonghuashishan
    *
    */
@@ -365,13 +365,13 @@ class HeartbeatManager implements DatanodeStatistics {
 
     @Override
     public void run() {
-      // while trueæ­»å¾ªçŽ¯ï¼Œåªè¦FSNamesystemè¿˜åœ¨
+      // while trueËÀÑ­»·£¬Ö»ÒªFSNamesystem»¹ÔÚ
       while(namesystem.isRunning()) {
         try {
           final long now = Time.now();
-          // æœ€è¿‘ä¸€æ¬¡è¿›è¡Œå¿ƒè·³æ£€æŸ¥çš„æ—¶é—´ + å¿ƒè·³æ£€æŸ¥çš„æ—¶é—´é—´éš” < å½“å‰æ—¶é—´
-          // æ¯éš”ä¸€æ®µæ—¶é—´ï¼Œå°±ä¼šæ‰§è¡Œä¸€æ¬¡å¿ƒè·³æ£€æŸ¥ï¼Œé»˜è®¤æƒ…å†µä¸‹ï¼Œæ˜¯30ç§’æ‰§è¡Œä¸€æ¬¡å¿ƒè·³çš„æ£€æŸ¥
-          // å¦‚æžœå‘çŽ°æŸä¸ªdatanodeè¶…è¿‡10åˆ†é’Ÿéƒ½æ²¡æœ‰å‘é€è¿‡å¿ƒè·³äº†ï¼Œå°±è®¤ä¸ºè¿™ä¸ªdatanodeå·²ç»æ­»æŽ‰äº†
+          // ×î½üÒ»´Î½øÐÐÐÄÌø¼ì²éµÄÊ±¼ä + ÐÄÌø¼ì²éµÄÊ±¼ä¼ä¸ô < µ±Ç°Ê±¼ä
+          // Ã¿¸ôÒ»¶ÎÊ±¼ä£¬¾Í»áÖ´ÐÐÒ»´ÎÐÄÌø¼ì²é£¬Ä¬ÈÏÇé¿öÏÂ£¬ÊÇ30ÃëÖ´ÐÐÒ»´ÎÐÄÌøµÄ¼ì²é
+          // Èç¹û·¢ÏÖÄ³¸ödatanode³¬¹ý10·ÖÖÓ¶¼Ã»ÓÐ·¢ËÍ¹ýÐÄÌøÁË£¬¾ÍÈÏÎªÕâ¸ödatanodeÒÑ¾­ËÀµôÁË
           if (lastHeartbeatCheck + heartbeatRecheckInterval < now) {
             heartbeatCheck();
             lastHeartbeatCheck = now;
@@ -443,7 +443,7 @@ class HeartbeatManager implements DatanodeStatistics {
       cacheCapacity -= node.getCacheCapacity();
       cacheUsed -= node.getCacheUsed();
     }
-
+    
     /** Increment expired heartbeat counter. */
     private void incrExpiredHeartbeats() {
       expiredHeartbeats++;

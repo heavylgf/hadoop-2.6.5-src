@@ -48,6 +48,7 @@ public class DatanodeInfo extends DatanodeID implements Node {
   private long blockPoolUsed;
   private long cacheCapacity;
   private long cacheUsed;
+  // 非常关键的一个东西，就是标识了最近一次进行心跳的时间
   private long lastUpdate;
   private int xceiverCount;
   private String location = NetworkTopology.DEFAULT_RACK;

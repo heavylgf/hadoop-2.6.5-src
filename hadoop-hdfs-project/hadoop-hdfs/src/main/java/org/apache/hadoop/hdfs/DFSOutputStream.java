@@ -112,8 +112,8 @@ import com.google.common.cache.RemovalNotification;
  * The client application writes data that is cached internally by
  * this stream. Data is broken up into packets, each packet is
  * typically 64K in size. A packet comprises of chunks. Each chunk
- * is typically 512 bytes and has an associated checksum with it.
- *
+ * is typically 512 bytes and has an associated checksum with it.  
+ *  
  * When a client application fills up the currentPacket, it is
  * enqueued into dataQueue.  The DataStreamer thread picks up
  * packets from the dataQueue, sends it to the first datanode in
@@ -156,6 +156,7 @@ public class DFSOutputStream extends FSOutputSummer
   private final int bytesPerChecksum; 
 
   // both dataQueue and ackQueue are protected by dataQueue lock
+  // 如果用LinkedList的话，相当于就是队列
   private final LinkedList<Packet> dataQueue = new LinkedList<Packet>();
   private final LinkedList<Packet> ackQueue = new LinkedList<Packet>();
   private Packet currentPacket = null;
@@ -216,6 +217,9 @@ public class DFSOutputStream extends FSOutputSummer
     boolean syncBlock; // this packet forces the current block to disk
     int numChunks; // number of chunks currently in packet
     final int maxChunks; // max chunks in packet
+    
+    // packet里的数据，是包含了一个checksum对应一个chunk，依次写入
+    // 全部是放在一个buf缓冲数组里的
     private byte[] buf;
     private boolean lastPacketInBlock; // is this the last packet in block?
 
@@ -360,9 +364,21 @@ public class DFSOutputStream extends FSOutputSummer
   // Datanodes. Every packet has a sequence number associated with
   // it. When all the packets for a block are sent out and acks for each
   // if them are received, the DataStreamer closes the current block.
-  //
+  /**
+   * 
+   * DataStreamer是一个核心的线程，是专门负责将数据上传到datanode的核心线程
+   * 他是负责通过一个数据管道（pipeline），将数据包（packet）发送给datanodes
+   * 他会从namenode获取一个blockid以及这些block副本在哪些datanode上，这样他才可以知道往哪个datanode写数据
+   * 他发送的每个packet都有一个序号
+   * 如果一个block里面的所有的packet数据包都成功发送给了datanode，而且所有的datanode都收到了这个block
+   * DataStreamer就会关闭当前的这个block，说明这个block已经上传成功了
+   * 
+   * @author zhonghuashishan
+   *
+   */
   class DataStreamer extends Daemon {
-    private volatile boolean streamerClosed = false;
+    
+	private volatile boolean streamerClosed = false;
     private volatile ExtendedBlock block; // its length is number of bytes acked
     private Token<BlockTokenIdentifier> accessToken;
     private DataOutputStream blockStream;
@@ -371,6 +387,10 @@ public class DFSOutputStream extends FSOutputSummer
     private volatile DatanodeInfo[] nodes = null; // list of targets for current block
     private volatile StorageType[] storageTypes = null;
     private volatile String[] storageIDs = null;
+   
+    // 根据这个名字，你大概可以理解一下，可能是什么呢？
+    // 某个datanode比如说故障了，无法接收你上传的那个block，此时就会将那个datanode
+    // 放入一个excludedNodes里面去
     private final LoadingCache<DatanodeInfo, DatanodeInfo> excludedNodes =
         CacheBuilder.newBuilder()
         .expireAfterWrite(
@@ -512,12 +532,17 @@ public class DFSOutputStream extends FSOutputSummer
       closeResponder();
       closeStream();
       setPipeline(null, null, null);
+      // stage重新变为了PIPELINE_SETUP_CREATE，需要重新建立一个数据管道
       stage = BlockConstructionStage.PIPELINE_SETUP_CREATE;
     }
     
     /*
      * streamer thread is the only thread that opens streams to datanode, 
      * and closes them. Any error recovery is also done by this thread.
+     * 
+     * 这个DataStreamer的线程，是唯一的一个负责跟datanode交互上传数据的一个线程
+     * 如果说这个线程被启动了之后，就会开始运行他的run方法
+     * 
      */
     @Override
     public void run() {
@@ -529,9 +554,14 @@ public class DFSOutputStream extends FSOutputSummer
       while (!streamerClosed && dfsClient.clientRunning) {
 
         // if the Responder encountered an error, shutdown Responder
+    	// 就是大概可以理解为，数据上传的过程中，如果出现了错误，此时会走这里
+    	// 如果在发送packet给primary datanode的过程中失败了，报错了，记录几个标识位
+    	// 进入下一轮循环到这里
         if (hasError && response != null) {
           try {
             response.close();
+            // 在这里直接阻塞住，务必等待PacketResponser线程必须先结束，才能往下走
+            // interrupt、sleep、close、volatile、join，在java并发编程的课程里都讲了
             response.join();
             response = null;
           } catch (InterruptedException  e) {
@@ -542,14 +572,31 @@ public class DFSOutputStream extends FSOutputSummer
         Packet one;
         try {
           // process datanode IO errors if any
+          // 这里大概也是说，如果数据上传的过程中，出现了错误，会从这里来进行错误的处理
+          // 关于hdfs文件上传的错误处理的机制，也是很重要的
+          // 之前我们就是有同学，出去面试大数据这块，人家就问底层的原理，就说hdfs上传文件出错是怎么解决的
           boolean doSleep = false;
+          // hasError = true
+          // errorIndex = 0，>= 0的条件
           if (hasError && (errorIndex >= 0 || restartingNodeIndex >= 0)) {
+        	// 处理datanode的故障
             doSleep = processDatanodeError();
           }
 
           synchronized (dataQueue) {
             // wait for a packet to be sent.
             long now = Time.now();
+            
+            // 这个什么意思
+            // 大概是发现如果说dataQueue这个队列里的数据是空的
+            // 此时会进入一个等待，无限的while循环
+            // 他在这里每次会等待个1秒钟，再来判断dataQueue中是否有数据
+            
+            // 再往下的代码，我们就可以先不要看了
+            // 你只要知道一点，刚开始初始化一个DataStreamer启动这个线程之后
+            // dataQueue这个队列一定是空的
+            // 所以这个线程一定会在这里卡住，阻塞住，等待有人放数据到dataQueue队列里来
+            // 如果有数据，那么就取出来数据，发送给datanode
             while ((!streamerClosed && !hasError && dfsClient.clientRunning 
                 && dataQueue.size() == 0 && 
                 (stage != BlockConstructionStage.DATA_STREAMING || 
@@ -567,23 +614,34 @@ public class DFSOutputStream extends FSOutputSummer
               doSleep = false;
               now = Time.now();
             }
+            
+            // 在这里跳出了这个while循环
+            // 说明他就从dataQueue这个队列里，获取到了一个packet
+            
             if (streamerClosed || hasError || !dfsClient.clientRunning) {
               continue;
             }
+            
             // get packet to be sent.
             if (dataQueue.isEmpty()) {
               one = createHeartbeatPacket();
             } else {
-              one = dataQueue.getFirst(); // regular data packet
+            	// 入队的时候，addLast
+            	// 出队的时候，getFirst，先进先出
+            	// 看过我的JDK集合源码分析的课，LinkedList是一个双向链表，分析过他的源码
+            	one = dataQueue.getFirst(); // regular data packet
             }
           }
           assert one != null;
 
           // get new block from namenode.
+          // 刚开始的时候，一定是走第一个if else的代码分支的，此时这个block正处于under construction状态
           if (stage == BlockConstructionStage.PIPELINE_SETUP_CREATE) {
             if(DFSClient.LOG.isDebugEnabled()) {
               DFSClient.LOG.debug("Allocating new block");
             }
+            // nextBlockOutputStream()方法
+            // 其实就是负责在跟namenode去申请一个新的block
             setPipeline(nextBlockOutputStream());
             initDataStreaming();
           } else if (stage == BlockConstructionStage.PIPELINE_SETUP_APPEND) {
@@ -605,7 +663,11 @@ public class DFSOutputStream extends FSOutputSummer
 
           if (one.lastPacketInBlock) {
             // wait for all data packets have been successfully acked
+        	// 如果发现是block里的最后一个packet，那么就会在这里陷入一个无限的循环和等待，等待之前发送的
+        	// block里面的packet全部被处理掉，都上传好
             synchronized (dataQueue) {
+              // 本来DataStreamer卡在这个while循环这里
+              // hasError = true，不是false，所以此时这个循环会退出
               while (!streamerClosed && !hasError && 
                   ackQueue.size() != 0 && dfsClient.clientRunning) {
                 try {
@@ -616,9 +678,12 @@ public class DFSOutputStream extends FSOutputSummer
                 }
               }
             }
+            // 如果发现hasError = true的话
             if (streamerClosed || hasError || !dfsClient.clientRunning) {
               continue;
             }
+            // 退出了以后，就会修改这个stage
+            // PIPELINE_CLOSE，关闭这个数据管道了
             stage = BlockConstructionStage.PIPELINE_CLOSE;
           }
           
@@ -639,6 +704,10 @@ public class DFSOutputStream extends FSOutputSummer
 
           // write out data to remote datanode
           try {
+        	// 直接将一个packet中的127个chunk所组成的数据，通过网络的输出流
+        	// 写入到第一个datanode上去
+        	// 将packet写入第一个datanode的代码是在这里，如果在这里报错了
+        	// 说明这个数据传输到第一个datanode是失败了
             one.writeTo(blockStream);
             blockStream.flush();   
           } catch (IOException e) {
@@ -648,6 +717,11 @@ public class DFSOutputStream extends FSOutputSummer
             // effect. Pipeline recovery can handle only one node error at a
             // time. If the primary node fails again during the recovery, it
             // will be taken out then.
+        	  
+        	// 如果无法将packet写入到第一个datanode，那么就将第一个datanode（primary datanode）认为是宕机
+        	// 如果PacketResponder已经记录了某个失败的、或者是正在重启中的datanode，对他的调用是不受影响的
+        	// 数据管道的恢复机制每次只能处理已给datanode的故障
+        	// 如果在数据管道恢复的过程中，primary datanode再次失败，那么就会将这个datanode从list中摘除
             tryMarkPrimaryDatanodeFailed();
             throw e;
           }
@@ -694,12 +768,17 @@ public class DFSOutputStream extends FSOutputSummer
           } else {
             setLastException(new IOException("DataStreamer Exception: ",e));
           }
+          // errorIndex标记的是数据管道里的哪个datanode故障了
+          // 标记hasError是true
           hasError = true;
           if (errorIndex == -1 && restartingNodeIndex == -1) {
             // Not a datanode issue
             streamerClosed = true;
           }
         }
+        
+        // 处理完异常故障了以后，就会进入下一轮的while循环
+        
       }
       if (traceScope != null) {
         traceScope.close();
@@ -809,7 +888,8 @@ public class DFSOutputStream extends FSOutputSummer
     synchronized void tryMarkPrimaryDatanodeFailed() {
       // There should be no existing error and no ongoing restart.
       if ((errorIndex == -1) && (restartingNodeIndex == -1)) {
-        errorIndex = 0;
+        // 主要就是做一个标记：errorIndex = 0，就意味着说第一个datanode是故障了
+    	errorIndex = 0;
       }
     }
 
@@ -875,9 +955,11 @@ public class DFSOutputStream extends FSOutputSummer
               DFSClient.LOG.debug("DFSClient " + ack);
             }
 
+            // 是否还有印象？每个packet其实都是有一个自增的seq序号
             long seqno = ack.getSeqno();
             // processes response status from datanodes.
             for (int i = ack.getNumOfReplies()-1; i >=0  && dfsClient.clientRunning; i--) {
+              // 在这里每次循环通过ack.getReply(i)，就可以获取到每个datanode给返回的一个结果
               final Status reply = ack.getReply(i);
               // Restart will not be treated differently unless it is
               // the local node or the only one in the pipeline.
@@ -891,6 +973,7 @@ public class DFSOutputStream extends FSOutputSummer
                throw new IOException(message);
               }
               // node error
+              // 我们在这里可以来看一下，他一定会感知到node error了
               if (reply != SUCCESS) {
                 setErrorIndex(i); // first bad datanode
                 throw new IOException("Bad response " + reply +
@@ -959,9 +1042,15 @@ public class DFSOutputStream extends FSOutputSummer
           }
         }
       }
-
+      
+      // 关闭一个核心的工作线程
+      // 这是非常经典的一个做法，我在java并发课程里全部都讲解了里面的原理
+      // 包括都演示了我们是如何通过一个手写微服务注册中心的项目全程演示了一模一样的关闭线程的机制
       void close() {
+    	// volatile的变量  
         responderClosed = true;
+        // 因为你的这个线程可能处于一个wait等待的状态，或者是sleep休眠的状态
+        // 所以你要打断一下这个线程的等待、休眠的状态，让他尽快结束
         this.interrupt();
       }
     }
@@ -976,10 +1065,14 @@ public class DFSOutputStream extends FSOutputSummer
         " waiting for responder to exit. ");
         return true;
       }
+      
+      // 直接将针对primary datanode的socket以及IO流的资源全部释放
       closeStream();
 
       // move packets from ack queue to front of the data queue
       synchronized (dataQueue) {
+    	// 将ackQeueu中的packet都重新加回到dataQueue中去  
+    	// 清空掉ackQueue
         dataQueue.addAll(0, ackQueue);
         ackQueue.clear();
       }
@@ -996,6 +1089,7 @@ public class DFSOutputStream extends FSOutputSummer
         return false;
       }
 
+      // 为了数据恢复而建立数据管道
       boolean doSleep = setupPipelineForAppendOrRecovery();
       
       if (!streamerClosed && dfsClient.clientRunning) {
@@ -1019,6 +1113,8 @@ public class DFSOutputStream extends FSOutputSummer
           }
           endBlock();
         } else {
+          // 之前是关闭了对应的PacketResponder
+          // 使用了新的datanode pipeline，此时会重新分配一个新的PacketResponder线程
           initDataStreaming();
         }
       }
@@ -1091,6 +1187,10 @@ public class DFSOutputStream extends FSOutputSummer
       }
 
       //get a new datanode
+      // 通过rpc的接口调用，找到了namenode获取了一个新的datanode
+      // 大概在这里都可以进行这么一个推测
+      // 在这里调用了namenode的方法之后，人家肯定是基于机架感知的特性，给datanode列表中加入一个datanode
+      // 人家这里会传输过去failed列表，告诉namenode再次挑选datanode的时候，不要使用那个有故障的datanode了l
       final DatanodeInfo[] original = nodes;
       final LocatedBlock lb = dfsClient.namenode.getAdditionalDatanode(
           src, fileId, block, nodes, storageIDs,
@@ -1099,6 +1199,7 @@ public class DFSOutputStream extends FSOutputSummer
       setPipeline(lb);
 
       //find the new datanode
+      // 找到那个namenode给分配的新的datanode是哪个
       final int d = findNewDatanode(original);
 
       //transfer replica
@@ -1112,6 +1213,10 @@ public class DFSOutputStream extends FSOutputSummer
         final StorageType[] targetStorageTypes,
         final Token<BlockTokenIdentifier> blockToken) throws IOException {
       //transfer replica to the new datanode
+      // 如果一旦找namenode建立了一个新的datanode列表之后
+      // 他就会在这里通过transfer方法，建立好跟primary datanode的socket、IO流资源
+      // 发送一个block过去
+      // 完成这个数据管道的这么一个建立
       Socket sock = null;
       DataOutputStream out = null;
       DataInputStream in = null;
@@ -1207,8 +1312,14 @@ public class DFSOutputStream extends FSOutputSummer
           DFSClient.LOG.warn("Error Recovery for block " + block +
               " in pipeline " + pipelineMsg + 
               ": bad datanode " + nodes[errorIndex]);
+          
+          // 这里做了一个记录，标记errorIndex = 0，标记primary datanode是故障的
           failed.add(nodes[errorIndex]);
 
+          // 这个是什么意思呢？他的这个意思，就是说，将故障的datanode之后的好的datanode
+          // 放入一个新的数组中去
+          // [datanode01, datanode02, datanode03]
+          // [datanode02, datanode03]
           DatanodeInfo[] newnodes = new DatanodeInfo[nodes.length-1];
           arraycopy(nodes, newnodes, errorIndex);
 
@@ -1218,6 +1329,7 @@ public class DFSOutputStream extends FSOutputSummer
           final String[] newStorageIDs = new String[newnodes.length];
           arraycopy(storageIDs, newStorageIDs, errorIndex);
           
+          // 目前的数据管道里，datanode就只有2个，[datanode02，datanode03]
           setPipeline(newnodes, newStorageTypes, newStorageIDs);
 
           // Just took care of a node error while waiting for a node restart
@@ -1242,10 +1354,15 @@ public class DFSOutputStream extends FSOutputSummer
           errorIndex = -1;
         }
 
+        // 如果replace-datanode策略是允许的话
+        // 他可以将之前故障的那个datanode给替换成一个新的良好的datanode
         // Check if replace-datanode policy is satisfied.
         if (dfsClient.dtpReplaceDatanodeOnFailure.satisfy(blockReplication,
             nodes, isAppend, isHflushed)) {
           try {
+        	// 他可以在pipeline里再加入一个新的datanode，满足3个datanode的条件
+        	// 他如果要执行这些代码，是要满足一些条件的，才能是找namenode来申请一个新的datanode加入管道中
+        	// 重新建立管道的连接
             addDatanode2ExistingPipeline();
           } catch(IOException ioe) {
             if (!dfsClient.dtpReplaceDatanodeOnFailure.isBestEffort()) {
@@ -1259,6 +1376,7 @@ public class DFSOutputStream extends FSOutputSummer
         }
 
         // get a new generation stamp and an access token
+        // 找namenode为数据管道更新一下block，大概的这个意思就是更新一下block的generation stamp，创建的时间戳
         LocatedBlock lb = dfsClient.namenode.updateBlockForPipeline(block, dfsClient.clientName);
         newGS = lb.getBlock().getGenerationStamp();
         accessToken = lb.getBlockToken();
@@ -1274,6 +1392,7 @@ public class DFSOutputStream extends FSOutputSummer
             Thread.sleep(2000);
           } catch (InterruptedException ie) {}
         } else {
+          
           success = createBlockOutputStream(nodes, storageTypes, newGS, isRecovery);
         }
 
@@ -1305,6 +1424,7 @@ public class DFSOutputStream extends FSOutputSummer
         }
       } // while
 
+      // 如果说对新的datanode列表，建立管道是成功了
       if (success) {
         // update pipeline at the namenode
         ExtendedBlock newBlock = new ExtendedBlock(
@@ -1322,6 +1442,15 @@ public class DFSOutputStream extends FSOutputSummer
      * This happens when a file is created and each time a new block is allocated.
      * Must get block ID and the IDs of the destinations from the namenode.
      * Returns the list of target datanodes.
+     * 
+     * 这个方法，其实是负责打开针对一个datanode的输出流，后面可以通过这个输出流写数据到datanode上去
+     * 这个操作一般会在一个文件被创建的时候，或者是一个新的block被分配出来的时候
+     * 此时，比如说你要往一个datanode写block数据，你必须知道那个block对应的datanode是谁呢？
+     * 你要知道datanode，又必须知道你要写的是哪个block啊？
+     * 
+     * 所以此时，在这个方法中，你需要找namenode申请一个新的block，人家会给你一个blockId
+     * 包括这个block对应的各个datanode的节点，他的副本分布在哪些节点上
+     * 
      */
     private LocatedBlock nextBlockOutputStream() throws IOException {
       LocatedBlock lb = null;
@@ -1342,6 +1471,10 @@ public class DFSOutputStream extends FSOutputSummer
             .keySet()
             .toArray(new DatanodeInfo[0]);
         block = oldBlock;
+        
+        // 我们在这里推测，估计很有可能找namenode申请一个新的block
+        // 其实应该就在这里，对不对？
+        // 通过这个方法，就可以在这里获取到一个block以及对应的datanode地址
         lb = locateFollowingBlock(startTime,
             excluded.length > 0 ? excluded : null);
         block = lb.getBlock();
@@ -1353,15 +1486,27 @@ public class DFSOutputStream extends FSOutputSummer
 
         //
         // Connect to first DataNode in the list.
-        //
+        // 直接对block的datnode列表中的第一个datanode，建立一个到他的连接以及输出流
+        // 其实这个东西的背后，你在建立连接的时候，就直接把一个贯穿了3个dataonde的数据管道的东西
+        // 给建立好了
+        // 建立数据管道的过程是非常的复杂的
         success = createBlockOutputStream(nodes, storageTypes, 0L, false);
 
         if (!success) {
           DFSClient.LOG.info("Abandoning " + block);
+          // 这里是他的一个故障处理的机制
+          // 我们猜测，如果在这里尝试连接到这个block的第一个datanode失败了
+          // 此处应该会找namenode，抛弃掉这个block
+          // 下一轮循环，重试，找namenode重新再申请一个block以及其他的datanode的列表
+          // 可以猜测，一定会上报这个故障的datanode给namenode
+          // namenode在机架感知算法里，下次给新的block分配datanode时候，就会避免分配给有问题的datanode
           dfsClient.namenode.abandonBlock(block, fileId, src,
               dfsClient.clientName);
           block = null;
           DFSClient.LOG.info("Excluding datanode " + nodes[errorIndex]);
+          // 那他下次再重新申请block的时候
+          // 肯定会告诉namenode一个excludedNodes列表，说你给block绑定datanode的时候
+          // 切记，兄弟，不要再搞那个有问题的datanode了
           excludedNodes.put(nodes[errorIndex], nodes[errorIndex]);
         }
       } while (!success && --count >= 0);
@@ -1374,7 +1519,11 @@ public class DFSOutputStream extends FSOutputSummer
 
     // connects to the first datanode in the pipeline
     // Returns true if success, otherwise return failure.
-    //
+    // 其实就是跟datanode list中的第一个datanode
+    // 通过建立socket连接
+    // 发送请求过去，完成连接的创建
+    // 这个方法就负责跟第一个datanode建立连接，然后由第一个datanode连接其他的datanode
+    // 建立起来一个数据管道
     private boolean createBlockOutputStream(DatanodeInfo[] nodes,
         StorageType[] nodeStorageTypes, long newGS, boolean recoveryFlag) {
       if (nodes.length == 0) {
@@ -1401,17 +1550,31 @@ public class DFSOutputStream extends FSOutputSummer
         try {
           assert null == s : "Previous socket unclosed";
           assert null == blockReplyStream : "Previous blockReplyStream unclosed";
+          // 针对datanode list中的第一个node
+          // 创建了一个针对第一个datanode的一个socket连接
+          // Java基础，我们的java架构课里
+          // 并发、IO+网络+Netty，那个里面就会讲解socket网络编程
           s = createSocketForPipeline(nodes[0], nodes.length, dfsClient);
           long writeTimeout = dfsClient.getDatanodeWriteTimeout(nodes.length);
           
+          // 构建起针对那个datanode的socket
+          // 获取输出流，可以用于向datanode通过socket链接写数据
+          // 获取输入流，可以通过socket连接从datanode读取数据过来
           OutputStream unbufOut = NetUtils.getOutputStream(s, writeTimeout);
           InputStream unbufIn = NetUtils.getInputStream(s);
+          
           IOStreamPair saslStreams = dfsClient.saslClient.socketSend(s,
             unbufOut, unbufIn, dfsClient, accessToken, nodes[0]);
           unbufOut = saslStreams.out;
           unbufIn = saslStreams.in;
+          // 封装了一个DataOutputStream
+          // 这个流的底层流是，BufferedOutputStream + socket的输出流
+          // 分布式系统底层大量的东西，并发、集合、IO、网络、磁盘、CPU、内存
           out = new DataOutputStream(new BufferedOutputStream(unbufOut,
               HdfsConstants.SMALL_BUFFER_SIZE));
+          // 用DataInputStream包裹了一下socket的输入流，可以读取到datanode返回的数据
+          // 也就是说通过blockReplyStream就可以从你hdfs客户端直接对接的第一个datanode获取输入流
+          // 可以通过这个流读取第一个datanode返回的响应消息
           blockReplyStream = new DataInputStream(unbufIn);
   
           //
@@ -1426,12 +1589,15 @@ public class DFSOutputStream extends FSOutputSummer
           blockCopy.setNumBytes(blockSize);
 
           // send the request
+          // 基于输出流，向datanode发送了一个请求来建立连接
+          // 此时发送过去的block其实还是空的
           new Sender(out).writeBlock(blockCopy, nodeStorageTypes[0], accessToken,
               dfsClient.clientName, nodes, nodeStorageTypes, null, bcs, 
               nodes.length, block.getNumBytes(), bytesSent, newGS,
               checksum4WriteBlock, cachingStrategy.get(), isLazyPersistFile);
   
           // receive ack for connect
+          // 等待获取datanode那边返回的建立好连接的ack消息
           BlockOpResponseProto resp = BlockOpResponseProto.parseFrom(
               PBHelper.vintPrefixed(blockReplyStream));
           pipelineStatus = resp.getStatus();
@@ -1442,6 +1608,11 @@ public class DFSOutputStream extends FSOutputSummer
           // the same node. If it is from a different node, it is not
           // from the local datanode. Thus it is safe to treat this as a
           // regular node error.
+          
+          // 以后大家自己写代码的时候，对于这种代码，就一大堆的异常检查的代码
+          // 完全可以抽到很多的小的私有方法里去
+          // 让代码更加的清晰
+          
           if (PipelineAck.isRestartOOBStatus(pipelineStatus) &&
             restartingNodeIndex == -1) {
             checkRestart = true;
@@ -1525,6 +1696,9 @@ public class DFSOutputStream extends FSOutputSummer
         long localstart = Time.now();
         while (true) {
           try {
+        	// dfsClient的namenode rpc代理
+        	// 调用rpc接口，addBlock()接口，申请新分配一个block
+        	// 哪个客户端，要为哪个文件多申请一个block
             return dfsClient.namenode.addBlock(src, dfsClient.clientName,
                 block, excludedNodes, fileId, favoredNodes);
           } catch (RemoteException e) {
@@ -1658,7 +1832,9 @@ public class DFSOutputStream extends FSOutputSummer
     this.dfsClient = dfsClient;
     this.src = src;
     this.fileId = stat.getFileId();
+    // blockSize就是你配置的 一个block是划分成多少MB一个块，默认反正就是128MB
     this.blockSize = stat.getBlockSize();
+    // 你配置的是一个block有几个副本，3个副本
     this.blockReplication = stat.getReplication();
     this.fileEncryptionInfo = stat.getFileEncryptionInfo();
     this.progress = progress;
@@ -1669,6 +1845,7 @@ public class DFSOutputStream extends FSOutputSummer
           "Set non-null progress callback on DFSOutputStream " + src);
     }
     
+    // 每个校验和块，有多少个字节
     this.bytesPerChecksum = checksum.getBytesPerChecksum();
     if (bytesPerChecksum <= 0) {
       throw new HadoopIllegalArgumentException(
@@ -1687,19 +1864,21 @@ public class DFSOutputStream extends FSOutputSummer
   }
 
   /** Construct a new output stream for creating a file. */
-  // 构造用于创建文件的新输出流。
   private DFSOutputStream(DFSClient dfsClient, String src, HdfsFileStatus stat,
       EnumSet<CreateFlag> flag, Progressable progress,
       DataChecksum checksum, String[] favoredNodes) throws IOException {
     this(dfsClient, src, progress, stat, checksum);
     this.shouldSyncBlock = flag.contains(CreateFlag.SYNC_BLOCK);
 
+    // 一个package是64mb
     computePacketChunkSize(dfsClient.getConf().writePacketSize, bytesPerChecksum);
 
     Span traceSpan = null;
     if (Trace.isTracing()) {
       traceSpan = Trace.startSpan(this.getClass().getSimpleName()).detach();
     }
+    // 最最核心的，在DFSOutputStream中，核心的组件是一个数据流组件
+    // 也就是DataStreamer组件
     streamer = new DataStreamer(stat, traceSpan);
     if (favoredNodes != null && favoredNodes.length != 0) {
       streamer.setFavoredNodes(favoredNodes);
@@ -1715,10 +1894,25 @@ public class DFSOutputStream extends FSOutputSummer
     // Retry the create if we get a RetryStartFileException up to a maximum
     // number of times
     boolean shouldRetry = true;
+    // 很明显，这个重要的操作，可以支持指定次数的重试，很明显这个东西是写死
+    // 默认可以重试10次
     int retryCount = CREATE_RETRY_COUNT;
+    
+    // 进入了一个可以支持重试的这么while循环
+    // 猜测：他会在里面干一件非常重要的事情，如果干成功了，就退出这个while循环
+    // 如果干失败了，可以设置shouldRetry = true
+    // 下一次循环再次来尝试一下，重试这个重要的操作，我们看到代码
     while (shouldRetry) {
       shouldRetry = false;
       try {
+    	// 走了一个rpc接口调用
+    	// 去调用了namenode的一个rpc接口，create()接口
+    	// 我告诉create()接口是干嘛的，非常的简单，你自己想一下，如果你在一个文件系统里创建一个文件的话
+    	// 是不是要去更新那个文件目录树，也就是更新文件系统的元数据
+    	// 文件目录树里，人家namenode就需要在内存的文件目录树里加入一个文件，挂在某个目录下面
+    	// 所以告诉大家一点，这里干的就是这个事儿
+    	// 如果你要针对一个hdfs文件创建一个输出流，首先人家就会调用namenode rpc接口，尝试在
+    	// 内存的文件目录树中加入这个文件，同时写会去写edits log
         stat = dfsClient.namenode.create(src, masked, dfsClient.clientName,
             new EnumSetWritable<CreateFlag>(flag), createParent, replication,
             blockSize, SUPPORTED_CRYPTO_VERSIONS);
@@ -1750,8 +1944,11 @@ public class DFSOutputStream extends FSOutputSummer
       }
     }
     Preconditions.checkNotNull(stat, "HdfsFileStatus should not be null!");
+    // 构造和初始化DFSOutputStream
+    // 核心的输出流组件
     final DFSOutputStream out = new DFSOutputStream(dfsClient, src, stat,
         flag, progress, checksum, favoredNodes);
+    // 很关键的这个行为，就是启动了这个DFSOutputStream
     out.start();
     return out;
   }
@@ -1797,7 +1994,29 @@ public class DFSOutputStream extends FSOutputSummer
 
   private void computePacketChunkSize(int psize, int csize) {
     final int chunkSize = csize + getChecksumSize();
+    // 一个是package里面可以包含几个chunk，默认是127个chunk
+    // chunkSize = 516字节
+    // psize = 65532字节
     chunksPerPacket = Math.max(psize/chunkSize, 1);
+    // package的大小，chunk的大小
+    // chunkSize就是512字节，chunksPerPacket每个packet有多少个chunk
+    // 一个packet是65532个字节，大概是64mb
+    // chunkSize = 516字节 * 127 = 64mb
+    
+    // csize = 512字节
+    // checkSumSize = 4字节
+    // chunkSize = 516字节
+    // 每个chunk不是都带了一个checksum，所以说一个checksum + chunk自己的数据 = 完成的chunk
+    // 所以一个完整的chunk的数据是：512字节的chunk数据 + 4字节的checksum数据 = 516字节
+    
+    // csize = 512字节
+    // checkSumSize = 4字节
+    // chunkSize = 516字节
+    // psize = 64mb * 1024字节 = 65536字节
+    // chunksPerPacket 约等于 127个（每个chunk包含了一个数据+校验和）
+    
+    // packetSize = 516 * 127 = 65532字节
+    
     packetSize = chunkSize*chunksPerPacket;
     if (DFSClient.LOG.isDebugEnabled()) {
       DFSClient.LOG.debug("computePacketChunkSize: src=" + src +
@@ -1810,11 +2029,14 @@ public class DFSOutputStream extends FSOutputSummer
   private void queueCurrentPacket() {
     synchronized (dataQueue) {
       if (currentPacket == null) return;
+      // 直接在队列尾部加入一个packet
       dataQueue.addLast(currentPacket);
+      // 更新一下packet的序号，每个packet都有一个从0开始递增的一个序号
       lastQueuedSeqno = currentPacket.seqno;
       if (DFSClient.LOG.isDebugEnabled()) {
         DFSClient.LOG.debug("Queued packet " + currentPacket.seqno);
       }
+      // 接下来再写数据，就重新开启一个新的packet了
       currentPacket = null;
       dataQueue.notifyAll();
     }
@@ -1824,6 +2046,7 @@ public class DFSOutputStream extends FSOutputSummer
     synchronized (dataQueue) {
       try {
       // If queue is full, then wait till we have enough space
+      // 如果队列是满的话，此时就进入阻塞方式，while循环等待
       while (!closed && dataQueue.size() + ackQueue.size()  > dfsClient.getConf().writeMaxPackets) {
         try {
           dataQueue.wait();
@@ -1863,6 +2086,7 @@ public class DFSOutputStream extends FSOutputSummer
                             getChecksumSize() + " but found to be " + cklen);
     }
 
+    // 在这里，他会判断一下，当前如果packet是空的话，就会新建一个packet出来
     if (currentPacket == null) {
       currentPacket = createPacket(packetSize, chunksPerPacket, 
           bytesCurBlock, currentSeqno++);
@@ -1876,13 +2100,19 @@ public class DFSOutputStream extends FSOutputSummer
       }
     }
 
+    // 人家往packet里写入一个checksum校验快的数据
     currentPacket.writeChecksum(checksum, ckoff, cklen);
+    // 就是把chunk自身的数据，写入了packet中
     currentPacket.writeData(b, offset, len);
+    // 更新你已经往这个packet里面写了几个chunk了
     currentPacket.numChunks++;
+    // 当前这个packet所属的这个block，已经写了多少字节的数据量了
     bytesCurBlock += len;
 
     // If packet is full, enqueue it for transmission
-    //
+    // 判断一下，如果当前这个packet里面的chunk的数量，已经达到了127个最大的chunk数量的大小之后
+    // 或者是当前block的数据量大小，已经等于你默认配置的那个block数据量的大小
+    // 都会进入这个if分支
     if (currentPacket.numChunks == currentPacket.maxChunks ||
         bytesCurBlock == blockSize) {
       if (DFSClient.LOG.isDebugEnabled()) {
@@ -1893,6 +2123,7 @@ public class DFSOutputStream extends FSOutputSummer
             ", blockSize=" + blockSize +
             ", appendChunk=" + appendChunk);
       }
+      // 他在这里，这个方法，就会将当前这个已经写满的packet，给放入到dataQueue队列中去
       waitAndQueueCurrentPacket();
 
       // If the reopened file did not end at chunk boundary and the above
@@ -1911,6 +2142,11 @@ public class DFSOutputStream extends FSOutputSummer
       // if encountering a block boundary, send an empty packet to 
       // indicate the end of block and reset bytesCurBlock.
       //
+      // 如何切割block
+      // 如果当前写入一个block的数据量，已经跟预先设置好的block的大小一样了
+      // 说明一个block也写满了
+      // 如果一个block满了以后，比如说一个block是2个packet
+      // 此时会写一个空的packet，代表说，这个block已经写满了，可以开启下一个block了
       if (bytesCurBlock == blockSize) {
         currentPacket = createPacket(0, 0, bytesCurBlock, currentSeqno++);
         currentPacket.lastPacketInBlock = true;
@@ -2161,6 +2397,7 @@ public class DFSOutputStream extends FSOutputSummer
   }
 
   private synchronized void start() {
+	// 核心的一点，就是启动了这个DataStreamer组件
     streamer.start();
   }
   

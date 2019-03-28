@@ -75,30 +75,30 @@ import com.google.protobuf.ServiceException;
 @InterfaceAudience.Private
 @InterfaceStability.Stable
 public class DatanodeProtocolClientSideTranslatorPB implements
-        ProtocolMetaInterface, DatanodeProtocol, Closeable {
-
+    ProtocolMetaInterface, DatanodeProtocol, Closeable {
+  
   /** RpcController is not used and hence is set to null */
   private final DatanodeProtocolPB rpcProxy;
-  private static final VersionRequestProto VOID_VERSION_REQUEST =
-          VersionRequestProto.newBuilder().build();
+  private static final VersionRequestProto VOID_VERSION_REQUEST = 
+      VersionRequestProto.newBuilder().build();
   private final static RpcController NULL_CONTROLLER = null;
-
+  
   public DatanodeProtocolClientSideTranslatorPB(InetSocketAddress nameNodeAddr,
-                                                Configuration conf) throws IOException {
+      Configuration conf) throws IOException {
     RPC.setProtocolEngine(conf, DatanodeProtocolPB.class,
-            ProtobufRpcEngine.class);
+        ProtobufRpcEngine.class);
     UserGroupInformation ugi = UserGroupInformation.getCurrentUser();
     rpcProxy = createNamenode(nameNodeAddr, conf, ugi);
   }
 
   private static DatanodeProtocolPB createNamenode(
-          InetSocketAddress nameNodeAddr, Configuration conf,
-          UserGroupInformation ugi) throws IOException {
-    // ÁúãËµ∑Êù•Â∞±ÊòØËé∑Âèñ‰∫Ü‰∏Ä‰∏™ÂèØ‰ª•Ë∞ÉÁî®namenodeÊé•Âè£ÁöÑRPC‰ª£ÁêÜ
-    // Áõ∏ÂΩì‰∫éÊòØËé∑Âèñ‰∫Ü‰∏Ä‰∏™ÂÆ¢Êà∑Á´ØÁöÑ‰ª£ÁêÜ
+      InetSocketAddress nameNodeAddr, Configuration conf,
+      UserGroupInformation ugi) throws IOException {
+	// ø¥∆¿¥æÕ «ªÒ»°¡À“ª∏ˆø…“‘µ˜”√namenodeΩ”ø⁄µƒRPC¥˙¿Ì
+	// œ‡µ±”⁄ «ªÒ»°¡À“ª∏ˆøÕªß∂Àµƒ¥˙¿Ì
     return RPC.getProxy(DatanodeProtocolPB.class,
-            RPC.getProtocolVersion(DatanodeProtocolPB.class), nameNodeAddr, ugi,
-            conf, NetUtils.getSocketFactory(conf, DatanodeProtocolPB.class));
+        RPC.getProtocolVersion(DatanodeProtocolPB.class), nameNodeAddr, ugi,
+        conf, NetUtils.getSocketFactory(conf, DatanodeProtocolPB.class));
   }
 
   @Override
@@ -108,9 +108,9 @@ public class DatanodeProtocolClientSideTranslatorPB implements
 
   @Override
   public DatanodeRegistration registerDatanode(DatanodeRegistration registration
-  ) throws IOException {
+      ) throws IOException {
     RegisterDatanodeRequestProto.Builder builder = RegisterDatanodeRequestProto
-            .newBuilder().setRegistration(PBHelper.convert(registration));
+        .newBuilder().setRegistration(PBHelper.convert(registration));
     RegisterDatanodeResponseProto resp;
     try {
       resp = rpcProxy.registerDatanode(NULL_CONTROLLER, builder.build());
@@ -122,13 +122,13 @@ public class DatanodeProtocolClientSideTranslatorPB implements
 
   @Override
   public HeartbeatResponse sendHeartbeat(DatanodeRegistration registration,
-                                         StorageReport[] reports, long cacheCapacity, long cacheUsed,
-                                         int xmitsInProgress, int xceiverCount, int failedVolumes)
-          throws IOException {
+      StorageReport[] reports, long cacheCapacity, long cacheUsed,
+          int xmitsInProgress, int xceiverCount, int failedVolumes)
+              throws IOException {
     HeartbeatRequestProto.Builder builder = HeartbeatRequestProto.newBuilder()
-            .setRegistration(PBHelper.convert(registration))
-            .setXmitsInProgress(xmitsInProgress).setXceiverCount(xceiverCount)
-            .setFailedVolumes(failedVolumes);
+        .setRegistration(PBHelper.convert(registration))
+        .setXmitsInProgress(xmitsInProgress).setXceiverCount(xceiverCount)
+        .setFailedVolumes(failedVolumes);
     builder.addAllReports(PBHelper.convertStorageReports(reports));
     if (cacheCapacity != 0) {
       builder.setCacheCapacity(cacheCapacity);
@@ -153,20 +153,20 @@ public class DatanodeProtocolClientSideTranslatorPB implements
       rollingUpdateStatus = PBHelper.convert(resp.getRollingUpgradeStatus());
     }
     return new HeartbeatResponse(cmds, PBHelper.convert(resp.getHaStatus()),
-            rollingUpdateStatus);
+        rollingUpdateStatus);
   }
 
   @Override
   public DatanodeCommand blockReport(DatanodeRegistration registration,
-                                     String poolId, StorageBlockReport[] reports, BlockReportContext context)
-          throws IOException {
+      String poolId, StorageBlockReport[] reports, BlockReportContext context)
+        throws IOException {
     BlockReportRequestProto.Builder builder = BlockReportRequestProto
-            .newBuilder().setRegistration(PBHelper.convert(registration))
-            .setBlockPoolId(poolId);
-
+        .newBuilder().setRegistration(PBHelper.convert(registration))
+        .setBlockPoolId(poolId);
+    
     for (StorageBlockReport r : reports) {
       StorageBlockReportProto.Builder reportBuilder = StorageBlockReportProto
-              .newBuilder().setStorage(PBHelper.convert(r.getStorage()));
+          .newBuilder().setStorage(PBHelper.convert(r.getStorage()));
       long[] blocks = r.getBlocks();
       for (int i = 0; i < blocks.length; i++) {
         reportBuilder.addBlocks(blocks[i]);
@@ -185,15 +185,15 @@ public class DatanodeProtocolClientSideTranslatorPB implements
 
   @Override
   public DatanodeCommand cacheReport(DatanodeRegistration registration,
-                                     String poolId, List<Long> blockIds) throws IOException {
+      String poolId, List<Long> blockIds) throws IOException {
     CacheReportRequestProto.Builder builder =
-            CacheReportRequestProto.newBuilder()
-                    .setRegistration(PBHelper.convert(registration))
-                    .setBlockPoolId(poolId);
+        CacheReportRequestProto.newBuilder()
+        .setRegistration(PBHelper.convert(registration))
+        .setBlockPoolId(poolId);
     for (Long blockId : blockIds) {
       builder.addBlocks(blockId);
     }
-
+    
     CacheReportResponseProto resp;
     try {
       resp = rpcProxy.cacheReport(NULL_CONTROLLER, builder.build());
@@ -208,15 +208,15 @@ public class DatanodeProtocolClientSideTranslatorPB implements
 
   @Override
   public void blockReceivedAndDeleted(DatanodeRegistration registration,
-                                      String poolId, StorageReceivedDeletedBlocks[] receivedAndDeletedBlocks)
-          throws IOException {
-    BlockReceivedAndDeletedRequestProto.Builder builder =
-            BlockReceivedAndDeletedRequestProto.newBuilder()
-                    .setRegistration(PBHelper.convert(registration))
-                    .setBlockPoolId(poolId);
+      String poolId, StorageReceivedDeletedBlocks[] receivedAndDeletedBlocks)
+      throws IOException {
+    BlockReceivedAndDeletedRequestProto.Builder builder = 
+        BlockReceivedAndDeletedRequestProto.newBuilder()
+        .setRegistration(PBHelper.convert(registration))
+        .setBlockPoolId(poolId);
     for (StorageReceivedDeletedBlocks storageBlock : receivedAndDeletedBlocks) {
-      StorageReceivedDeletedBlocksProto.Builder repBuilder =
-              StorageReceivedDeletedBlocksProto.newBuilder();
+      StorageReceivedDeletedBlocksProto.Builder repBuilder = 
+          StorageReceivedDeletedBlocksProto.newBuilder();
       repBuilder.setStorageUuid(storageBlock.getStorage().getStorageID());  // Set for wire compatibility.
       repBuilder.setStorage(PBHelper.convert(storageBlock.getStorage()));
       for (ReceivedDeletedBlockInfo rdBlock : storageBlock.getBlocks()) {
@@ -233,10 +233,10 @@ public class DatanodeProtocolClientSideTranslatorPB implements
 
   @Override
   public void errorReport(DatanodeRegistration registration, int errorCode,
-                          String msg) throws IOException {
+      String msg) throws IOException {
     ErrorReportRequestProto req = ErrorReportRequestProto.newBuilder()
-            .setRegistartion(PBHelper.convert(registration))
-            .setErrorCode(errorCode).setMsg(msg).build();
+        .setRegistartion(PBHelper.convert(registration))
+        .setErrorCode(errorCode).setMsg(msg).build();
     try {
       rpcProxy.errorReport(NULL_CONTROLLER, req);
     } catch (ServiceException se) {
@@ -248,7 +248,7 @@ public class DatanodeProtocolClientSideTranslatorPB implements
   public NamespaceInfo versionRequest() throws IOException {
     try {
       return PBHelper.convert(rpcProxy.versionRequest(NULL_CONTROLLER,
-              VOID_VERSION_REQUEST).getInfo());
+          VOID_VERSION_REQUEST).getInfo());
     } catch (ServiceException e) {
       throw ProtobufHelper.getRemoteException(e);
     }
@@ -257,7 +257,7 @@ public class DatanodeProtocolClientSideTranslatorPB implements
   @Override
   public void reportBadBlocks(LocatedBlock[] blocks) throws IOException {
     ReportBadBlocksRequestProto.Builder builder = ReportBadBlocksRequestProto
-            .newBuilder();
+        .newBuilder();
     for (int i = 0; i < blocks.length; i++) {
       builder.addBlocks(i, PBHelper.convert(blocks[i]));
     }
@@ -271,14 +271,14 @@ public class DatanodeProtocolClientSideTranslatorPB implements
 
   @Override
   public void commitBlockSynchronization(ExtendedBlock block,
-                                         long newgenerationstamp, long newlength, boolean closeFile,
-                                         boolean deleteblock, DatanodeID[] newtargets, String[] newtargetstorages
-  ) throws IOException {
-    CommitBlockSynchronizationRequestProto.Builder builder =
-            CommitBlockSynchronizationRequestProto.newBuilder()
-                    .setBlock(PBHelper.convert(block)).setNewGenStamp(newgenerationstamp)
-                    .setNewLength(newlength).setCloseFile(closeFile)
-                    .setDeleteBlock(deleteblock);
+      long newgenerationstamp, long newlength, boolean closeFile,
+      boolean deleteblock, DatanodeID[] newtargets, String[] newtargetstorages
+      ) throws IOException {
+    CommitBlockSynchronizationRequestProto.Builder builder = 
+        CommitBlockSynchronizationRequestProto.newBuilder()
+        .setBlock(PBHelper.convert(block)).setNewGenStamp(newgenerationstamp)
+        .setNewLength(newlength).setCloseFile(closeFile)
+        .setDeleteBlock(deleteblock);
     for (int i = 0; i < newtargets.length; i++) {
       builder.addNewTaragets(PBHelper.convert(newtargets[i]));
       builder.addNewTargetStorages(newtargetstorages[i]);
@@ -293,9 +293,9 @@ public class DatanodeProtocolClientSideTranslatorPB implements
 
   @Override // ProtocolMetaInterface
   public boolean isMethodSupported(String methodName)
-          throws IOException {
+      throws IOException {
     return RpcClientUtil.isMethodSupported(rpcProxy, DatanodeProtocolPB.class,
-            RPC.RpcKind.RPC_PROTOCOL_BUFFER,
-            RPC.getProtocolVersion(DatanodeProtocolPB.class), methodName);
+        RPC.RpcKind.RPC_PROTOCOL_BUFFER,
+        RPC.getProtocolVersion(DatanodeProtocolPB.class), methodName);
   }
 }

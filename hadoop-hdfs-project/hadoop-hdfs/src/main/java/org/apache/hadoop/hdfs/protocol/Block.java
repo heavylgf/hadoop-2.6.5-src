@@ -131,6 +131,9 @@ public class Block implements Writable, Comparable<Block> {
   }
 
   /**
+   * 
+   * 一个block文件的名称：blk_000000000001
+   * 
    */
   public String getBlockName() {
     return BLOCK_FILE_PREFIX + String.valueOf(blockId);

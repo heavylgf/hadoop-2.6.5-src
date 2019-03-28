@@ -53,6 +53,13 @@ import com.google.common.annotations.VisibleForTesting;
  * <ul>
  * <li>
  * It maintains a map from (namenode, user) pairs to lease renewers. 
+ * 
+ * 在这个hdfs联邦架构里，同时存在的active namenode都有多个，所以说一个hdfs客户端是可以跟多个namenode进行通信的
+ * 所以说可能一个hdfs客户端可能在不同的namenode都有契约
+ * 所以说他这里的意思，就是说针对不同的namenode进行续约的线程是不一样的
+ * 
+ * 同一个user，针对同一个namenode，进行续约的时候，会用一个LeaseRenewer线程
+ * 
  * The same {@link LeaseRenewer} instance is used for renewing lease
  * for all the {@link DFSClient} to the same namenode and the same user.
  * </li>
@@ -64,6 +71,9 @@ import com.google.common.annotations.VisibleForTesting;
  * <li>
  * A thread per namenode per user is used by the {@link LeaseRenewer}
  * to renew the leases.
+ * 
+ * 
+ * 
  * </li>
  * </ul>
  * </p>
@@ -77,6 +87,7 @@ class LeaseRenewer {
   /** Get a {@link LeaseRenewer} instance */
   static LeaseRenewer getInstance(final String authority,
       final UserGroupInformation ugi, final DFSClient dfsc) throws IOException {
+	// 你可以创建多个DistributedFileSystem
     final LeaseRenewer r = Factory.INSTANCE.get(authority, ugi);
     r.addClient(dfsc);
     return r;
@@ -292,10 +303,15 @@ class LeaseRenewer {
     if (dfsc.isClientRunning()) {
       if (!isRunning() || isRenewerExpired()) {
         //start a new deamon with a new id.
+    	  
+    	// 大概意思就是说，你如果是第一次针对某个namenode上的契约申请开启续约操作
+    	// 在这里，他就会给你创建一个后台线程
+    	  
         final int id = ++currentId;
         daemon = new Daemon(new Runnable() {
           @Override
           public void run() {
+        	// 在这个run方法里，就是续约的核心逻辑
             try {
               if (LOG.isDebugEnabled()) {
                 LOG.debug("Lease renewer daemon for " + clientsString()
@@ -403,6 +419,10 @@ class LeaseRenewer {
     }
   }
 
+  /**
+   * 发起续约的核心逻辑
+   * @throws IOException
+   */
   private void renew() throws IOException {
     final List<DFSClient> copies;
     synchronized(this) {
@@ -416,6 +436,7 @@ class LeaseRenewer {
       }
     });
     String previousName = "";
+    // 相当于是遍历所有的DFSClient，调用其续约的方法
     for(int i = 0; i < copies.size(); i++) {
       final DFSClient c = copies.get(i);
       //skip if current client name is the same as the previous name.
@@ -440,8 +461,14 @@ class LeaseRenewer {
    * when the lease period is half over.
    */
   private void run(final int id) throws InterruptedException {
+	// 在这里会进入一个无限循环
+	// 线程的interrupt中断是什么意思，大家具体可以参考一下我的java并发编程系列课程
+	// 默认是1秒钟续约一次
     for(long lastRenewed = Time.now(); !Thread.interrupted();
         Thread.sleep(getSleepPeriod())) {
+      // 有些琐碎的一些细节，有可能会出现一些小的失误，发现就跟我说
+      // 如果当前时间距离上次续约的时间，大于了30秒，就会发起一次新的续约
+      // 所以说，他默认的续约的间隔是30秒
       final long elapsed = Time.now() - lastRenewed;
       if (elapsed >= getRenewalTime()) {
         try {

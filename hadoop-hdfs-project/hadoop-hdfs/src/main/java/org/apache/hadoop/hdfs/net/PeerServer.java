@@ -35,6 +35,10 @@ public interface PeerServer extends Closeable {
    * Listens for a connection to be made to this server and accepts 
    * it. The method blocks until a connection is made.
    *
+   * 专门作为socket服务器的组件
+   * 专门用来监听别人发送过来的请求，默认就是阻塞
+   * 直到收到别人发送的连接
+   *
    * @exception IOException  if an I/O error occurs when waiting for a
    *               connection.
    * @exception SecurityException  if a security manager exists and its  

@@ -50,6 +50,7 @@ abstract public class FSOutputSummer extends OutputStream {
   
   protected FSOutputSummer(DataChecksum sum) {
     this.sum = sum;
+    // Ò»¸öbuf»º³åÊı×éµÄ´óĞ¡£¬ÊÇÒ»¸öchunkµÄ512×Ö½ÚµÄ´óĞ¡ * 9¸öchunk
     this.buf = new byte[sum.getBytesPerChecksum() * BUFFER_NUM_CHUNKS];
     this.checksum = new byte[getChecksumSize() * BUFFER_NUM_CHUNKS];
     this.count = 0;
@@ -84,6 +85,22 @@ abstract public class FSOutputSummer extends OutputStream {
    * starting at offset <code>off</code> and generate a checksum for
    * each data chunk.
    *
+   * ÉÔÎ¢ÆÕ¼°Ò»ÏÂËùÎ½µÄchecksum£¬ËûÖ÷ÒªÊÇ±£Ö¤Ò»¸öÊı¾İ´«Êä¹ı³ÌÖĞ²»»á·¢ÉúÆÆËğ£¬»òÕßÊÇ´æ´¢µ½ÁË´ÅÅÌÒÔºó²»»á·¢ÉúÆÆËğ
+   * Èç¹û·¢ÉúÁËÊı¾İÆÆËğ£¬ÄÇÃ´¿ÉÒÔ¼°Ê±·¢ÏÖ
+   * 
+   * ±¾À´ÄãÓĞÒ»¸öchunk£¬ÀïÃæ´æ´¢µÄÊı¾İÊÇ£ºÕÅÈıºÜË§£¡
+   * È»ºóÄØ£¬Äã¿ÉÒÔÕë¶ÔÕâ¸öchunkµÄÊı¾İ£¬¼ÆËãÒ»¸öchecksumĞ£ÑéºÍ³öÀ´£¬±ÈÈç£º342kddd00
+   * 
+   * ÍòÒ»ÔÚ´«ÊäµÄ¹ı³ÌÖĞ£¬chunkÀïµÄÒ»Ğ©Êı¾İ´«¶ªÁË£¬µ¼ÖÂ´«ËÍµ½datanodeµÄÊ±ºò£¬Êı¾İ±äÎªÁË£ºÕÅÈıºÜ£¡
+   * È»ºóÄØ£¬±È·½Ëµ£¬ÔÚdaatanodeÄÇ¶ù£¬ËûÒªÈ·±£Ò»ÏÂ£¬Äã´«µİµÄ¹ı³ÌÖĞ£¬Êı¾İÓĞÃ»ÓĞ³öÏÖÆÆËğµÄ»°£¬¾Í¿ÉÒÔÖØĞÂ»ùÓÚÄÚÈİËãÒ»¸öchecksum
+   * ±ÈÈçËµ»ùÓÚ¡°ÕÅÈıºÜ£¡¡±ËãÒ»¸öchecksum£º556kk908
+   * 
+   * ·¢ÏÖÈË¼Ò´«µİ¹ıÀ´µÄÄÇ¸öchecksum£¬¸úÄã¼ÆËã³öÀ´µÄchecksum£¬²»Ò»ÑùµÄ
+   * 
+   * ËµÃ÷ÄãÔÚ´«µİµÄ¹ı³ÌÖĞ£¬³öÏÖÁËÒ»Ğ©Êı¾İµÄÆÆËğ£¬Õâ¸öchunkµÄÊı¾İÄÚÈİÊÇ²»ÄÜÓÃµÄ
+   * 
+   * Ã¿¸öchunk¶¼ÓĞÒ»¸öchecksum£¬ÔÚpacketÀï£¬ÆäÊµÊÇÓĞÒ»´ó¶ÑµÄchunkºÍÒ»´ó¶ÑµÄchecksum£¬»¹ÓĞÒ»Ğ©header
+   *
    * <p> This method stores bytes from the given array into this
    * stream's buffer before it gets checksumed. The buffer gets checksumed 
    * and flushed to the underlying output stream when all data 
@@ -91,6 +108,10 @@ abstract public class FSOutputSummer extends OutputStream {
    * requested length is at least as large as the size of next checksum chunk
    * size, this method will checksum and write the chunk directly 
    * to the underlying output stream.  Thus it avoids uneccessary data copy.
+   *
+   * byte b[]£¬Õâ¸ö×Ö½ÚÊı×éÊÇ´ÓÄÄ¶ùÀ´µÄ£¿
+   * Õâ¶«Î÷£¬¾ÍÊÇÄãµÄÎÄ¼şÊäÈëÁ÷£¬´ÓÄã±¾µØµÄ1TBµÄ´óÎÄ¼şÀï¶Á³öÀ´µÄ£¬Äã¿ÉÒÔ¶Á¸ö¼¸°Ù¸ö×Ö½Ú£¬·¢ËÍ¸øDFSOutputStream
+   * ÈË¼Ò¾Í¿ÉÒÔ»ñÈ¡µ½Ò»¸ö×Ö½ÚÊı×é
    *
    * @param      b     the data.
    * @param      off   the start offset in the data.
@@ -107,6 +128,8 @@ abstract public class FSOutputSummer extends OutputStream {
       throw new ArrayIndexOutOfBoundsException();
     }
 
+    // ÈË¼ÒÆäÊµ¾ÍÊÇµ÷ÓÃwrite1·½·¨
+    // ³¢ÊÔ½«byte[]Êı×éÖĞµÄÊı¾İÈ«²¿Í¨¹ıwrite1Ğ´ÈëÒ»¸öµ×²ãµÄµØ·½È¥
     for (int n=0;n<len;n+=write1(b, off+n, len-n)) {
     }
   }
@@ -120,19 +143,25 @@ abstract public class FSOutputSummer extends OutputStream {
       // local buffer is empty and user buffer size >= local buffer size, so
       // simply checksum the user buffer and send it directly to the underlying
       // stream
-      // è¿™ä¸ªçš„æ„æ€æ˜¯è¯´ï¼Œä½ å†™çš„è¿™ä¸ªå­—èŠ‚æ•°ç»„çš„å¤§å°ï¼Œç›´æ¥å°±è¾¾åˆ°äº†ä¸€ä¸ªchunkçš„å¤§å°äº†
-      // ä½ ä¼ é€’è¿›æ¥çš„å­—èŠ‚æ•°ç»„çš„å¤§å° >= ç¼“å†²æ•°ç»„çš„å¤§å°
-      // æ‰€ä»¥æ­¤æ—¶ï¼Œå°±ä¸éœ€è¦å°†å­—èŠ‚æ•°ç»„çš„æ•°æ®å†™å…¥ä¸€ä¸ªç¼“å†²
+      // Õâ¸öµÄÒâË¼¾ÍÊÇËµ£¬ÄãĞ´ÈëµÄÕâ¸ö×Ö½ÚÊı×éµÄ´óĞ¡£¬Ö±½Ó¾Í´ïµ½ÁËÒ»¸öchunkµÄ´óĞ¡ÁË
+      // Äã´«µİ½øÀ´µÄ×Ö½ÚÊı×éµÄ´óĞ¡ >= »º³åÊı×éµÄ´óĞ¡
+      // ËùÒÔ´ËÊ±£¬¾Í²»ĞèÒª½«×Ö½ÚÊı×éµÄÊı¾İĞ´ÈëÒ»¸ö»º³å£¬Ö±½Ó¾Í½«Õâ¸ö×Ö½ÚÊı×éµÄÊı¾İ×÷ÎªÒ»¸öchunkĞ´Èëµ×²ãµÄÁ÷¾Í¿ÉÒÔÁË
+      // Ğ´Èëµ×²ãµÄÁ÷ÖĞ£¬½«Õâ¸öÊı×éÇĞ¸îÎªchunk
       final int length = buf.length;
       writeChecksumChunks(b, off, length);
       return length;
     }
     
     // copy user data to local buffer
+    // »òÕß£¬±ÈÈçËµ£¬Èç¹ûÄãµ±Ç°Õâ¸ö×Ö½ÚÊı×éµÄÊı¾İ»¹Ã»´ïµ½Ò»¸öchunkµÄ´óĞ¡
+    // ´ËÊ±¿ÉÒÔ½«Õâ¸ö×Ö½ÚÊı×éµÄÊı¾İÏÈĞ´ÈëÒ»¸öbuffer»º³åÖĞ
     int bytesToCopy = buf.length-count;
     bytesToCopy = (len<bytesToCopy) ? len : bytesToCopy;
     System.arraycopy(b, off, buf, count, bytesToCopy);
     count += bytesToCopy;
+    // µ±Äã²»¶ÏµÄÍù»º³åÊı×éÀï¿½ÈëÊı¾İ£¬Ö±µ½¿½±´½ø»º³åÊı×éµÄÊı¾İ£¬ËûµÄ×Ü´óĞ¡£¬µÈÓÚÁË»º³åÊı×é×î´óµÄ³¤¶ÈÖ®ºó
+    // ÄãµÄ»º³åÊı×é±»¿½±´ÂúÁË
+    // ´ËÊ±¾Í»áÖ´ĞĞflushBuffer·½·¨£¬Ë¢ĞÂ»º³åÊı×éÖĞµÄÊı¾İµ½µ×²ãÁ÷ÀïÈ¥£¬ÇĞ¸î³Échunk
     if (count == buf.length) {
       // local buffer is full
       flushBuffer();
@@ -204,8 +233,13 @@ abstract public class FSOutputSummer extends OutputStream {
   throws IOException {
     sum.calculateChunkedSums(b, off, len, checksum, 0);
     for (int i = 0; i < len; i += sum.getBytesPerChecksum()) {
+      // ºËĞÄµÄÇĞ¸îchunkµÄËã·¨£¬¾ÍÔÚÕâÀï
+      // »º³åÊı×éÀïÃæ¿ÉÒÔ·Å²»Ö¹Ò»¸öchunkµÄ£¬¿´¹ıÔ´ÂëÁË£¬ÖªµÀÄÇ¸ö»º³åÊı×éÀï×î¶à¿ÉÒÔ·Å´ïµ½9¸öchunkµÄÊı¾İ
+      // µ±ÄãµÄ»º³åÊı×é¶¼Ğ´ÂúÁË£¬¿ªÊ¼µ½ÕâÀïÀ´ÇĞ¸îchunk
+      // ÔÚÕâÀï£¬Õâ¸öforÑ­»·£¬¾ÍÊÇÔÚÇĞ¸îchunk£¬Ã¿¸öchunk¾ÍÊÇ512×Ö½Ú
       int chunkLen = Math.min(sum.getBytesPerChecksum(), len - i);
       int ckOffset = i / sum.getBytesPerChecksum() * getChecksumSize();
+      // ÔÚÕâÀïÆäÊµ¾ÍÊÇ°Ñbyte[]Êı×éÀïµÄ¹Ì¶¨µÄ512¸ö×Ö½ÚµÄÊı¾İ£¬Ğ´Èëµ×²ã£¬ÇĞ¸î³ÉÒ»¸öchunk
       writeChunk(b, off + i, chunkLen, checksum, ckOffset, getChecksumSize());
     }
   }

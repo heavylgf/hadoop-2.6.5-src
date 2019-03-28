@@ -34,19 +34,19 @@ import com.google.common.base.Preconditions;
  * is flushed, the two internal buffers are swapped. This allows edits
  * to progress concurrently to flushes without allocating new buffers each
  * time.
- *
- * æ–°çš„edits logæ˜¯å†™å…¥åˆ°ç¬¬ä¸€ä¸ªbufferç¼“å†²åŒºé‡Œé¢åŽ»çš„ï¼Œä»–é‡Œé¢æ˜¯æœ‰ä¸¤ä¸ªbufferç¼“å†²åŒºçš„
- * ç¬¬äºŒä¸ªbufferç¼“å†²åŒºæ˜¯ç”¨æ¥åˆ·æ–°å†…å­˜æ•°æ®åˆ°ç£ç›˜ä¸Šæˆ–è€…ç½‘ç»œä¸­åŽ»çš„
- * æ¯æ¬¡åŒç¼“å†²è¢«åˆ·æ–°çš„æ—¶å€™ï¼ˆç¬¬äºŒä¸ªbufferç¼“å†²åŒºè¢«åˆ·æ–°åˆ°ç£ç›˜æˆ–è€…ç½‘ç»œï¼‰ï¼Œä¸¤ä¸ªbufferç¼“å†²åŒºä¼šè¢«äº¤æ¢ä¸€ä¸‹
- * è¿™ä¸ªå¯ä»¥å…è®¸edits logæŒç»­å†™å…¥å†…å­˜ç¼“å†²çš„æ—¶å€™ï¼Œè¿˜å¯ä»¥åŒæ—¶å°†å†…å­˜ç¼“å†²ä¸­çš„æ•°æ®åˆ·æ–°åˆ°ç£ç›˜æˆ–è€…ç½‘ç»œä¸­
- *
+ * 
+ * ÐÂµÄedits logÊÇÐ´Èëµ½µÚÒ»¸öbuffer»º³åÇøÀïÃæÈ¥µÄ£¬ËûÀïÃæÊÇÓÐÁ½¸öbuffer»º³åÇøµÄ
+ * µÚ¶þ¸öbuffer»º³åÇøÊÇÓÃÀ´Ë¢ÐÂÄÚ´æÊý¾Ýµ½´ÅÅÌÉÏ»òÕßÍøÂçÖÐÈ¥µÄ
+ * Ã¿´ÎË«»º³å±»Ë¢ÐÂµÄÊ±ºò£¨µÚ¶þ¸öbuffer»º³åÇø±»Ë¢ÐÂµ½´ÅÅÌ»òÕßÍøÂç£©£¬Á½¸öbuffer»º³åÇø»á±»½»»»Ò»ÏÂ
+ * Õâ¸ö¿ÉÒÔÔÊÐíedits log³ÖÐøÐ´ÈëÄÚ´æ»º³åµÄÊ±ºò£¬»¹¿ÉÒÔÍ¬Ê±½«ÄÚ´æ»º³åÖÐµÄÊý¾ÝË¢ÐÂµ½´ÅÅÌ»òÕßÍøÂçÖÐ
+ * 
  */
 @InterfaceAudience.Private
 public class EditsDoubleBuffer {
-
-  // é‡Œé¢æ”¾äº†ä¸¤ä¸ªç¼“å†²åŒº 
-  // æ¯ä¸ªç¼“å†²åŒºï¼Œéƒ½æ˜¯åŸºäºŽDataOutputSteamæ¥å®žçŽ°çš„
-  // å…¶å®žè¯´ç™½äº†ï¼Œå°±æ˜¯å°†æ•°æ®å†™å…¥åˆ°å†…å­˜ä¸­ï¼Œè¿™ä¸ªæ˜¯JDK IOè¿™å—åº•å±‚çš„API
+ 
+  // ÀïÃæ·ÅÁËÁ½¸ö»º³åÇø 
+  // Ã¿¸ö»º³åÇø£¬¶¼ÊÇ»ùÓÚDataOutputSteamÀ´ÊµÏÖµÄ
+  // ÆäÊµËµ°×ÁË£¬¾ÍÊÇ½«Êý¾ÝÐ´Èëµ½ÄÚ´æÖÐ£¬Õâ¸öÊÇJDK IOÕâ¿éµ×²ãµÄAPI
   private TxnBuffer bufCurrent; // current buffer for writing
   private TxnBuffer bufReady; // buffer ready for flushing
   private final int initBufferSize;
@@ -57,16 +57,16 @@ public class EditsDoubleBuffer {
     bufReady = new TxnBuffer(initBufferSize);
 
   }
-
+    
   public void writeOp(FSEditLogOp op) throws IOException {
-    // å°±æ˜¯å°†æ•°æ®å†™å…¥bufCurrentè¿™å—ç¼“å†²åŒºä¸­
+	// ¾ÍÊÇ½«Êý¾ÝÐ´ÈëbufCurrentÕâ¿é»º³åÇøÖÐ
     bufCurrent.writeOp(op);
   }
 
   public void writeRaw(byte[] bytes, int offset, int length) throws IOException {
     bufCurrent.write(bytes, offset, length);
   }
-
+  
   public void close() throws IOException {
     Preconditions.checkNotNull(bufCurrent);
     Preconditions.checkNotNull(bufReady);
@@ -74,20 +74,20 @@ public class EditsDoubleBuffer {
     int bufSize = bufCurrent.size();
     if (bufSize != 0) {
       throw new IOException("FSEditStream has " + bufSize
-              + " bytes still to be flushed and cannot be closed.");
+          + " bytes still to be flushed and cannot be closed.");
     }
 
     IOUtils.cleanup(null, bufCurrent, bufReady);
     bufCurrent = bufReady = null;
   }
-
+  
   public void setReadyToFlush() {
     assert isFlushed() : "previous data not flushed yet";
     TxnBuffer tmp = bufReady;
     bufReady = bufCurrent;
     bufCurrent = tmp;
   }
-
+  
   /**
    * Writes the content of the "ready" buffer to the given output stream,
    * and resets it. Does not swap any buffers.
@@ -96,7 +96,7 @@ public class EditsDoubleBuffer {
     bufReady.writeTo(out); // write data to file
     bufReady.reset(); // erase all data in the buffer
   }
-
+  
   public boolean shouldForceSync() {
     return bufCurrent.size() >= initBufferSize;
   }
@@ -104,7 +104,7 @@ public class EditsDoubleBuffer {
   DataOutputBuffer getReadyBuf() {
     return bufReady;
   }
-
+  
   DataOutputBuffer getCurrentBuf() {
     return bufCurrent;
   }
@@ -138,12 +138,12 @@ public class EditsDoubleBuffer {
   public int countReadyBytes() {
     return bufReady.size();
   }
-
+  
   private static class TxnBuffer extends DataOutputBuffer {
     long firstTxId;
     int numTxns;
     private final Writer writer;
-
+    
     public TxnBuffer(int initBufferSize) {
       super(initBufferSize);
       writer = new FSEditLogOp.Writer(this);
@@ -159,7 +159,7 @@ public class EditsDoubleBuffer {
       writer.writeOp(op);
       numTxns++;
     }
-
+    
     @Override
     public DataOutputBuffer reset() {
       super.reset();

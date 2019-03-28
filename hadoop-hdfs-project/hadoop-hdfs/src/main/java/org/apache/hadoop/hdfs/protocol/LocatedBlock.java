@@ -34,6 +34,12 @@ import com.google.common.collect.Lists;
  * and other block metadata (E.g. the file offset associated with this
  * block, whether it is corrupt, a location is cached in memory,
  * security token, etc).
+ * 
+ * 这个LocatedBlock就代表了一个block，他有多个副本，每个副本放在一个datanode上面
+ * 同时这里也包含了block的其他的元数据
+ * 比如说：一个大文件拆成了多个block，这个block是代表了这个大文件的哪一部分的内容呢？
+ * 还有，好比说这个block的数据是否破损了
+ * 
  */
 @InterfaceAudience.Private
 @InterfaceStability.Evolving

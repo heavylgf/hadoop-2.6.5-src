@@ -227,8 +227,6 @@ public class NameNodeProxies {
         createFailoverProxyProvider(config, nameNodeUri, xface, true,
           fallbackToSimpleAuth);
 
-
-    // namenode
     if (failoverProxyProvider != null) { // HA case
       int delay = config.getInt(
           DFS_CLIENT_FAILOVER_SLEEPTIME_BASE_KEY,

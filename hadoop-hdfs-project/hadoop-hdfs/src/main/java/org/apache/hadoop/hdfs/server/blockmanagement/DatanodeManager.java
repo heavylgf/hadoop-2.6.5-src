@@ -223,6 +223,8 @@ public class DatanodeManager {
     final int heartbeatRecheckInterval = conf.getInt(
         DFSConfigKeys.DFS_NAMENODE_HEARTBEAT_RECHECK_INTERVAL_KEY, 
         DFSConfigKeys.DFS_NAMENODE_HEARTBEAT_RECHECK_INTERVAL_DEFAULT); // 5 minutes
+    // 2 * 5 * 60 * 1000 + 10 * 1000 * 3
+    // 10·ÖÖÓ + 30Ãë
     this.heartbeatExpireInterval = 2 * heartbeatRecheckInterval
         + 10 * 1000 * heartbeatIntervalSeconds;
     final int blockInvalidateLimit = Math.max(20*(int)(heartbeatIntervalSeconds),
@@ -515,12 +517,13 @@ public class DatanodeManager {
   private void removeDatanode(DatanodeDescriptor nodeInfo) {
     assert namesystem.hasWriteLock();
     heartbeatManager.removeDatanode(nodeInfo);
-    // éå¸¸å…³é”®ï¼Œblockä¸€åˆ‡ä¸œè¥¿ä½ éƒ½çœ‹æ˜ç™½äº†
-    // å› ä¸ºè¿™ä¸ªdatanodeå·²ç»æ­»æ‰äº†ï¼Œæ‰€ä»¥è¯´åœ¨è¿™é‡Œï¼Œå°±ä¼šä»BlockManagerä¸­
-    // å°†è¿™ä¸ªdatanodeä¸blockçš„å…³è”å…³ç³»éƒ½åˆ é™¤
-    // å‡å¦‚è¯´ï¼Œæœ¬æ¥blockåœ¨datanode01ã€datanode02ã€datanode03ã€ä¸Šé¢
-    // ç°åœ¨datanode02æ­»æ‰äº†
+    // ·Ç³£¹Ø¼ü£¬blockÒ»ÇĞ¶«Î÷Äã¶¼´ó¸Å¿´Ã÷°×ÁË
+    // ÒòÎªÕâ¸ödatanodeÒÑ¾­ËÀµôÁË£¬ËùÒÔËµÔÚÕâÀï£¬¾Í»á´ÓBlockManagerÖĞ
+    // ½«Õâ¸ödatanodeÓëblockµÄ¹ØÁª¹ØÏµ¶¼É¾³ı
+    // ¼ÙÈçËµ£¬±¾À´blockÔÚdatanode01¡¢datanode02¡¢datanode03ÉÏÃæ£¬ÏÖÔÚdatanode02ËÀµôÁË
+    // ÄÇÃ´¾Í±ä³É£¬blockÔÚdatanode01¡¢datanode03ÉÏÃæÁË
     blockManager.removeBlocksAssociatedTo(nodeInfo);
+    // datanode×é³ÉµÄ¼¯ÈºÍøÂçÍØÆËÀïÃæÉ¾³ı
     networktopology.remove(nodeInfo);
     decrementVersionCount(nodeInfo.getSoftwareVersion());
 
@@ -569,12 +572,23 @@ public class DatanodeManager {
 
   /** Is the datanode dead? */
   boolean isDatanodeDead(DatanodeDescriptor node) {
+	// Ê¹ÓÃÁË¹Ø¼üµÄÊôĞÔ£¬lastUpdate
+	// Èç¹ûÉÏ´ÎĞÄÌøµÄÊ±¼ä < µ±Ç°Ê±¼ä - ĞÄÌø¹ıÆÚµÄ¼ä¸ô
+	// Á½´ÎĞÄÌøÊ±¼ä³¬¹ıÁËÒ»¶¨µÄ¼ä¸ô£¬¾Í»áÈÏÎªÕâ¸ödatanodeÒÑ¾­å´»úÁË£¬Ä¬ÈÏµÄ¼ä¸ôÊÇ10·ÖÖÓ+30Ãë
+	// Õâ±ßÆäÊµÊÇ´ó¸ÅÀ´ËµÈç¹ûÒ»¸ödatanode³¬¹ı10·ÖÖÓ¶àÖÓ¶¼»¹Ã»ÓĞ·¢ËÍĞÄÌøµÄ»°£¬´ËÊ±¾Í»áÈÏÎªÕâ¸ödatanodeÒÑ¾­å´»úÁË
     return (node.getLastUpdate() <
             (Time.now() - heartbeatExpireInterval));
   }
 
   /** Add a datanode. */
   void addDatanode(final DatanodeDescriptor node) {
+	// Õâ¿é¶«Î÷²ÅÊÇ×î×îºËĞÄµÄ×¢²ádatanodeµÄÒ»¶ÎÂß¼­
+	// ×¢²áÒ»¸ödatanodeÂß¼­ºÜ¼òµ¥£¬ÎŞ·Ç¾ÍÊÇ·â×°Ò»¸ö´ú±íÁËdatanodeµÄDatanodeDescriptor¶ÔÏó
+	// È»ºó½«Õâ¸ö¶«Î÷·ÅÈëÁË¼¸¸ömapÖĞ
+	// datanodeMap<datanodeUuid, datanode>
+	// networkTopolocy
+	// host2DatanodeMap<ipAddr, datanode>
+	  
     // To keep host2DatanodeMap consistent with datanodeMap,
     // remove  from host2DatanodeMap the datanodeDescriptor removed
     // from datanodeMap before adding node to host2DatanodeMap.
@@ -872,6 +886,9 @@ public class DatanodeManager {
    * Register the given datanode with the namenode. NB: the given
    * registration is mutated and given back to the datanode.
    *
+   * ½«datanode×¢²áµ½namenodeÉÏÈ¥£¬Í¬Ê±DatanodeRegistration¶ÔÏóÊÇ¿É±äµÄ£¨mutated£©
+   * ±ä»¯¹ıºóŞšDatanodeRegistration¶ÔÏó»á·µ»¹¸øÄÇ¸ödatanode
+   *
    * @param nodeReg the datanode registration
    * @throws DisallowedDatanodeException if the registration request is
    *    denied because the datanode does not match includes/excludes
@@ -910,6 +927,9 @@ public class DatanodeManager {
       NameNode.stateChangeLog.info("BLOCK* registerDatanode: from "
           + nodeReg + " storage " + nodeReg.getDatanodeUuid());
   
+      // Èç¹û¹ı¶àµÄÈ¥½âÊÍÕâ¸öÀïÃæµÄÂß¼­£¬ºÜÄÑËµÇå³ş
+      // ´ó¼ÒÏÖÔÚ¶ÔºÜ¶à¶«Î÷¶¼»¹Ã»¸ãÇå³ş£¬ËùÒÔÎÒÕâÀï¼ò¶ÌËµÒ»ÏÂ£¬´ÓÁ½¸ömapÀïÃæ¶¼»ñÈ¡ÁËÒ»¸öDatanodeDescriptorµÄ¶ÔÏó
+      // Õı³£Çé¿öÏÂ£¬Èç¹ûÊÇµÚÒ»´Î¸Õ¸ÕÀ´×¢²áµÄdatanode£¬ÕâÀï»ñÈ¡µ½µÄnodeSºÍnodeN£¬¿Ï¶¨¶¼ÊÇnull
       DatanodeDescriptor nodeS = getDatanode(nodeReg.getDatanodeUuid());
       DatanodeDescriptor nodeN = host2DatanodeMap.getDatanodeByXferAddr(
           nodeReg.getIpAddr(), nodeReg.getXferPort());
@@ -985,8 +1005,15 @@ public class DatanodeManager {
           }
         }
         return;
+        
+        // ÍÂ²ÛÒ»ÏÂÏÂ£¬ÕâÀïµÄ×¢²áµÄ´úÂëÂß¼­£¬ºÜÃ÷ÏÔÊÇÄÇĞ©¿ªÔ´µÄ×÷Õß£¬ËûÃÇÔÚÌî³ä´úÂë£¬¸ù±¾Ã»¿¼ÂÇµ½´úÂëµÄ¿É¶ÁĞÔ
+        // ¿ªÔ´×÷Õß×Ô¼º±¾ÉíÊÇ¸ãµÄÃ÷°×ÕâĞ©´úÂëµÄÂß¼­µÄ
+        // µ«ÊÇ£¬ÈÃÈ¥ÔÄ¶Á¿ªÔ´ÏîÄ¿Ô´ÂëµÄÈË£¬»á¾õµÃºÜÂé·³
       }
 
+      // Õı³£À´Ëµ£¬µÚÒ»´Î×¢²ádatanode£¬Ô´ÂëÓ¦¸ÃÊÇ×ßµ½ÕâÀïÀ´µÄ
+      // ÎªÕâ¸ö×¢²á¹ıÀ´µÄdatanode£¬·â×°ºÍ´´½¨Ò»¸öDatanodeDescriptor¶ÔÏó
+      // Õâ¸ö¶«Î÷ÆäÊµ¾ÍÊÇÔÚnamenodeÕâÒ»±ß´ú±íÁËÒ»¸ödatanode
       DatanodeDescriptor nodeDescr 
         = new DatanodeDescriptor(nodeReg, NetworkTopology.DEFAULT_RACK);
       boolean success = false;
@@ -1001,16 +1028,26 @@ public class DatanodeManager {
           nodeDescr.setDependentHostNames(
               getNetworkDependenciesWithDefault(nodeDescr));
         }
+        
+        // ÕâÀïµÄÒâË¼£¬Äã´ó¸ÅÆäÊµ¶¼¿ÉÒÔÏëµ½£¬ÎŞ·Ç¾ÍÊÇ½«Õâ¸ödatanode·ÅÈëÁË¼¯ÈºÍØÆËµÄ¶ÔÏóÀïÃæ
         networktopology.add(nodeDescr);
         nodeDescr.setSoftwareVersion(nodeReg.getSoftwareVersion());
   
-        // register new datanode
+        // register new datanode£¬×¢²áÒ»¸öĞÂµÄdatanode
         addDatanode(nodeDescr);
+        // ¼ì²éÒ»ÏÂ£¬ÎÒÃÇÔÚ²¿ÊğhdfsµÄÊ±ºò£¬ÓĞÒ»¸öÎÄ¼ş£¬¿ÉÒÔÔÚÀïÃæ¼ÓÈëÄÄĞ©datanodeÊÇÒªÏÂÏßµÄ
+        // Õâ±ßÆäÊµ¾ÍÊÇ¼ì²éÒ»ÏÂ£¬¿ÉÄÜÄ³¸ödatanodeÊÇÒªÏÂÏß
         checkDecommissioning(nodeDescr);
         
         // also treat the registration message as a heartbeat
         // no need to update its timestamp
         // because its is done when the descriptor is created
+        
+        // HeartbeatManager
+        // ÊÇÓÃÀ´¹ÜÀídatanodeºóĞø·¢ËÍµÄĞÄÌøµÄ
+        // Õâ¸ö¶«Î÷ÊÇÓÃÀ´¼à¿Ø£¬Èç¹ûÄãÔÚÒ»¶¨Ê±¼ä·¶Î§ÄÚÃ»ÓĞ·¢ËÍĞÄÌø¹ıÀ´£¬¾ÍÈÏÎªdatanodeËÀµôÁË
+        // ¾Í»á½«Õâ¸ödatanodeÕª³ı
+        // ×¢²ádatanodeÖ®ºó£¬Èç¹û×¢²á³É¹¦ÁË£¬´ËÊ±¾Í»á½«Õâ¸ödatanode¼ÓÈëHeartbeatManagerµÄ¹ÜÏ½·¶Î§ÄÚ
         heartbeatManager.addDatanode(nodeDescr);
         success = true;
         incrementVersionCount(nodeReg.getSoftwareVersion());
@@ -1387,6 +1424,8 @@ public class DatanodeManager {
           return new DatanodeCommand[]{RegisterCommand.REGISTER};
         }
 
+        // HeartbeatManagerµ×²ã¾ÍÊÇµ÷ÓÃÁË¶ÔÓ¦µÄÄÇ¸öDatanodeDescriptorËûµÄ´¦ÀíĞÄÌøµÄ·½·¨
+        // DatanodeDesciptorÎŞ·Ç¾ÍÊÇÔÚ¸üĞÂÒ»Ğ©´ÅÅÌÊ¹ÓÃ¿Õ¼äµÄÊı¾İ£¬¸üĞÂÁËÒ»ÏÂ×î½üÒ»´Î½øĞĞĞÄÌøµÄÊ±¼ä
         heartbeatManager.updateHeartbeat(nodeinfo, reports,
                                          cacheCapacity, cacheUsed,
                                          xceiverCount, failedVolumes);
@@ -1397,6 +1436,17 @@ public class DatanodeManager {
           return new DatanodeCommand[0];
         }
 
+        // ÏÂÃæµÄÄÇÛçÂß¼­
+        // Ö÷Òª¾ÍÊÇnamenodeÔÚÅĞ¶Ï£¬Õâ´Îdatanode²»ÊÇ¸øÎÒ·¢ËÍ¹ıÀ´ÁËÒ»´ÎĞÄÌøÂğ£¿
+        // ÎÒÕâÀïÅĞ¶ÏÒ»ÏÂ£¬µ±Ç°ÊÇ·ñÓĞĞèÒªÕâ¸ödatanodeÖ´ĞĞµÄÈÎÎñ
+        // Command
+        // ±ÈÈçËµnamenode·¢ÏÖÎÒÏÖÔÚĞèÒªÕâ¸ödatanodeÈ¥¸´ÖÆÒ»¸öblock¸±±¾¸øÆäËûµÄdatanode
+        // ´ËÊ±¾Í»á¿ÉÄÜ»áÔÚÕâÀï·µ»ØÒ»¸öcommand¸ødatanode
+        // datanode·¢ËÍĞÄÌøÖ®ºó£¬»áÊÕµ½namenode¸øËû·µ»ØµÄÒ»ÏµÁĞµÄcommand£¬¾Í»áÈ¥Ö´ĞĞÄÇĞ©command
+        
+        // ÎÒÃÇÕâ±ßÊÇ²»ÄÜÔÚÕâÀï¸ø´ó¼ÒÀ´½²½âµÄ£¬ÎÒÃÇ¿ÉÒÔÔÚºóÃæblock¹ÜÀíµÄÊ±ºò£¬¼¯ÈºÈİ´í»úÖÆµÄÔ´ÂëµÄÊ±ºò
+        // ²Å»áÀ´¿´µ½ÕâÀïµÄÔ´Âë
+        
         //check lease recovery
         BlockInfoUnderConstruction[] blocks = nodeinfo
             .getLeaseRecoveryCommand(Integer.MAX_VALUE);
@@ -1438,6 +1488,7 @@ public class DatanodeManager {
 
         final List<DatanodeCommand> cmds = new ArrayList<DatanodeCommand>();
         //check pending replication
+        // ÔÚÕâÀï£¬¾Í¿ÉÒÔ»ñÈ¡µ½Õâ¸öDatanode¶ÔÓ¦µÄreplicatoin¸´ÖÆÈÎÎñ
         List<BlockTargetPair> pendingList = nodeinfo.getReplicationCommand(
               maxTransfers);
         if (pendingList != null) {
