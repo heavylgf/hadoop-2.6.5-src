@@ -299,8 +299,8 @@ public class DistributedFileSystem extends FileSystem {
       @Override
       public FSDataInputStream doCall(final Path p)
           throws IOException, UnresolvedLinkException {
-    	// ÕâÀï×ßµÄÊÇÕâ¸ö·½·¨£¬DFSClent.open()·½·¨£¬´´½¨ÁËÒ»¸öDFSInputStreamµÄÊäÈëÁ÷
-    	// È»ºóÓÖÓÃÕâ¸öDFSClent°ü×°³ÉÒ»¸öHDFSDataInputStream
+    	// è¿™é‡Œèµ°çš„æ˜¯è¿™ä¸ªæ–¹æ³•ï¼ŒDFSClent.open()æ–¹æ³•ï¼Œåˆ›å»ºäº†ä¸€ä¸ªDFSInputStreamçš„è¾“å…¥æµ
+    	// ç„¶ååˆç”¨è¿™ä¸ªDFSClentåŒ…è£…æˆä¸€ä¸ªHDFSDataInputStream
         final DFSInputStream dfsis =
           dfs.open(getPathName(p), bufferSize, verifyChecksum);
         return dfs.createWrappedInputStream(dfsis);
@@ -396,13 +396,13 @@ public class DistributedFileSystem extends FileSystem {
       @Override
       public FSDataOutputStream doCall(final Path p)
           throws IOException, UnresolvedLinkException {
-    	// Õâ¸ö¶«Î÷µÄµ×²ã£¬Ö÷Òª»¹ÊÇÔÚµ÷ÓÃDFSClientµÄcreate()·½·¨£¬À´´´½¨Ò»¸öÕë¶ÔhdfsµÄÊä³öÁ÷
+    	// è¿™ä¸ªä¸œè¥¿çš„åº•å±‚ï¼Œä¸»è¦è¿˜æ˜¯åœ¨è°ƒç”¨DFSClientçš„create()æ–¹æ³•ï¼Œæ¥åˆ›å»ºä¸€ä¸ªé’ˆå¯¹hdfsçš„è¾“å‡ºæµ
         final DFSOutputStream dfsos = dfs.create(getPathName(p), permission,
                 cflags, replication, blockSize, progress, bufferSize,
                 checksumOpt);
-        // Êµ¼ÊÉÏ·µ»ØµÄ¸øÎÒÃÇµÄÓ¦ÓÃÏµÍ³µÄ²»ÊÇµ×²ãµÄDFSOutputStreamÊä³öÁ÷
-        // ÈË¼Ò»á°ü¹üÒ»ÏÂµÄ£¬°ÑÕâ¸öµ×²ãµÄÊä³öÁ÷°ü¹ü³ÉÒ»¸öFSDataOutputStreamÊä³öÁ÷
-        // Õâ¸öÊµ¼ÊµÄÊä³öÁ÷µÄÀàĞÍ£¬ÊÇHDFSDataOutputStream
+        // å®é™…ä¸Šè¿”å›çš„ç»™æˆ‘ä»¬çš„åº”ç”¨ç³»ç»Ÿçš„ä¸æ˜¯åº•å±‚çš„DFSOutputStreamè¾“å‡ºæµ
+        // äººå®¶ä¼šåŒ…è£¹ä¸€ä¸‹çš„ï¼ŒæŠŠè¿™ä¸ªåº•å±‚çš„è¾“å‡ºæµåŒ…è£¹æˆä¸€ä¸ªFSDataOutputStreamè¾“å‡ºæµ
+        // è¿™ä¸ªå®é™…çš„è¾“å‡ºæµçš„ç±»å‹ï¼Œæ˜¯HDFSDataOutputStream
         return dfs.createWrappedOutputStream(dfsos, statistics);
       }
       @Override

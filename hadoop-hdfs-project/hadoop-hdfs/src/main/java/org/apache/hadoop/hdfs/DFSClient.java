@@ -1616,7 +1616,7 @@ public class DFSClient implements java.io.Closeable, RemotePeerFactory,
    * 
    * @return output stream
    * 
-   * @see ClientProtocol#create(String, FsPermission, String, EnumSetWritable,
+   * @see ClientProtocol#(String, FsPermission, String, EnumSetWritable,
    * boolean, short, long) for detailed description of exceptions thrown
    */
   public DFSOutputStream create(String src, 
@@ -1899,7 +1899,7 @@ public class DFSClient implements java.io.Closeable, RemotePeerFactory,
 
   /**
    * Move blocks from src to trg and delete src
-   * See {@link ClientProtocol#concat(String, String [])}. 
+   * See {@link ClientProtocol#(String, String [])}.
    */
   public void concat(String trg, String [] srcs) throws IOException {
     checkOpen();
