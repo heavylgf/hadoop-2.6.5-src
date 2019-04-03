@@ -102,10 +102,15 @@ class QuorumCall<KEY, RESULT> {
    * @throws TimeoutException if the specified timeout elapses before
    * achieving the desired conditions
    */
+  // QJM 集群写入等待算法的入参梳理以及完整算法流程分析
   public synchronized void waitFor(
       int minResponses, int minSuccesses, int maxExceptions,
       int millis, String operationName)
       throws InterruptedException, TimeoutException {
+
+    // millis = 20s，必须在20s内完成返回
+
+    // 当前时间
     long st = Time.monotonicNow();
     long nextLogTime = st + (long)(millis * WAIT_PROGRESS_INFO_THRESHOLD);
     long et = st + millis;
@@ -114,6 +119,7 @@ class QuorumCall<KEY, RESULT> {
       if (minResponses > 0 && countResponses() >= minResponses) return;
       if (minSuccesses > 0 && countSuccesses() >= minSuccesses) return;
       if (maxExceptions >= 0 && countExceptions() > maxExceptions) return;
+      // 当前时间
       long now = Time.monotonicNow();
       
       if (now > nextLogTime) {
