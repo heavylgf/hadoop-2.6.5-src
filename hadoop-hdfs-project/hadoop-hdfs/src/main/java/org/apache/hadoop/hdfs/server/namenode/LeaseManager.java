@@ -47,7 +47,7 @@ import com.google.common.base.Preconditions;
 /**
  * LeaseManager does the lease housekeeping for writing on files.   
  * This class also provides useful static methods for lease recovery.
- * 
+ *
  * Lease Recovery Algorithm
  * 1) Namenode retrieves lease information
  * 2) For each file f in the lease, consider the last block b of f
@@ -85,12 +85,12 @@ public class LeaseManager {
   // 里面是提到了这个TreeMap的，红黑树保存的集合数据结构，特点就是说放入里面的数据
   // 可以默认自动根据key的自然大小来排序
   // 排序好了以后，下次你如果遍历TreeMap的时候，就是根据key自然大小排序后的顺序来遍历的
-  
+
   // HashMap遍历的时候是无序的
   // LinkedHashMap是用一个双向链表保存了插入map的key-value对的顺序
   // 遍历LinkedHashMap的时候是根据插入的顺序来遍历的
   // TreeMap是默认根据key的自然大小来排序的，遍历的时候也是按照这个顺序来遍历的
-  
+
   // 用TreeMap保存了一个lease数据集合
   // 用屁股想想都知道，Lease一看就是契约，是LeaseManager管理的核心数据
   // 一个Lease就是代表了某个客户端对一个文件拥有的契约
@@ -106,7 +106,7 @@ public class LeaseManager {
   // 默认是根据lease的lastUpdate续约时间来排序，如果一样，就根据客户端名称来排序
   private final NavigableSet<Lease> sortedLeases = new TreeSet<Lease>();
 
-  // 
+  //
   // Map path names to leases. It is protected by the sortedLeases lock.
   // The map stores pathnames in lexicographical order.
   //
@@ -116,7 +116,7 @@ public class LeaseManager {
 
   // 核心：Daemon，本身就是基于他创建的线程，都是daemon后台线程
   private Daemon lmthread;
-  
+
   // 有一个东西，是叫做shouldRunMonitor，标志位
   // volatile修饰的标志位，volatilie是什么东西？请参加我的java并发编程课程
   // 我会详细的剖析volatile和java内存模型的原理
@@ -135,15 +135,15 @@ public class LeaseManager {
    * This method iterates through all the leases and counts the number of blocks
    * which are not COMPLETE. The FSNamesystem read lock MUST be held before
    * calling this method.
-   * 
+   *
    * 在namenode启动的时候，会进行一个safe mode的检查
    * 会调用这个方法
-   * 
+   *
    * @return
    */
   synchronized long getNumUnderConstructionBlocks() {
     assert this.fsnamesystem.hasReadLock() : "The FSNamesystem read lock wasn't"
-      + "acquired before counting under construction blocks";
+            + "acquired before counting under construction blocks";
     long numUCBlocks = 0;
     // 这里的话呢就是在遍历所有的lease，Lease契约的东西，这个东西得在后面来讲解
     // 每个lease里面有多个path，你可以认为一个path就是代表了一个文件的路径，/usr/warehosue/hive/access.log
@@ -157,13 +157,13 @@ public class LeaseManager {
           // 在这里他会判断一下，这个文件当前是否处于under construction状态，如果不是处于这个状态，那么就直接看下一个path
           if (!cons.isUnderConstruction()) {
             LOG.warn("The file " + cons.getFullPathName()
-                + " is not under construction but has lease.");
+                    + " is not under construction but has lease.");
             continue;
           }
         } catch (UnresolvedLinkException e) {
           throw new AssertionError("Lease files should reside on this FS");
         }
-        
+
         // 这边是通过INodeFile.getBlocks()方法
         // 获取/usr/warehosue/hive/access.log文件的blocks
         // 每个文件都可以对应多个block，可以拆分为128m一个的block，所以这里一个文件可能有多个block
@@ -196,16 +196,16 @@ public class LeaseManager {
     }
     return count;
   }
-  
+
   /**
    * Adds (or re-adds) the lease for the specified file.
-   * 
+   *
    * 为某个客户端加入一个针对某个文件的契约
-   * 
+   *
    */
   synchronized Lease addLease(String holder, String src) {
-	// holder一看就是代表客户端的名字
-	// 刚开始肯定是找不到的
+    // holder一看就是代表客户端的名字
+    // 刚开始肯定是找不到的
     Lease lease = getLease(holder);
     if (lease == null) {
       // 直接构造一个内部类，Lease对象，传入进去客户端的名称
@@ -226,10 +226,10 @@ public class LeaseManager {
 
   /**
    * Remove the specified lease and src.
-   * 
+   *
    * 删除某个客户端针对某个文件的契约
    * 从他所有的数据结构中，将这个文件契约给删除掉
-   * 
+   *
    */
   synchronized void removeLease(Lease lease, String src) {
     sortedLeasesByPath.remove(src);
@@ -256,7 +256,7 @@ public class LeaseManager {
       removeLease(lease, src);
     } else {
       LOG.warn("Removing non-existent lease! holder=" + holder +
-          " src=" + src);
+              " src=" + src);
     }
   }
 
@@ -279,12 +279,12 @@ public class LeaseManager {
 
   /**
    * Renew the lease(s) held by the given client
-   * 
+   *
    * renew，如果大家看过我之前分析过的spring cloud源码的课的话，就知道在里面
    * 微服务注册中心，eureka里面有lease和renew的概念
    * 各个微服务都会不断的发送心跳给eureka server，里面会维护每个服务跟eureka server之间的lease
    * 每次发送一次心跳，就会renew lease，续约
-   * 
+   *
    */
   synchronized void renewLease(String holder) {
     renewLease(getLease(holder));
@@ -317,7 +317,7 @@ public class LeaseManager {
    * expire, all the corresponding locks can be released.
    *************************************************************/
   class Lease implements Comparable<Lease> {
-	// holder，哪个客户端持有的这份契约
+    // holder，哪个客户端持有的这份契约
     private final String holder;
     // 客户端，一看就是说，肯定是有了一份契约之后，必须得用一个后台线程不断发送请求
     // 来进行renew lease，续约
@@ -325,7 +325,7 @@ public class LeaseManager {
     private long lastUpdate;
     // 这个客户端在这份契约里针对哪些文件声明了自己的所有权
     private final Collection<String> paths = new TreeSet<String>();
-  
+
     /** Only LeaseManager object can create a lease */
     private Lease(String holder) {
       this.holder = holder;
@@ -357,9 +357,9 @@ public class LeaseManager {
     @Override
     public String toString() {
       return "[Lease.  Holder: " + holder
-          + ", pendingcreates: " + paths.size() + "]";
+              + ", pendingcreates: " + paths.size() + "]";
     }
-  
+
     @Override
     public int compareTo(Lease o) {
       Lease l1 = this;
@@ -373,11 +373,11 @@ public class LeaseManager {
       } else if (lu1 > lu2) {
         return 1;
       } else {
-    	// 如果两个客户端的续约的时间是一样的 ，那么就根据客户端的名称来排序
+        // 如果两个客户端的续约的时间是一样的 ，那么就根据客户端的名称来排序
         return l1.holder.compareTo(l2.holder);
       }
     }
-  
+
     @Override
     public boolean equals(Object o) {
       if (!(o instanceof Lease)) {
@@ -385,17 +385,17 @@ public class LeaseManager {
       }
       Lease obj = (Lease) o;
       if (lastUpdate == obj.lastUpdate &&
-          holder.equals(obj.holder)) {
+              holder.equals(obj.holder)) {
         return true;
       }
       return false;
     }
-  
+
     @Override
     public int hashCode() {
       return holder.hashCode();
     }
-    
+
     Collection<String> getPaths() {
       return paths;
     }
@@ -408,7 +408,7 @@ public class LeaseManager {
       paths.remove(oldpath);
       paths.add(newpath);
     }
-    
+
     @VisibleForTesting
     long getLastUpdate() {
       return lastUpdate;
@@ -418,12 +418,12 @@ public class LeaseManager {
   synchronized void changeLease(String src, String dst) {
     if (LOG.isDebugEnabled()) {
       LOG.debug(getClass().getSimpleName() + ".changelease: " +
-               " src=" + src + ", dest=" + dst);
+              " src=" + src + ", dest=" + dst);
     }
 
     final int len = src.length();
     for(Map.Entry<String, Lease> entry
-        : findLeaseWithPrefixPath(src, sortedLeasesByPath).entrySet()) {
+            : findLeaseWithPrefixPath(src, sortedLeasesByPath).entrySet()) {
       final String oldpath = entry.getKey();
       final Lease lease = entry.getValue();
       // replace stem of src with new destination
@@ -439,24 +439,24 @@ public class LeaseManager {
 
   synchronized void removeLeaseWithPrefixPath(String prefix) {
     for(Map.Entry<String, Lease> entry
-        : findLeaseWithPrefixPath(prefix, sortedLeasesByPath).entrySet()) {
+            : findLeaseWithPrefixPath(prefix, sortedLeasesByPath).entrySet()) {
       if (LOG.isDebugEnabled()) {
         LOG.debug(LeaseManager.class.getSimpleName()
-            + ".removeLeaseWithPrefixPath: entry=" + entry);
+                + ".removeLeaseWithPrefixPath: entry=" + entry);
       }
-      removeLease(entry.getValue(), entry.getKey());    
+      removeLease(entry.getValue(), entry.getKey());
     }
   }
 
   static private Map<String, Lease> findLeaseWithPrefixPath(
-      String prefix, SortedMap<String, Lease> path2lease) {
+          String prefix, SortedMap<String, Lease> path2lease) {
     if (LOG.isDebugEnabled()) {
       LOG.debug(LeaseManager.class.getSimpleName() + ".findLease: prefix=" + prefix);
     }
 
     final Map<String, Lease> entries = new HashMap<String, Lease>();
     int srclen = prefix.length();
-    
+
     // prefix may ended with '/'
     if (prefix.charAt(srclen - 1) == Path.SEPARATOR_CHAR) {
       srclen -= 1;
@@ -476,9 +476,9 @@ public class LeaseManager {
 
   public void setLeasePeriod(long softLimit, long hardLimit) {
     this.softLimit = softLimit;
-    this.hardLimit = hardLimit; 
+    this.hardLimit = hardLimit;
   }
-  
+
   /******************************************************
    * Monitor checks for leases that have expired,
    * and disposes of them.
@@ -514,7 +514,7 @@ public class LeaseManager {
               fsnamesystem.getEditLog().logSync();
             }
           }
-  
+
           // 默认是每隔2秒，对所有的契约做一次检查
           Thread.sleep(HdfsServerConstants.NAMENODE_LEASE_RECHECK_INTERVAL);
         } catch(InterruptedException ie) {
@@ -540,7 +540,7 @@ public class LeaseManager {
           inodes.put(p, node);
         } else {
           LOG.warn("Ignore the lease of file " + p
-              + " for checkpoint since the file is not under construction");
+                  + " for checkpoint since the file is not under construction");
         }
       } catch (IOException ioe) {
         LOG.error(ioe);
@@ -548,13 +548,13 @@ public class LeaseManager {
     }
     return inodes;
   }
-  
+
   /** Check the leases beginning from the oldest.
-   *  
+   *
    *  sortedLeases默认是根据lease续约时间来进行排序的，默认是续约时间越旧，越老的，越靠前的
    *  是放在第一个
    *  所以在这里直接可以first()方法获取第一个契约
-   * 
+   *
    *  @return true is sync is needed.
    */
   @VisibleForTesting
@@ -579,11 +579,11 @@ public class LeaseManager {
       }
 
       // 如果进入到这里，发现有某个契约，已经超过了1小时还没续约了
-      
+
       LOG.info(leaseToCheck + " has expired hard limit");
 
       final List<String> removing = new ArrayList<String>();
-      // need to create a copy of the oldest lease paths, because 
+      // need to create a copy of the oldest lease paths, because
       // internalReleaseLease() removes paths corresponding to empty files,
       // i.e. it needs to modify the collection being iterated over
       // causing ConcurrentModificationException
@@ -595,7 +595,7 @@ public class LeaseManager {
           // 此时就会自动释放掉那些契约
           // 释放掉一个契约针对某个文件路径的所有权
           boolean completed = fsnamesystem.internalReleaseLease(leaseToCheck, p,
-              HdfsServerConstants.NAMENODE_LEASE_HOLDER);
+                  HdfsServerConstants.NAMENODE_LEASE_HOLDER);
           if (LOG.isDebugEnabled()) {
             if (completed) {
               LOG.debug("Lease recovery for " + p + " is complete. File closed.");
@@ -609,13 +609,13 @@ public class LeaseManager {
           }
         } catch (IOException e) {
           LOG.error("Cannot release the path " + p + " in the lease "
-              + leaseToCheck, e);
+                  + leaseToCheck, e);
           removing.add(p);
         }
       }
 
       for(String p : removing) {
-    	// 删除这个契约
+        // 删除这个契约
         removeLease(leaseToCheck, p);
       }
       // 获取到sortedLeases中的第二个契约，发现第一个契约是过期的
@@ -625,7 +625,7 @@ public class LeaseManager {
     try {
       if(leaseToCheck != sortedLeases.first()) {
         LOG.warn("Unable to release hard-limit expired lease: "
-          + sortedLeases.first());
+                + sortedLeases.first());
       }
     } catch(NoSuchElementException e) {}
     return needSync;
@@ -634,10 +634,10 @@ public class LeaseManager {
   @Override
   public synchronized String toString() {
     return getClass().getSimpleName() + "= {"
-        + "\n leases=" + leases
-        + "\n sortedLeases=" + sortedLeases
-        + "\n sortedLeasesByPath=" + sortedLeasesByPath
-        + "\n}";
+            + "\n leases=" + leases
+            + "\n sortedLeases=" + sortedLeases
+            + "\n sortedLeasesByPath=" + sortedLeasesByPath
+            + "\n}";
   }
 
   /**
@@ -647,12 +647,12 @@ public class LeaseManager {
    */
   void startMonitor() {
     Preconditions.checkState(lmthread == null,
-        "Lease Monitor already running");
+            "Lease Monitor already running");
     shouldRunMonitor = true;
     lmthread = new Daemon(new Monitor());
     lmthread.start();
   }
-  
+
   void stopMonitor() {
     if (lmthread != null) {
       shouldRunMonitor = false;
@@ -673,7 +673,7 @@ public class LeaseManager {
   @VisibleForTesting
   void triggerMonitorCheckNow() {
     Preconditions.checkState(lmthread != null,
-        "Lease monitor is not running");
+            "Lease monitor is not running");
     lmthread.interrupt();
   }
 }
